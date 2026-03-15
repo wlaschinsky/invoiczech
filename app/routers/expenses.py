@@ -93,9 +93,16 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     duzp = parse_date(form.get("duzp", ""))
     paid_date = parse_date(form.get("paid_date", ""))
 
+    today = date.today()
+    next_number = generate_expense_number(db)
+    form_ctx = {
+        "request": request, "expense": None, "contacts": contacts,
+        "today": today, "next_number": next_number,
+    }
+
     if not issue_date:
         flash(request, "Datum vystavení je povinné.", "error")
-        return templates.TemplateResponse("expenses/form.html", {"request": request, "expense": None, "contacts": contacts})
+        return templates.TemplateResponse("expenses/form.html", form_ctx)
 
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
@@ -105,7 +112,7 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     price_includes_vat = form.get("price_includes_vat") == "1"
 
     expense = Expense(
-        number=generate_expense_number(db),
+        number=next_number,
         contact_id=contact_id,
         contact_name=contact_name,
         supplier_document_number=form.get("supplier_document_number", "").strip(),
@@ -133,7 +140,7 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     if not expense.items:
         db.rollback()
         flash(request, "Náklad musí mít alespoň jednu položku.", "error")
-        return templates.TemplateResponse("expenses/form.html", {"request": request, "expense": None, "contacts": contacts})
+        return templates.TemplateResponse("expenses/form.html", form_ctx)
 
     db.commit()
     flash(request, f"Náklad {expense.number} byl přidán.", "success")
@@ -186,9 +193,14 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     duzp = parse_date(form.get("duzp", ""))
     paid_date = parse_date(form.get("paid_date", ""))
 
+    form_ctx = {
+        "request": request, "expense": expense, "contacts": contacts,
+        "today": date.today(), "next_number": expense.number,
+    }
+
     if not issue_date:
         flash(request, "Datum vystavení je povinné.", "error")
-        return templates.TemplateResponse("expenses/form.html", {"request": request, "expense": expense, "contacts": contacts})
+        return templates.TemplateResponse("expenses/form.html", form_ctx)
 
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
@@ -217,6 +229,11 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:
         expense.attachment_path = _save_attachment(attachment, expense.id)
+
+    if not expense.items:
+        db.rollback()
+        flash(request, "Náklad musí mít alespoň jednu položku.", "error")
+        return templates.TemplateResponse("expenses/form.html", form_ctx)
 
     db.commit()
     flash(request, "Náklad byl uložen.", "success")

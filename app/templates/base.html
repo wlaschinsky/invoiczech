@@ -13,11 +13,32 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <!-- Topbar -->
+  <header class="topbar">
+    <a href="/" class="topbar-logo">
+      <img src="/static/logo.svg" alt="InvoiCzech" height="32">
+    </a>
+    <div class="topbar-search">
+      <input type="text" class="topbar-search-input" placeholder="Hledat...">
+    </div>
+    <div class="topbar-right"></div>
+  </header>
+
   <div class="layout">
+    <!-- Sidebar -->
     <nav class="sidebar">
-      <div class="sidebar-brand">
-        <img src="/static/logo.svg" alt="InvoiCzech" height="48">
+      <div class="sidebar-user">
+        <div class="user-avatar">SW</div>
+        <div class="user-info">
+          <div class="user-name">Vlastník Aplikace</div>
+          <div class="user-email">owner@example.com</div>
+        </div>
+        <button class="user-menu-btn" onclick="document.getElementById('user-dropdown').classList.toggle('hidden')">⋮</button>
+        <div class="user-dropdown hidden" id="user-dropdown">
+          <a href="/odhlaseni" class="user-dropdown-item">Odhlásit se</a>
+        </div>
       </div>
+      <hr class="sidebar-separator">
       <ul class="nav-list">
         <li class="nav-item">
           <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
@@ -45,11 +66,9 @@
           </a>
         </li>
       </ul>
-      <div class="sidebar-footer">
-        <a href="/odhlaseni" class="nav-link nav-logout">Odhlásit se</a>
-      </div>
     </nav>
 
+    <!-- Main content -->
     <main class="main-content">
       <div class="content-inner">
         {% for flash in flashes %}
@@ -65,6 +84,14 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/static/sw.js').catch(() => {});
     }
+    // Close user dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('user-dropdown');
+      if (!dd) return;
+      if (!e.target.closest('.sidebar-user')) {
+        dd.classList.add('hidden');
+      }
+    });
   </script>
   {% block scripts %}{% endblock %}
 </body>

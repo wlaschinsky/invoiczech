@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4;
+      margin: 1.8cm 1.5cm 1.5cm 1.5cm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 9pt;
+      color: #1a1a2e;
+      line-height: 1.4;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20pt;
+      border-bottom: 2pt solid #1e40af;
+      padding-bottom: 10pt;
+    }
+    .header-title h1 {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1e40af;
+      letter-spacing: -0.5pt;
+    }
+    .header-title .doc-type {
+      font-size: 9pt;
+      color: #64748b;
+      margin-top: 2pt;
+    }
+    .header-number {
+      text-align: right;
+    }
+    .header-number .number {
+      font-size: 13pt;
+      font-weight: 700;
+    }
+    .header-number .vs {
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    /* ---- Parties ---- */
+    .parties {
+      display: flex;
+      gap: 20pt;
+      margin-bottom: 16pt;
+    }
+    .party {
+      flex: 1;
+      padding: 10pt;
+      border: 0.5pt solid #e2e8f0;
+      border-radius: 4pt;
+    }
+    .party-label {
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5pt;
+      color: #64748b;
+      margin-bottom: 5pt;
+    }
+    .party-name {
+      font-size: 11pt;
+      font-weight: 700;
+      margin-bottom: 3pt;
+    }
+    .party-line {
+      margin-bottom: 1pt;
+      color: #374151;
+    }
+    .party-ids {
+      margin-top: 5pt;
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    /* ---- Dates & Payment ---- */
+    .meta-row {
+      display: flex;
+      gap: 12pt;
+      margin-bottom: 14pt;
+    }
+    .meta-box {
+      flex: 1;
+      padding: 8pt 10pt;
+      background: #f8fafc;
+      border-radius: 4pt;
+    }
+    .meta-box-label {
+      font-size: 7pt;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 2pt;
+    }
+    .meta-box-value {
+      font-size: 10pt;
+      font-weight: 600;
+    }
+    .meta-box-value.overdue {
+      color: #dc2626;
+    }
+
+    /* ---- Payment info ---- */
+    .payment-section {
+      display: flex;
+      gap: 12pt;
+      margin-bottom: 16pt;
+      align-items: flex-start;
+    }
+    .payment-info {
+      flex: 1;
+      padding: 10pt;
+      background: #eff6ff;
+      border: 0.5pt solid #bfdbfe;
+      border-radius: 4pt;
+    }
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3pt;
+    }
+    .payment-row-label {
+      color: #64748b;
+      font-size: 8pt;
+    }
+    .payment-row-value {
+      font-weight: 600;
+    }
+    .payment-total {
+      margin-top: 6pt;
+      padding-top: 6pt;
+      border-top: 0.5pt solid #93c5fd;
+      font-size: 11pt;
+      font-weight: 700;
+      color: #1e40af;
+      text-align: right;
+    }
+    .qr-wrap {
+      text-align: center;
+    }
+    .qr-wrap img {
+      width: 70pt;
+      height: 70pt;
+    }
+    .qr-label {
+      font-size: 7pt;
+      color: #94a3b8;
+      margin-top: 2pt;
+    }
+
+    /* ---- Items table ---- */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12pt;
+    }
+    .items-table th {
+      background: #1e40af;
+      color: white;
+      padding: 5pt 6pt;
+      font-size: 8pt;
+      font-weight: 600;
+      text-align: left;
+    }
+    .items-table th.text-right { text-align: right; }
+    .items-table td {
+      padding: 5pt 6pt;
+      border-bottom: 0.3pt solid #e2e8f0;
+      font-size: 8.5pt;
+    }
+    .items-table td.text-right { text-align: right; }
+    .items-table tbody tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    /* ---- VAT recap ---- */
+    .vat-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14pt;
+    }
+    .vat-table-wrap {
+      width: 260pt;
+    }
+    .vat-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .vat-table th {
+      font-size: 7.5pt;
+      color: #64748b;
+      padding: 3pt 6pt;
+      text-align: right;
+      border-bottom: 0.5pt solid #e2e8f0;
+    }
+    .vat-table td {
+      padding: 3pt 6pt;
+      font-size: 8.5pt;
+      text-align: right;
+      border-bottom: 0.3pt solid #e2e8f0;
+    }
+    .vat-table th:first-child, .vat-table td:first-child {
+      text-align: left;
+    }
+
+    /* ---- Grand total ---- */
+    .grand-total-box {
+      background: #1e40af;
+      color: white;
+      padding: 10pt 14pt;
+      border-radius: 4pt;
+      text-align: right;
+      margin-bottom: 14pt;
+    }
+    .grand-total-label {
+      font-size: 9pt;
+      opacity: 0.85;
+    }
+    .grand-total-value {
+      font-size: 16pt;
+      font-weight: 700;
+    }
+
+    /* ---- Footer text ---- */
+    .invoice-text {
+      font-size: 8pt;
+      color: #64748b;
+      border-top: 0.3pt solid #e2e8f0;
+      padding-top: 8pt;
+      margin-top: 10pt;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-title">
+    <h1>FAKTURA</h1>
+    <div class="doc-type">DAŇOVÝ DOKLAD</div>
+  </div>
+  <div class="header-number">
+    <div class="number">{{ invoice.number }}</div>
+    <div class="vs">VS: {{ invoice.variable_symbol }}</div>
+  </div>
+</div>
+
+<!-- Parties -->
+<div class="parties">
+  <div class="party">
+    <div class="party-label">Dodavatel</div>
+    <div class="party-name">{{ settings.SUPPLIER_NAME }}</div>
+    <div class="party-line">{{ settings.SUPPLIER_STREET }}</div>
+    <div class="party-line">{{ settings.SUPPLIER_ZIP }} {{ settings.SUPPLIER_CITY }}</div>
+    <div class="party-ids">
+      IČO: {{ settings.SUPPLIER_ICO }} &nbsp;|&nbsp; DIČ: {{ settings.SUPPLIER_DIC }}<br>
+      Plátce DPH
+    </div>
+  </div>
+  <div class="party">
+    <div class="party-label">Odběratel</div>
+    <div class="party-name">{{ invoice.contact_name or '—' }}</div>
+    {% if invoice.contact_street %}<div class="party-line">{{ invoice.contact_street }}</div>{% endif %}
+    {% if invoice.contact_zip or invoice.contact_city %}
+    <div class="party-line">{{ invoice.contact_zip or '' }} {{ invoice.contact_city or '' }}</div>
+    {% endif %}
+    <div class="party-ids">
+      {% if invoice.contact_ico %}IČO: {{ invoice.contact_ico }}{% endif %}
+      {% if invoice.contact_dic %} &nbsp;|&nbsp; DIČ: {{ invoice.contact_dic }}{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Meta dates -->
+<div class="meta-row">
+  <div class="meta-box">
+    <div class="meta-box-label">Datum vystavení</div>
+    <div class="meta-box-value">{{ invoice.issue_date | date_cs }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-box-label">Datum splatnosti</div>
+    <div class="meta-box-value">{{ invoice.due_date | date_cs }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-box-label">DUZP</div>
+    <div class="meta-box-value">{{ invoice.duzp | date_cs }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-box-label">Způsob úhrady</div>
+    <div class="meta-box-value">{{ invoice.payment_method }}</div>
+  </div>
+</div>
+
+<!-- Payment info + QR -->
+<div class="payment-section">
+  <div class="payment-info">
+    <div class="payment-row">
+      <span class="payment-row-label">Číslo účtu:</span>
+      <span class="payment-row-value">{{ settings.SUPPLIER_ACCOUNT }}</span>
+    </div>
+    <div class="payment-row">
+      <span class="payment-row-label">Variabilní symbol:</span>
+      <span class="payment-row-value">{{ invoice.variable_symbol }}</span>
+    </div>
+    {% if settings.SUPPLIER_IBAN %}
+    <div class="payment-row">
+      <span class="payment-row-label">IBAN:</span>
+      <span class="payment-row-value">{{ settings.SUPPLIER_IBAN }}</span>
+    </div>
+    {% endif %}
+    <div class="payment-total">
+      Celkem k úhradě: {{ invoice.total | czk }}
+    </div>
+  </div>
+  {% if qr_base64 %}
+  <div class="qr-wrap">
+    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR kód platby">
+    <div class="qr-label">QR platba</div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Items -->
+<table class="items-table">
+  <thead>
+    <tr>
+      <th>Popis</th>
+      <th class="text-right">Množství</th>
+      <th class="text-right">Cena / MJ</th>
+      <th class="text-right">DPH %</th>
+      <th class="text-right">Základ DPH</th>
+      <th class="text-right">Celkem s DPH</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in invoice.items %}
+    <tr>
+      <td>{{ item.description }}</td>
+      <td class="text-right">{{ item.quantity | num(2) }}</td>
+      <td class="text-right">{{ item.unit_price | czk }}</td>
+      <td class="text-right">{{ item.vat_rate }} %</td>
+      <td class="text-right">{{ item.subtotal | czk }}</td>
+      <td class="text-right">{{ item.total | czk }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- VAT recap -->
+<div class="vat-section">
+  <div class="vat-table-wrap">
+    <table class="vat-table">
+      <thead>
+        <tr>
+          <th>Sazba DPH</th>
+          <th>Základ</th>
+          <th>DPH</th>
+          <th>Včetně DPH</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rate, vals in invoice.vat_breakdown.items() %}
+        <tr>
+          <td>{{ rate }} %</td>
+          <td>{{ vals.base | czk }}</td>
+          <td>{{ vals.vat | czk }}</td>
+          <td>{{ vals.total | czk }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Grand total -->
+<div class="grand-total-box">
+  <div class="grand-total-label">Celkem k úhradě</div>
+  <div class="grand-total-value">{{ invoice.total | czk }}</div>
+</div>
+
+<!-- Invoice text -->
+{% if invoice.invoice_text %}
+<div class="invoice-text">{{ invoice.invoice_text }}</div>
+{% endif %}
+
+</body>
+</html>

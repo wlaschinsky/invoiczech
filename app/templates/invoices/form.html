@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block title %}{% if invoice %}Upravit fakturu{% else %}Nová faktura{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% if invoice %}Upravit fakturu {{ invoice.number }}{% else %}Nová faktura ({{ next_number }}){% endif %}</h1>
+  {% if invoice %}
+  <a href="/faktury/{{ invoice.id }}" class="btn btn-ghost">Zpět</a>
+  {% else %}
+  <a href="/faktury" class="btn btn-ghost">Zpět</a>
+  {% endif %}
+</div>
+
+<form method="post"
+      action="{% if invoice %}/faktury/{{ invoice.id }}/upravit{% else %}/faktury/nova{% endif %}"
+      class="form-card">
+
+  <!-- Odběratel -->
+  <div class="form-section">
+    <h2 class="form-section-title">Odběratel</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="contact_id">Vybrat z adresáře</label>
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
+          <option value="">— Zadat ručně —</option>
+          {% for c in contacts %}
+          <option value="{{ c.id }}"
+                  data-name="{{ c.name }}"
+                  data-ico="{{ c.ico or '' }}"
+                  data-dic="{{ c.dic or '' }}"
+                  data-street="{{ c.street or '' }}"
+                  data-city="{{ c.city or '' }}"
+                  data-zip="{{ c.zip_code or '' }}"
+                  data-email="{{ c.email or '' }}"
+                  {% if invoice and invoice.contact_id == c.id %}selected{% endif %}>
+            {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>IČO pro ARES</label>
+        <div class="input-group">
+          <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_name">Název *</label>
+        <input type="text" id="contact_name" name="contact_name"
+               value="{{ invoice.contact_name if invoice else '' }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="contact_ico">IČO</label>
+        <input type="text" id="contact_ico" name="contact_ico"
+               value="{{ invoice.contact_ico if invoice else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_dic">DIČ</label>
+        <input type="text" id="contact_dic" name="contact_dic"
+               value="{{ invoice.contact_dic if invoice else '' }}"
+               class="form-control">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_street">Ulice a číslo</label>
+        <input type="text" id="contact_street" name="contact_street"
+               value="{{ invoice.contact_street if invoice else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_zip">PSČ</label>
+        <input type="text" id="contact_zip" name="contact_zip"
+               value="{{ invoice.contact_zip if invoice else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group form-group-lg">
+        <label for="contact_city">Město</label>
+        <input type="text" id="contact_city" name="contact_city"
+               value="{{ invoice.contact_city if invoice else '' }}"
+               class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <!-- Datum a platba -->
+  <div class="form-section">
+    <h2 class="form-section-title">Datum a platební podmínky</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="issue_date">Datum vystavení *</label>
+        <input type="date" id="issue_date" name="issue_date"
+               value="{{ invoice.issue_date.isoformat() if invoice else today.isoformat() }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="due_date">Datum splatnosti *</label>
+        <input type="date" id="due_date" name="due_date"
+               value="{{ invoice.due_date.isoformat() if invoice else due_default.isoformat() }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="duzp">DUZP</label>
+        <input type="date" id="duzp" name="duzp"
+               value="{{ invoice.duzp.isoformat() if invoice and invoice.duzp else today.isoformat() }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="payment_method">Způsob úhrady</label>
+        <select id="payment_method" name="payment_method" class="form-control">
+          {% set pm = invoice.payment_method if invoice else 'Bankovní převod' %}
+          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+          <option {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Položky -->
+  <div class="form-section">
+    <h2 class="form-section-title">Položky faktury</h2>
+    <table class="table items-table" id="items-table">
+      <thead>
+        <tr>
+          <th>Popis *</th>
+          <th>Množství</th>
+          <th>Cena / MJ (Kč)</th>
+          <th>DPH %</th>
+          <th class="text-right">Bez DPH</th>
+          <th class="text-right">Celkem</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="items-tbody">
+        {% if invoice and invoice.items %}
+          {% for item in invoice.items %}
+          <tr>
+            <td><input type="text" name="description" value="{{ item.description }}" class="form-control" required></td>
+            <td><input type="number" name="quantity" value="{{ item.quantity | num(3) }}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+            <td><input type="number" name="unit_price" value="{{ item.unit_price | num(2) }}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+              </select>
+            </td>
+            <td class="text-right row-subtotal">{{ item.subtotal | czk }}</td>
+            <td class="text-right row-total">{{ item.total | czk }}</td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td><input type="text" name="description" class="form-control" placeholder="Popis služby/zboží" required></td>
+            <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+            <td><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+                <option value="21" selected>21 %</option>
+                <option value="12">12 %</option>
+                <option value="0">0 %</option>
+              </select>
+            </td>
+            <td class="text-right row-subtotal">—</td>
+            <td class="text-right row-total">—</td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <div class="items-actions">
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+    </div>
+
+    <div class="totals-box" id="totals-box">
+      <div class="totals-row">
+        <span>Celkem bez DPH:</span>
+        <span id="total-subtotal">0,00 Kč</span>
+      </div>
+      <div class="totals-row">
+        <span>DPH (21 %):</span>
+        <span id="total-vat">0,00 Kč</span>
+      </div>
+      <div class="totals-row totals-row-total">
+        <span>Celkem k úhradě:</span>
+        <span id="total-grand">0,00 Kč</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text faktury -->
+  <div class="form-section">
+    <h2 class="form-section-title">Text faktury</h2>
+    <div class="form-group">
+      <textarea name="invoice_text" rows="3" class="form-control">{{ invoice.invoice_text if invoice else default_text }}</textarea>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">
+      {% if invoice %}Uložit změny{% else %}Vystavit fakturu{% endif %}
+    </button>
+    {% if invoice %}
+    <a href="/faktury/{{ invoice.id }}" class="btn btn-ghost">Zrušit</a>
+    {% else %}
+    <a href="/faktury" class="btn btn-ghost">Zrušit</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fmtCzk(val) {
+  if (isNaN(val)) return '—';
+  return val.toLocaleString('cs-CZ', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' Kč';
+}
+
+function recalcRow(el) {
+  const row = el.closest('tr');
+  const qty = parseFloat(row.querySelector('[name=quantity]').value) || 0;
+  const price = parseFloat(row.querySelector('[name=unit_price]').value) || 0;
+  const vat = parseFloat(row.querySelector('[name=vat_rate]').value) || 0;
+  const subtotal = qty * price;
+  const total = subtotal + subtotal * vat / 100;
+  row.querySelector('.row-subtotal').textContent = fmtCzk(subtotal);
+  row.querySelector('.row-total').textContent = fmtCzk(total);
+  recalcTotals();
+}
+
+function recalcTotals() {
+  let subtotal = 0, vat = 0;
+  document.querySelectorAll('#items-tbody tr').forEach(row => {
+    const qty = parseFloat(row.querySelector('[name=quantity]')?.value) || 0;
+    const price = parseFloat(row.querySelector('[name=unit_price]')?.value) || 0;
+    const vatRate = parseFloat(row.querySelector('[name=vat_rate]')?.value) || 0;
+    const s = qty * price;
+    subtotal += s;
+    vat += s * vatRate / 100;
+  });
+  document.getElementById('total-subtotal').textContent = fmtCzk(subtotal);
+  document.getElementById('total-vat').textContent = fmtCzk(vat);
+  document.getElementById('total-grand').textContent = fmtCzk(subtotal + vat);
+}
+
+function addItemRow() {
+  const tbody = document.getElementById('items-tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+    <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+    <td><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
+    <td>
+      <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+        <option value="21" selected>21 %</option>
+        <option value="12">12 %</option>
+        <option value="0">0 %</option>
+      </select>
+    </td>
+    <td class="text-right row-subtotal">—</td>
+    <td class="text-right row-total">—</td>
+    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+  `;
+  tbody.appendChild(row);
+  row.querySelector('[name=description]').focus();
+}
+
+function removeRow(btn) {
+  const tbody = document.getElementById('items-tbody');
+  if (tbody.rows.length > 1) {
+    btn.closest('tr').remove();
+    recalcTotals();
+  }
+}
+
+function fillContactFromSelect(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById('contact_name').value = opt.dataset.name || '';
+  document.getElementById('contact_ico').value = opt.dataset.ico || '';
+  document.getElementById('contact_dic').value = opt.dataset.dic || '';
+  document.getElementById('contact_street').value = opt.dataset.street || '';
+  document.getElementById('contact_zip').value = opt.dataset.zip || '';
+  document.getElementById('contact_city').value = opt.dataset.city || '';
+}
+
+async function loadFromAres() {
+  const ico = document.getElementById('ares_ico').value.trim();
+  if (!ico) { alert('Zadejte IČO'); return; }
+  try {
+    const resp = await fetch(`/adresar/ares/${ico}`);
+    const data = await resp.json();
+    if (data.error) { alert('ARES: ' + data.error); return; }
+    document.getElementById('contact_name').value = data.name || '';
+    document.getElementById('contact_ico').value = data.ico || '';
+    document.getElementById('contact_dic').value = data.dic || '';
+    document.getElementById('contact_street').value = data.street || '';
+    document.getElementById('contact_zip').value = data.zip_code || '';
+    document.getElementById('contact_city').value = data.city || '';
+    document.getElementById('contact_id').value = '';
+  } catch(e) {
+    alert('Chyba při komunikaci s ARES');
+  }
+}
+
+// Inicializace
+document.addEventListener('DOMContentLoaded', recalcTotals);
+</script>
+{% endblock %}

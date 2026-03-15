@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <span class="text-muted">{{ today | date_cs }}</span>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Příjmy tento měsíc</div>
+    <div class="stat-value">{{ income_month | czk }}</div>
+    <div class="stat-sub">bez DPH</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Příjmy tento rok</div>
+    <div class="stat-value">{{ income_year | czk }}</div>
+    <div class="stat-sub">bez DPH</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Výdaje tento měsíc</div>
+    <div class="stat-value">{{ costs_month | czk }}</div>
+    <div class="stat-sub">s DPH</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Výdaje tento rok</div>
+    <div class="stat-value">{{ costs_year | czk }}</div>
+    <div class="stat-sub">s DPH</div>
+  </div>
+  <div class="stat-card {% if unpaid_count > 0 %}stat-card--warning{% endif %}">
+    <div class="stat-label">Neuhrazené faktury</div>
+    <div class="stat-value">{{ unpaid_count }}</div>
+    <div class="stat-sub">celkem {{ unpaid_total | czk }}</div>
+  </div>
+  <div class="stat-card {% if overdue %}stat-card--danger{% endif %}">
+    <div class="stat-label">Po splatnosti</div>
+    <div class="stat-value">{{ overdue | length }}</div>
+    <div class="stat-sub">faktur</div>
+  </div>
+  <div class="stat-card stat-card--info">
+    <div class="stat-label">Odhadovaná DPH (měsíc)</div>
+    <div class="stat-value">{{ estimated_vat | czk }}</div>
+    <div class="stat-sub">daň na výstupu − odpočet</div>
+  </div>
+</div>
+
+{% if overdue %}
+<div class="section">
+  <h2 class="section-title">Faktury po splatnosti</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Číslo</th>
+        <th>Odběratel</th>
+        <th>Splatnost</th>
+        <th>Celkem s DPH</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in overdue %}
+      <tr class="row-danger">
+        <td><a href="/faktury/{{ inv.id }}">{{ inv.number }}</a></td>
+        <td>{{ inv.contact_name }}</td>
+        <td>{{ inv.due_date | date_cs }}</td>
+        <td class="text-right">{{ inv.total | czk }}</td>
+        <td>
+          <form method="post" action="/faktury/{{ inv.id }}/uhradit" style="display:inline">
+            <input type="hidden" name="paid_date" value="{{ today.isoformat() }}">
+            <button type="submit" class="btn btn-sm btn-success">Uhradit</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="dashboard-actions">
+  <a href="/faktury/nova" class="btn btn-primary">Nová faktura</a>
+  <a href="/naklady/novy" class="btn btn-secondary">Nový náklad</a>
+  <a href="/exporty" class="btn btn-secondary">DPH exporty</a>
+</div>
+{% endblock %}

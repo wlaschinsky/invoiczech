@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="manifest" href="/static/manifest.json">
+  <title>Přihlášení — Fakturace</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">◈</div>
+        <h1>Fakturace</h1>
+        <p>Samuel Wlaschinský</p>
+      </div>
+
+      {% if flashes is defined %}
+      {% for flash in flashes %}
+      <div class="alert alert-{{ flash.category }}">{{ flash.message }}</div>
+      {% endfor %}
+      {% endif %}
+
+      <form method="post" action="/prihlaseni" class="login-form">
+        <div class="form-group">
+          <label for="password">Heslo</label>
+          <input type="password" id="password" name="password"
+                 placeholder="Zadejte heslo" required autofocus
+                 class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Přihlásit se</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

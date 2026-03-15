@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Faktury{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Vydané faktury</h1>
+  <a href="/faktury/nova" class="btn btn-primary">+ Nová faktura</a>
+</div>
+
+<!-- Filtry -->
+<div class="filter-bar">
+  <form method="get" action="/faktury" class="filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm">
+    <select name="status" class="form-control form-control-sm">
+      <option value="" {% if not status_filter %}selected{% endif %}>Všechny stavy</option>
+      <option value="Vystavena" {% if status_filter == 'Vystavena' %}selected{% endif %}>Vystavena</option>
+      <option value="Uhrazena" {% if status_filter == 'Uhrazena' %}selected{% endif %}>Uhrazena</option>
+      <option value="Stornována" {% if status_filter == 'Stornována' %}selected{% endif %}>Stornována</option>
+    </select>
+    <select name="rok" class="form-control form-control-sm">
+      <option value="">Všechny roky</option>
+      {% for year in years %}
+      <option value="{{ year }}" {% if rok_filter == year|string %}selected{% endif %}>{{ year }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+    <a href="/faktury" class="btn btn-ghost btn-sm">Zrušit</a>
+  </form>
+</div>
+
+{% if invoices %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Číslo</th>
+      <th>Odběratel</th>
+      <th>Vystavení</th>
+      <th>Splatnost</th>
+      <th class="text-right">Bez DPH</th>
+      <th class="text-right">Celkem s DPH</th>
+      <th>Stav</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inv in invoices %}
+    <tr class="{% if inv.status == 'Vystavena' and inv.due_date < today %}row-danger{% endif %}">
+      <td><a href="/faktury/{{ inv.id }}" class="link-strong">{{ inv.number }}</a></td>
+      <td>{{ inv.contact_name or '—' }}</td>
+      <td>{{ inv.issue_date | date_cs }}</td>
+      <td class="{% if inv.status == 'Vystavena' and inv.due_date < today %}text-danger{% endif %}">
+        {{ inv.due_date | date_cs }}
+      </td>
+      <td class="text-right">{{ inv.subtotal | czk }}</td>
+      <td class="text-right font-medium">{{ inv.total | czk }}</td>
+      <td>
+        <span class="badge badge-{{ inv.status | lower | replace('á', 'a') | replace('í', 'i') | replace('ó', 'o') }}">
+          {{ inv.status }}
+        </span>
+      </td>
+      <td class="actions">
+        <a href="/faktury/{{ inv.id }}" class="btn btn-sm btn-ghost">Detail</a>
+        <a href="/faktury/{{ inv.id }}/pdf" class="btn btn-sm btn-ghost">PDF</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4" class="text-right text-muted">Celkem ({{ invoices | length }} faktur):</td>
+      <td class="text-right">{{ invoices | sum(attribute='subtotal') | czk }}</td>
+      <td class="text-right font-medium">{{ invoices | sum(attribute='total') | czk }}</td>
+      <td colspan="2"></td>
+    </tr>
+  </tfoot>
+</table>
+{% else %}
+<div class="empty-state">
+  <p>Žádné faktury nenalezeny.</p>
+  <a href="/faktury/nova" class="btn btn-primary">Vystavit první fakturu</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.number }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ invoice.number }}</h1>
+    <span class="badge badge-{{ invoice.status | lower | replace('á','a') | replace('í','i') | replace('ó','o') }} badge-lg">
+      {{ invoice.status }}
+    </span>
+    {% if invoice.status == 'Vystavena' and invoice.due_date < today %}
+    <span class="badge badge-po-splatnosti badge-lg">Po splatnosti</span>
+    {% endif %}
+  </div>
+  <div class="header-actions">
+    {% if invoice.status != 'Stornována' %}
+    <a href="/faktury/{{ invoice.id }}/upravit" class="btn btn-secondary">Upravit</a>
+    {% endif %}
+    <a href="/faktury/{{ invoice.id }}/pdf" class="btn btn-primary">Stáhnout PDF</a>
+    <a href="/faktury" class="btn btn-ghost">Zpět</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <!-- Odběratel -->
+  <div class="detail-card">
+    <h3>Odběratel</h3>
+    <div class="detail-contact">
+      <strong>{{ invoice.contact_name or '—' }}</strong>
+      {% if invoice.contact_street or invoice.contact_city %}
+      <div>{{ invoice.contact_street or '' }}</div>
+      <div>{{ invoice.contact_zip or '' }} {{ invoice.contact_city or '' }}</div>
+      {% endif %}
+      {% if invoice.contact_ico %}<div>IČO: {{ invoice.contact_ico }}</div>{% endif %}
+      {% if invoice.contact_dic %}<div>DIČ: {{ invoice.contact_dic }}</div>{% endif %}
+      {% if invoice.contact_email %}<div>{{ invoice.contact_email }}</div>{% endif %}
+    </div>
+  </div>
+
+  <!-- Platební info -->
+  <div class="detail-card">
+    <h3>Platební informace</h3>
+    <table class="detail-table">
+      <tr><th>Způsob úhrady</th><td>{{ invoice.payment_method }}</td></tr>
+      <tr><th>Variabilní symbol</th><td><strong>{{ invoice.variable_symbol }}</strong></td></tr>
+      <tr><th>Datum vystavení</th><td>{{ invoice.issue_date | date_cs }}</td></tr>
+      <tr><th>Datum splatnosti</th><td class="{% if invoice.status == 'Vystavena' and invoice.due_date < today %}text-danger{% endif %}">
+        {{ invoice.due_date | date_cs }}</td></tr>
+      <tr><th>DUZP</th><td>{{ invoice.duzp | date_cs }}</td></tr>
+      {% if invoice.paid_date %}<tr><th>Uhrazeno</th><td>{{ invoice.paid_date | date_cs }}</td></tr>{% endif %}
+    </table>
+  </div>
+</div>
+
+<!-- Položky -->
+<div class="detail-card mt-4">
+  <h3>Položky</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Popis</th>
+        <th class="text-right">Množství</th>
+        <th class="text-right">Cena / MJ</th>
+        <th class="text-right">DPH %</th>
+        <th class="text-right">Bez DPH</th>
+        <th class="text-right">Celkem</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in invoice.items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td class="text-right">{{ item.quantity | num(2) }}</td>
+        <td class="text-right">{{ item.unit_price | czk }}</td>
+        <td class="text-right">{{ item.vat_rate }} %</td>
+        <td class="text-right">{{ item.subtotal | czk }}</td>
+        <td class="text-right font-medium">{{ item.total | czk }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Rekapitulace DPH -->
+  <div class="vat-summary">
+    <div class="vat-table-wrap">
+      <table class="table vat-table">
+        <thead>
+          <tr>
+            <th>Sazba DPH</th>
+            <th class="text-right">Základ</th>
+            <th class="text-right">DPH</th>
+            <th class="text-right">Včetně DPH</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rate, vals in invoice.vat_breakdown.items() %}
+          <tr>
+            <td>{{ rate }} %</td>
+            <td class="text-right">{{ vals.base | czk }}</td>
+            <td class="text-right">{{ vals.vat | czk }}</td>
+            <td class="text-right">{{ vals.total | czk }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="grand-total">
+      <span>Celkem k úhradě:</span>
+      <span class="grand-total-value">{{ invoice.total | czk }}</span>
+    </div>
+  </div>
+</div>
+
+{% if invoice.invoice_text %}
+<div class="detail-card mt-4">
+  <h3>Text faktury</h3>
+  <p>{{ invoice.invoice_text }}</p>
+</div>
+{% endif %}
+
+<!-- Akce -->
+<div class="detail-card mt-4">
+  <h3>Akce</h3>
+  <div class="action-buttons">
+    {% if invoice.status == 'Vystavena' %}
+    <form method="post" action="/faktury/{{ invoice.id }}/uhradit" class="inline-form">
+      <input type="date" name="paid_date" value="{{ today.isoformat() }}" class="form-control form-control-sm">
+      <button type="submit" class="btn btn-success">Označit jako uhrazenou</button>
+    </form>
+    <form method="post" action="/faktury/{{ invoice.id }}/stornovat"
+          onsubmit="return confirm('Opravdu stornovat fakturu {{ invoice.number }}?')">
+      <button type="submit" class="btn btn-danger">Stornovat</button>
+    </form>
+    {% elif invoice.status == 'Uhrazena' %}
+    <form method="post" action="/faktury/{{ invoice.id }}/neuhrazena">
+      <button type="submit" class="btn btn-secondary">Vrátit na Vystavena</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

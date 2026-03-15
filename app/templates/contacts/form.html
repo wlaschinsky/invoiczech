@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{% if contact %}Upravit kontakt{% else %}Nový kontakt{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% if contact %}Upravit kontakt{% else %}Nový kontakt{% endif %}</h1>
+  {% if contact %}
+  <a href="/adresar/{{ contact.id }}" class="btn btn-ghost">Zpět</a>
+  {% else %}
+  <a href="/adresar" class="btn btn-ghost">Zpět</a>
+  {% endif %}
+</div>
+
+<form method="post"
+      action="{% if contact %}/adresar/{{ contact.id }}/upravit{% else %}/adresar/novy{% endif %}"
+      class="form-card">
+
+  <div class="form-section">
+    <h2 class="form-section-title">Základní údaje</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>IČO pro ARES</label>
+        <div class="input-group">
+          <input type="text" id="ares_ico"
+                 value="{{ contact.ico if contact else '' }}"
+                 placeholder="12345678" class="form-control">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="name">Název / Jméno *</label>
+        <input type="text" id="name" name="name"
+               value="{{ contact.name if contact else '' }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="ico">IČO</label>
+        <input type="text" id="ico" name="ico"
+               value="{{ contact.ico if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="dic">DIČ</label>
+        <input type="text" id="dic" name="dic"
+               value="{{ contact.dic if contact else '' }}"
+               class="form-control">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="street">Ulice a číslo</label>
+        <input type="text" id="street" name="street"
+               value="{{ contact.street if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="zip_code">PSČ</label>
+        <input type="text" id="zip_code" name="zip_code"
+               value="{{ contact.zip_code if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group form-group-lg">
+        <label for="city">Město</label>
+        <input type="text" id="city" name="city"
+               value="{{ contact.city if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="country">Stát</label>
+        <input type="text" id="country" name="country"
+               value="{{ contact.country if contact else 'Česká republika' }}"
+               class="form-control">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email"
+               value="{{ contact.email if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="phone">Telefon</label>
+        <input type="tel" id="phone" name="phone"
+               value="{{ contact.phone if contact else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_type">Typ kontaktu</label>
+        <select id="contact_type" name="contact_type" class="form-control">
+          {% set ct = contact.contact_type if contact else 'Obojí' %}
+          <option {% if ct == 'Odběratel' %}selected{% endif %}>Odběratel</option>
+          <option {% if ct == 'Dodavatel' %}selected{% endif %}>Dodavatel</option>
+          <option {% if ct == 'Obojí' %}selected{% endif %}>Obojí</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">
+      {% if contact %}Uložit změny{% else %}Přidat kontakt{% endif %}
+    </button>
+    {% if contact %}
+    <a href="/adresar/{{ contact.id }}" class="btn btn-ghost">Zrušit</a>
+    {% else %}
+    <a href="/adresar" class="btn btn-ghost">Zrušit</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadFromAres() {
+  const ico = document.getElementById('ares_ico').value.trim();
+  if (!ico) { alert('Zadejte IČO'); return; }
+  try {
+    const resp = await fetch(`/adresar/ares/${ico}`);
+    const data = await resp.json();
+    if (data.error) { alert('ARES: ' + data.error); return; }
+    document.getElementById('name').value = data.name || '';
+    document.getElementById('ico').value = data.ico || '';
+    document.getElementById('dic').value = data.dic || '';
+    document.getElementById('street').value = data.street || '';
+    document.getElementById('zip_code').value = data.zip_code || '';
+    document.getElementById('city').value = data.city || '';
+    document.getElementById('country').value = data.country || 'Česká republika';
+  } catch(e) {
+    alert('Chyba při komunikaci s ARES');
+  }
+}
+</script>
+{% endblock %}

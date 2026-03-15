@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e40af">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <title>{% block title %}Fakturace{% endblock %} — Fakturace</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">Fakturace</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+            <span class="nav-icon">⬜</span> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/faktury" class="nav-link {% if '/faktury' in request.url.path %}active{% endif %}">
+            <span class="nav-icon">◧</span> Faktury
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/naklady" class="nav-link {% if '/naklady' in request.url.path %}active{% endif %}">
+            <span class="nav-icon">◨</span> Náklady
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/adresar" class="nav-link {% if '/adresar' in request.url.path %}active{% endif %}">
+            <span class="nav-icon">◫</span> Adresář
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/exporty" class="nav-link {% if '/exporty' in request.url.path %}active{% endif %}">
+            <span class="nav-icon">◪</span> DPH exporty
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="/odhlaseni" class="nav-link nav-logout">Odhlásit se</a>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="content-inner">
+        {% for flash in flashes %}
+        <div class="alert alert-{{ flash.category }}">{{ flash.message }}</div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Registrace Service Workeru pro PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

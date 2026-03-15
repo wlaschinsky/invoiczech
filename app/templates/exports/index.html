@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}DPH exporty{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>DPH exporty</h1>
+</div>
+
+<p class="text-muted mb-4">
+  Generování XML souborů pro portál <strong>Moje Daně</strong> (Finanční správa ČR).<br>
+  Výsledný soubor nahrajte do sekce <em>Podat → DPH → Nahrát soubor</em>.
+</p>
+
+<div class="export-grid">
+
+  <!-- Kontrolní hlášení -->
+  <div class="export-card">
+    <div class="export-card-header">
+      <h2>Kontrolní hlášení (KH1)</h2>
+      <span class="badge badge-neutral">XML</span>
+    </div>
+    <p class="text-muted">
+      Obsahuje vydané faktury B2B (základ &gt; 10 000 Kč) v sekci A4
+      a souhrnný řádek daňově uznatelných nákladů v sekci B3.
+    </p>
+    <form method="post" action="/exporty/kh1" class="export-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rok</label>
+          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24">
+        </div>
+        <div class="form-group">
+          <label>Typ období</label>
+          <select name="period_type" class="form-control" id="kh1-period-type" onchange="togglePeriod('kh1')">
+            <option value="month">Měsíc</option>
+            <option value="quarter">Čtvrtletí</option>
+          </select>
+        </div>
+        <div class="form-group" id="kh1-month-group">
+          <label>Měsíc</label>
+          <select name="period" class="form-control">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m == today.month %}selected{% endif %}>
+              {{ ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][m-1] }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group hidden" id="kh1-quarter-group">
+          <label>Čtvrtletí</label>
+          <select name="period" class="form-control">
+            <option value="1">Q1 (leden–březen)</option>
+            <option value="2">Q2 (duben–červen)</option>
+            <option value="3">Q3 (červenec–září)</option>
+            <option value="4">Q4 (říjen–prosinec)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Datum podání</label>
+          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Stáhnout KH1 XML</button>
+    </form>
+  </div>
+
+  <!-- Přiznání k DPH -->
+  <div class="export-card">
+    <div class="export-card-header">
+      <h2>Přiznání k DPH (DP3)</h2>
+      <span class="badge badge-neutral">XML</span>
+    </div>
+    <p class="text-muted">
+      Přiznání k dani z přidané hodnoty. Obsahuje výstupy (vydané faktury),
+      vstupy (uznatelné náklady) a výslednou daňovou povinnost nebo přeplatek.
+    </p>
+    <form method="post" action="/exporty/dp3" class="export-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rok</label>
+          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24">
+        </div>
+        <div class="form-group">
+          <label>Typ období</label>
+          <select name="period_type" class="form-control" id="dp3-period-type" onchange="togglePeriod('dp3')">
+            <option value="month">Měsíc</option>
+            <option value="quarter">Čtvrtletí</option>
+          </select>
+        </div>
+        <div class="form-group" id="dp3-month-group">
+          <label>Měsíc</label>
+          <select name="period" class="form-control">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m == today.month %}selected{% endif %}>
+              {{ ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][m-1] }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group hidden" id="dp3-quarter-group">
+          <label>Čtvrtletí</label>
+          <select name="period" class="form-control">
+            <option value="1">Q1 (leden–březen)</option>
+            <option value="2">Q2 (duben–červen)</option>
+            <option value="3">Q3 (červenec–září)</option>
+            <option value="4">Q4 (říjen–prosinec)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Datum podání</label>
+          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Stáhnout DP3 XML</button>
+    </form>
+  </div>
+
+</div>
+
+<div class="info-box mt-4">
+  <strong>Poznámka:</strong> Vygenerovaný XML soubor obsahuje data z fakturbáze na základě pole DUZP.
+  Zkontrolujte prosím, že všechny faktury a náklady mají správně vyplněné DUZP před generováním exportu.
+  Hodnoty DPH jsou zaokrouhleny na celé Kč.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePeriod(prefix) {
+  const type = document.getElementById(`${prefix}-period-type`).value;
+  document.getElementById(`${prefix}-month-group`).classList.toggle('hidden', type !== 'month');
+  document.getElementById(`${prefix}-quarter-group`).classList.toggle('hidden', type === 'month');
+}
+</script>
+{% endblock %}

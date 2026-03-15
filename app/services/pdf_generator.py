@@ -29,6 +29,8 @@ def generate_invoice_pdf(invoice: Invoice) -> bytes:
     """Vygeneruje PDF faktury a vrátí bytes."""
     env = _get_template_env()
     env.filters["czk"] = _fmt_czk
+    env.filters["date_cs"] = _fmt_date
+    env.filters["num"] = _fmt_num
     template = env.get_template("invoices/pdf.html")
 
     qr_base64 = generate_payment_qr(

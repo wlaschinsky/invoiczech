@@ -136,6 +136,8 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
     db.flush()  # get ID
 
     _save_items(form, invoice, db)
+    db.flush()
+    db.expire(invoice, ["items"])
 
     if not invoice.items:
         db.rollback()
@@ -233,6 +235,8 @@ async def update_invoice(request: Request, invoice_id: int, db: Session = Depend
     db.flush()
 
     _save_items(form, invoice, db)
+    db.flush()
+    db.expire(invoice, ["items"])
 
     if not invoice.items:
         db.rollback()

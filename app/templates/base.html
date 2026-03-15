@@ -27,14 +27,16 @@
   <div class="layout">
     <!-- Sidebar -->
     <nav class="sidebar">
-      <div class="sidebar-user">
-        <div class="user-avatar">SW</div>
-        <div class="user-info">
-          <div class="user-name">Samuel Wlaschinský</div>
-          <div class="user-email">samuel@invoiczech.cz</div>
+      <div class="sidebar-user" id="sidebar-user">
+        <div class="user-toggle" onclick="document.getElementById('sidebar-user').classList.toggle('open')">
+          <div class="user-avatar">SW</div>
+          <div class="user-info">
+            <div class="user-name">Samuel Wlaschinský</div>
+            <div class="user-email">samuel@invoiczech.cz</div>
+          </div>
+          <span class="user-chevron">›</span>
         </div>
-        <button class="user-menu-btn" onclick="document.getElementById('user-dropdown').classList.toggle('hidden')">⋮</button>
-        <div class="user-dropdown hidden" id="user-dropdown">
+        <div class="user-dropdown" id="user-dropdown">
           <a href="/odhlaseni" class="user-dropdown-item">Odhlásit se</a>
         </div>
       </div>
@@ -86,10 +88,10 @@
     }
     // Close user dropdown on outside click
     document.addEventListener('click', function(e) {
-      const dd = document.getElementById('user-dropdown');
-      if (!dd) return;
+      const su = document.getElementById('sidebar-user');
+      if (!su) return;
       if (!e.target.closest('.sidebar-user')) {
-        dd.classList.add('hidden');
+        su.classList.remove('open');
       }
     });
   </script>

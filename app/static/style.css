@@ -73,6 +73,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 .logo-wordmark:hover { text-decoration: none; }
 .logo-invoi { color: #f8fafc; }
+.logo-dot { color: #00d68f; font-size: 22px; line-height: 1; }
+.logo-dot--sm { font-size: 18px; }
 .logo-czech { color: #6366f1; }
 .logo-short { display: none; }
 .topbar-search {
@@ -884,6 +886,7 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   margin-bottom: 8px;
 }
 .brand-invoi { color: var(--color-text-primary); }
+.brand-dot { color: #00d68f; font-size: 36px; line-height: 1; }
 .brand-czech { color: var(--color-accent-primary); }
 .login-header p { color: var(--color-text-secondary); font-size: 0.9rem; }
 .login-form .form-group { margin-bottom: 16px; }

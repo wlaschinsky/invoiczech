@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}{% if expense %}Upravit náklad{% else %}Nový náklad{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% if expense %}Upravit náklad {{ expense.number }}{% else %}Nový náklad ({{ next_number }}){% endif %}</h1>
+  {% if expense %}
+  <a href="/naklady/{{ expense.id }}" class="btn btn-ghost">Zpět</a>
+  {% else %}
+  <a href="/naklady" class="btn btn-ghost">Zpět</a>
+  {% endif %}
+</div>
+
+<form method="post" enctype="multipart/form-data"
+      action="{% if expense %}/naklady/{{ expense.id }}/upravit{% else %}/naklady/novy{% endif %}"
+      class="form-card">
+
+  <!-- Dodavatel -->
+  <div class="form-section">
+    <h2 class="form-section-title">Dodavatel</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="contact_id">Vybrat z adresáře</label>
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
+          <option value="">— Zadat ručně —</option>
+          {% for c in contacts %}
+          <option value="{{ c.id }}"
+                  data-name="{{ c.name }}"
+                  {% if expense and expense.contact_id == c.id %}selected{% endif %}>
+            {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>IČO pro ARES</label>
+        <div class="input-group">
+          <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_name">Název dodavatele *</label>
+        <input type="text" id="contact_name" name="contact_name"
+               value="{{ expense.contact_name if expense else '' }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="supplier_document_number">Číslo dokladu dodavatele</label>
+        <input type="text" name="supplier_document_number"
+               value="{{ expense.supplier_document_number if expense else '' }}"
+               class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <!-- Datum a typ -->
+  <div class="form-section">
+    <h2 class="form-section-title">Datum a klasifikace</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="issue_date">Datum vystavení *</label>
+        <input type="date" id="issue_date" name="issue_date"
+               value="{{ expense.issue_date.isoformat() if expense else today.isoformat() }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="duzp">DUZP</label>
+        <input type="date" name="duzp"
+               value="{{ expense.duzp.isoformat() if expense and expense.duzp else today.isoformat() }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="paid_date">Datum uhrazení</label>
+        <input type="date" name="paid_date"
+               value="{{ expense.paid_date.isoformat() if expense and expense.paid_date else '' }}"
+               class="form-control">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="payment_method">Způsob úhrady</label>
+        <select name="payment_method" class="form-control">
+          {% set pm = expense.payment_method if expense else 'Bankovní převod' %}
+          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+          <option {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="document_type">Typ dokladu</label>
+        <select name="document_type" class="form-control">
+          {% set dt = expense.document_type if expense else 'Faktura' %}
+          <option {% if dt == 'Faktura' %}selected{% endif %}>Faktura</option>
+          <option {% if dt == 'Účtenka' %}selected{% endif %}>Účtenka</option>
+          <option {% if dt == 'Jiný' %}selected{% endif %}>Jiný</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="tax_deductible">Daňově uznatelný</label>
+        <select name="tax_deductible" class="form-control">
+          {% set td = expense.tax_deductible if expense else 'Nevím' %}
+          <option {% if td == 'Ano' %}selected{% endif %}>Ano</option>
+          <option {% if td == 'Ne' %}selected{% endif %}>Ne</option>
+          <option {% if td == 'Nevím' %}selected{% endif %}>Nevím</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fulfillment_code">Kód předmětu plnění</label>
+        <input type="text" name="fulfillment_code"
+               value="{{ expense.fulfillment_code if expense else '' }}"
+               class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <!-- Položky -->
+  <div class="form-section">
+    <h2 class="form-section-title">Položky</h2>
+    <div class="form-group form-group-check">
+      <label class="check-label">
+        <input type="checkbox" name="price_includes_vat" value="1" id="price_includes_vat"
+               {% if expense and expense.price_includes_vat %}checked{% elif not expense %}checked{% endif %}>
+        Ceny jsou zadány <strong>s DPH</strong> (automaticky přepočítám na základ)
+      </label>
+    </div>
+
+    <table class="table items-table">
+      <thead>
+        <tr>
+          <th>Popis *</th>
+          <th>Množství</th>
+          <th>MJ</th>
+          <th>Cena / MJ (Kč)</th>
+          <th>DPH %</th>
+          <th class="text-right">Základ</th>
+          <th class="text-right">Celkem</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="items-tbody">
+        {% if expense and expense.items %}
+          {% for item in expense.items %}
+          <tr>
+            <td><input type="text" name="description" value="{{ item.description }}" class="form-control" required></td>
+            <td><input type="number" name="quantity" value="{{ item.quantity | num(2) }}" step="0.001" min="0.001" class="form-control w-20" oninput="recalcRow(this)"></td>
+            <td><input type="text" name="unit" value="{{ item.unit }}" class="form-control w-16" placeholder="ks"></td>
+            <td><input type="number" name="unit_price" value="{{ item.unit_price | num(4) }}" step="0.0001" min="0" class="form-control w-28" oninput="recalcRow(this)"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+              </select>
+            </td>
+            <td class="text-right row-subtotal">{{ item.subtotal | czk }}</td>
+            <td class="text-right row-total">{{ item.total | czk }}</td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+            <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-20" oninput="recalcRow(this)"></td>
+            <td><input type="text" name="unit" value="ks" class="form-control w-16"></td>
+            <td><input type="number" name="unit_price" step="0.0001" min="0" class="form-control w-28" placeholder="0.00" oninput="recalcRow(this)"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+                <option value="21" selected>21 %</option>
+                <option value="12">12 %</option>
+                <option value="0">0 %</option>
+              </select>
+            </td>
+            <td class="text-right row-subtotal">—</td>
+            <td class="text-right row-total">—</td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <div class="items-actions">
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+    </div>
+
+    <div class="totals-box">
+      <div class="totals-row"><span>Celkem bez DPH:</span><span id="total-subtotal">0,00 Kč</span></div>
+      <div class="totals-row"><span>DPH:</span><span id="total-vat">0,00 Kč</span></div>
+      <div class="totals-row totals-row-total"><span>Celkem s DPH:</span><span id="total-grand">0,00 Kč</span></div>
+    </div>
+  </div>
+
+  <!-- Příloha -->
+  <div class="form-section">
+    <h2 class="form-section-title">Příloha</h2>
+    {% if expense and expense.attachment_path %}
+    <p class="text-muted mb-2">
+      Aktuální příloha: <a href="/naklady/{{ expense.id }}/priloha" target="_blank">Stáhnout</a>
+    </p>
+    {% endif %}
+    <div class="form-group">
+      <label for="attachment">Nahrát soubor (foto, PDF)</label>
+      <input type="file" id="attachment" name="attachment" class="form-control"
+             accept=".pdf,.jpg,.jpeg,.png,.gif,.heic">
+    </div>
+    <div class="form-group">
+      <label for="notes">Poznámky</label>
+      <textarea name="notes" rows="2" class="form-control">{{ expense.notes if expense else '' }}</textarea>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">
+      {% if expense %}Uložit změny{% else %}Přidat náklad{% endif %}
+    </button>
+    {% if expense %}
+    <a href="/naklady/{{ expense.id }}" class="btn btn-ghost">Zrušit</a>
+    {% else %}
+    <a href="/naklady" class="btn btn-ghost">Zrušit</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fmtCzk(val) {
+  if (isNaN(val)) return '—';
+  return val.toLocaleString('cs-CZ', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' Kč';
+}
+
+function recalcRow(el) {
+  const row = el.closest('tr');
+  const qty = parseFloat(row.querySelector('[name=quantity]').value) || 0;
+  const price = parseFloat(row.querySelector('[name=unit_price]').value) || 0;
+  const vat = parseFloat(row.querySelector('[name=vat_rate]').value) || 0;
+  const withVat = document.getElementById('price_includes_vat').checked;
+  let subtotal, total;
+  if (withVat) {
+    total = qty * price;
+    subtotal = total / (1 + vat / 100);
+  } else {
+    subtotal = qty * price;
+    total = subtotal + subtotal * vat / 100;
+  }
+  row.querySelector('.row-subtotal').textContent = fmtCzk(subtotal);
+  row.querySelector('.row-total').textContent = fmtCzk(total);
+  recalcTotals();
+}
+
+function recalcTotals() {
+  const withVat = document.getElementById('price_includes_vat').checked;
+  let subtotal = 0, vat = 0;
+  document.querySelectorAll('#items-tbody tr').forEach(row => {
+    const qty = parseFloat(row.querySelector('[name=quantity]')?.value) || 0;
+    const price = parseFloat(row.querySelector('[name=unit_price]')?.value) || 0;
+    const vatRate = parseFloat(row.querySelector('[name=vat_rate]')?.value) || 0;
+    let s, v;
+    if (withVat) {
+      const total = qty * price;
+      s = total / (1 + vatRate / 100);
+      v = total - s;
+    } else {
+      s = qty * price;
+      v = s * vatRate / 100;
+    }
+    subtotal += s;
+    vat += v;
+  });
+  document.getElementById('total-subtotal').textContent = fmtCzk(subtotal);
+  document.getElementById('total-vat').textContent = fmtCzk(vat);
+  document.getElementById('total-grand').textContent = fmtCzk(subtotal + vat);
+}
+
+function addItemRow() {
+  const tbody = document.getElementById('items-tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+    <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-20" oninput="recalcRow(this)"></td>
+    <td><input type="text" name="unit" value="ks" class="form-control w-16"></td>
+    <td><input type="number" name="unit_price" step="0.0001" min="0" class="form-control w-28" placeholder="0.00" oninput="recalcRow(this)"></td>
+    <td><select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+      <option value="21" selected>21 %</option>
+      <option value="12">12 %</option>
+      <option value="0">0 %</option>
+    </select></td>
+    <td class="text-right row-subtotal">—</td>
+    <td class="text-right row-total">—</td>
+    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+  `;
+  tbody.appendChild(row);
+  row.querySelector('[name=description]').focus();
+}
+
+function removeRow(btn) {
+  const tbody = document.getElementById('items-tbody');
+  if (tbody.rows.length > 1) {
+    btn.closest('tr').remove();
+    recalcTotals();
+  }
+}
+
+function fillContactFromSelect(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById('contact_name').value = opt.dataset.name || '';
+}
+
+async function loadFromAres() {
+  const ico = document.getElementById('ares_ico').value.trim();
+  if (!ico) { alert('Zadejte IČO'); return; }
+  try {
+    const resp = await fetch(`/adresar/ares/${ico}`);
+    const data = await resp.json();
+    if (data.error) { alert('ARES: ' + data.error); return; }
+    document.getElementById('contact_name').value = data.name || '';
+    document.getElementById('contact_id').value = '';
+  } catch(e) {
+    alert('Chyba při komunikaci s ARES');
+  }
+}
+
+document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
+document.addEventListener('DOMContentLoaded', recalcTotals);
+</script>
+{% endblock %}

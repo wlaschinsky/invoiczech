@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}{{ expense.number }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ expense.number }}</h1>
+    <span class="badge badge-neutral badge-lg">{{ expense.document_type }}</span>
+    {% if expense.tax_deductible == 'Ano' %}
+    <span class="badge badge-uhrazena badge-lg">Daň. uznatelný</span>
+    {% elif expense.tax_deductible == 'Ne' %}
+    <span class="badge badge-stornova badge-lg">Neuznatelný</span>
+    {% else %}
+    <span class="badge badge-neutral badge-lg">Uznatelnost: Nevím</span>
+    {% endif %}
+  </div>
+  <div class="header-actions">
+    <a href="/naklady/{{ expense.id }}/upravit" class="btn btn-secondary">Upravit</a>
+    <form method="post" action="/naklady/{{ expense.id }}/smazat"
+          onsubmit="return confirm('Opravdu smazat náklad {{ expense.number }}?')"
+          style="display:inline">
+      <button type="submit" class="btn btn-danger">Smazat</button>
+    </form>
+    <a href="/naklady" class="btn btn-ghost">Zpět</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h3>Dodavatel</h3>
+    <div class="detail-contact">
+      <strong>{{ expense.contact_name or '—' }}</strong>
+      {% if expense.contact %}
+      {% if expense.contact.street %}<div>{{ expense.contact.street }}</div>{% endif %}
+      {% if expense.contact.city %}<div>{{ expense.contact.zip_code or '' }} {{ expense.contact.city }}</div>{% endif %}
+      {% if expense.contact.ico %}<div>IČO: {{ expense.contact.ico }}</div>{% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="detail-card">
+    <h3>Informace o dokladu</h3>
+    <table class="detail-table">
+      <tr><th>Č. dokladu dodavatele</th><td>{{ expense.supplier_document_number or '—' }}</td></tr>
+      <tr><th>Datum vystavení</th><td>{{ expense.issue_date | date_cs }}</td></tr>
+      <tr><th>DUZP</th><td>{{ expense.duzp | date_cs }}</td></tr>
+      <tr><th>Způsob úhrady</th><td>{{ expense.payment_method }}</td></tr>
+      {% if expense.paid_date %}<tr><th>Uhrazeno</th><td>{{ expense.paid_date | date_cs }}</td></tr>{% endif %}
+      <tr><th>Daňová uznatelnost</th><td>{{ expense.tax_deductible }}</td></tr>
+      {% if expense.fulfillment_code %}<tr><th>Kód předmětu plnění</th><td>{{ expense.fulfillment_code }}</td></tr>{% endif %}
+    </table>
+  </div>
+</div>
+
+<div class="detail-card mt-4">
+  <h3>Položky</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Popis</th>
+        <th class="text-right">Množství</th>
+        <th>MJ</th>
+        <th class="text-right">Cena / MJ</th>
+        <th class="text-right">DPH %</th>
+        <th class="text-right">Základ DPH</th>
+        <th class="text-right">Celkem s DPH</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in expense.items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td class="text-right">{{ item.quantity | num(2) }}</td>
+        <td>{{ item.unit }}</td>
+        <td class="text-right">{{ item.unit_price | czk }}</td>
+        <td class="text-right">{{ item.vat_rate }} %</td>
+        <td class="text-right">{{ item.subtotal | czk }}</td>
+        <td class="text-right font-medium">{{ item.total | czk }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="vat-summary">
+    <div class="vat-table-wrap">
+      <table class="table vat-table">
+        <thead>
+          <tr>
+            <th>Sazba DPH</th>
+            <th class="text-right">Základ</th>
+            <th class="text-right">DPH</th>
+            <th class="text-right">Včetně DPH</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rate, vals in expense.vat_breakdown.items() %}
+          <tr>
+            <td>{{ rate }} %</td>
+            <td class="text-right">{{ vals.base | czk }}</td>
+            <td class="text-right">{{ vals.vat | czk }}</td>
+            <td class="text-right">{{ vals.total | czk }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="grand-total">
+      <span>Celkem s DPH:</span>
+      <span class="grand-total-value">{{ expense.total | czk }}</span>
+    </div>
+  </div>
+</div>
+
+{% if expense.notes %}
+<div class="detail-card mt-4">
+  <h3>Poznámky</h3>
+  <p>{{ expense.notes }}</p>
+</div>
+{% endif %}
+
+{% if expense.attachment_path %}
+<div class="detail-card mt-4">
+  <h3>Příloha</h3>
+  <a href="/naklady/{{ expense.id }}/priloha" class="btn btn-secondary" target="_blank">
+    Stáhnout přílohu
+  </a>
+</div>
+{% endif %}
+{% endblock %}

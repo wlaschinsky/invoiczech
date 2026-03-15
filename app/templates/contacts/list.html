@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Adresář{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Adresář</h1>
+  <a href="/adresar/novy" class="btn btn-primary">+ Nový kontakt</a>
+</div>
+
+<div class="filter-bar">
+  <form method="get" action="/adresar" class="filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat podle názvu nebo IČO…" class="form-control form-control-sm">
+    <select name="typ" class="form-control form-control-sm">
+      <option value="" {% if not typ %}selected{% endif %}>Všechny typy</option>
+      <option value="Odběratel" {% if typ == 'Odběratel' %}selected{% endif %}>Odběratel</option>
+      <option value="Dodavatel" {% if typ == 'Dodavatel' %}selected{% endif %}>Dodavatel</option>
+      <option value="Obojí" {% if typ == 'Obojí' %}selected{% endif %}>Obojí</option>
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+    <a href="/adresar" class="btn btn-ghost btn-sm">Zrušit</a>
+  </form>
+</div>
+
+{% if contacts %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Název</th>
+      <th>IČO</th>
+      <th>DIČ</th>
+      <th>Adresa</th>
+      <th>Typ</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in contacts %}
+    <tr>
+      <td><a href="/adresar/{{ c.id }}" class="link-strong">{{ c.name }}</a></td>
+      <td>{{ c.ico or '—' }}</td>
+      <td>{{ c.dic or '—' }}</td>
+      <td class="text-muted">{{ c.full_address or '—' }}</td>
+      <td><span class="badge badge-neutral">{{ c.contact_type }}</span></td>
+      <td class="actions">
+        <a href="/adresar/{{ c.id }}/upravit" class="btn btn-sm btn-ghost">Upravit</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+  <p>Adresář je prázdný.</p>
+  <a href="/adresar/novy" class="btn btn-primary">Přidat první kontakt</a>
+</div>
+{% endif %}
+{% endblock %}

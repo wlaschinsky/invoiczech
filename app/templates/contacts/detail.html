@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ contact.name }}</h1>
+    <span class="badge badge-neutral badge-lg">{{ contact.contact_type }}</span>
+  </div>
+  <div class="header-actions">
+    <a href="/adresar/{{ contact.id }}/upravit" class="btn btn-secondary">Upravit</a>
+    <form method="post" action="/adresar/{{ contact.id }}/smazat"
+          onsubmit="return confirm('Opravdu smazat kontakt {{ contact.name }}?')"
+          style="display:inline">
+      <button type="submit" class="btn btn-danger">Smazat</button>
+    </form>
+    <a href="/adresar" class="btn btn-ghost">Zpět</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-card">
+    <h3>Kontaktní údaje</h3>
+    <table class="detail-table">
+      {% if contact.ico %}<tr><th>IČO</th><td>{{ contact.ico }}</td></tr>{% endif %}
+      {% if contact.dic %}<tr><th>DIČ</th><td>{{ contact.dic }}</td></tr>{% endif %}
+      {% if contact.full_address %}<tr><th>Adresa</th><td>{{ contact.full_address }}</td></tr>{% endif %}
+      {% if contact.email %}<tr><th>E-mail</th><td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td></tr>{% endif %}
+      {% if contact.phone %}<tr><th>Telefon</th><td>{{ contact.phone }}</td></tr>{% endif %}
+    </table>
+  </div>
+
+  <div class="detail-card">
+    <h3>Aktivity</h3>
+    <div class="activity-stats">
+      <div>
+        <span class="stat-label">Faktur celkem:</span>
+        <strong>{{ contact.invoices | length }}</strong>
+      </div>
+      <div>
+        <span class="stat-label">Nákladů celkem:</span>
+        <strong>{{ contact.expenses | length }}</strong>
+      </div>
+    </div>
+    {% if contact.invoices %}
+    <div class="mt-2">
+      <a href="/faktury?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit faktury</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

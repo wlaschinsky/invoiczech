@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Náklady{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Přijaté doklady (Náklady)</h1>
+  <a href="/naklady/novy" class="btn btn-primary">+ Nový náklad</a>
+</div>
+
+<div class="filter-bar">
+  <form method="get" action="/naklady" class="filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm">
+    <select name="typ" class="form-control form-control-sm">
+      <option value="" {% if not typ_filter %}selected{% endif %}>Všechny typy</option>
+      <option value="Faktura" {% if typ_filter == 'Faktura' %}selected{% endif %}>Faktura</option>
+      <option value="Účtenka" {% if typ_filter == 'Účtenka' %}selected{% endif %}>Účtenka</option>
+      <option value="Jiný" {% if typ_filter == 'Jiný' %}selected{% endif %}>Jiný</option>
+    </select>
+    <select name="rok" class="form-control form-control-sm">
+      <option value="">Všechny roky</option>
+      {% for year in years %}
+      <option value="{{ year }}" {% if rok_filter == year|string %}selected{% endif %}>{{ year }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+    <a href="/naklady" class="btn btn-ghost btn-sm">Zrušit</a>
+  </form>
+</div>
+
+{% if expenses %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Číslo</th>
+      <th>Dodavatel</th>
+      <th>Typ</th>
+      <th>Datum</th>
+      <th>Daň. uznatelný</th>
+      <th class="text-right">Bez DPH</th>
+      <th class="text-right">Celkem s DPH</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for exp in expenses %}
+    <tr>
+      <td><a href="/naklady/{{ exp.id }}" class="link-strong">{{ exp.number }}</a></td>
+      <td>{{ exp.contact_name or '—' }}</td>
+      <td><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
+      <td>{{ exp.issue_date | date_cs }}</td>
+      <td>
+        {% if exp.tax_deductible == 'Ano' %}
+        <span class="badge badge-uhrazena">Ano</span>
+        {% elif exp.tax_deductible == 'Ne' %}
+        <span class="badge badge-stornova">Ne</span>
+        {% else %}
+        <span class="badge badge-neutral">Nevím</span>
+        {% endif %}
+      </td>
+      <td class="text-right">{{ exp.subtotal | czk }}</td>
+      <td class="text-right font-medium">{{ exp.total | czk }}</td>
+      <td class="actions">
+        <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost">Detail</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5" class="text-right text-muted">Celkem ({{ expenses | length }}):</td>
+      <td class="text-right">{{ expenses | sum(attribute='subtotal') | czk }}</td>
+      <td class="text-right font-medium">{{ expenses | sum(attribute='total') | czk }}</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+{% else %}
+<div class="empty-state">
+  <p>Žádné náklady nenalezeny.</p>
+  <a href="/naklady/novy" class="btn btn-primary">Přidat první náklad</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -64,13 +64,16 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 200;
   gap: 24px;
 }
-.topbar-logo {
-  display: flex;
-  align-items: center;
+.logo-wordmark {
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   flex-shrink: 0;
 }
-.topbar-logo img { height: 32px; width: auto; display: block; }
-.topbar-logo:hover { opacity: 0.85; }
+.logo-wordmark:hover { text-decoration: none; }
+.logo-invoi { color: #f8fafc; }
+.logo-czech { color: #6366f1; }
 .topbar-search {
   flex: 1;
   display: flex;

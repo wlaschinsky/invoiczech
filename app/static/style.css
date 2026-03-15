@@ -131,12 +131,18 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ---- User section ---- */
 .sidebar-user {
+  position: relative;
+}
+.user-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 16px;
-  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-radius: 0;
 }
+.user-toggle:hover { background: rgba(99, 102, 241, 0.06); }
 .user-avatar {
   width: 36px;
   height: 36px;
@@ -169,18 +175,15 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.user-menu-btn {
-  background: none;
-  border: none;
+.user-chevron {
   color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-size: 16px;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
   line-height: 1;
 }
-.user-menu-btn:hover { color: var(--color-text-primary); background: rgba(99, 102, 241, 0.1); }
+.sidebar-user.open .user-chevron { transform: rotate(270deg); }
 .user-dropdown {
   position: absolute;
   top: 100%;
@@ -192,7 +195,9 @@ h1, h2, h3, h4, h5, h6 {
   padding: 4px;
   z-index: 300;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: none;
 }
+.sidebar-user.open .user-dropdown { display: block; }
 .user-dropdown-item {
   display: block;
   padding: 8px 12px;

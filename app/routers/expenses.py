@@ -131,12 +131,14 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     db.flush()
 
     _save_items(form, expense, price_includes_vat, db)
+    db.flush()
 
     # Zpracování přílohy
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:
         expense.attachment_path = _save_attachment(attachment, expense.id)
 
+    db.expire(expense, ["items"])
     if not expense.items:
         db.rollback()
         flash(request, "Náklad musí mít alespoň jednu položku.", "error")
@@ -224,12 +226,14 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     db.flush()
 
     _save_items(form, expense, expense.price_includes_vat, db)
+    db.flush()
 
     # Nová příloha
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:
         expense.attachment_path = _save_attachment(attachment, expense.id)
 
+    db.expire(expense, ["items"])
     if not expense.items:
         db.rollback()
         flash(request, "Náklad musí mít alespoň jednu položku.", "error")

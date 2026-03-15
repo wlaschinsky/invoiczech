@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- pozadí -->
+  <rect width="64" height="64" rx="14" fill="#0e0f23"/>
+  <rect width="64" height="64" rx="14" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- faktura -->
+  <rect x="12" y="8" width="34" height="42" rx="5" fill="#07080f"/>
+  <rect x="12" y="8" width="34" height="42" rx="5" fill="none" stroke="#6366f1" stroke-width="1" opacity="0.5"/>
+  <rect x="12" y="8" width="34" height="10" rx="5" fill="#6366f1" opacity="0.7"/>
+  <rect x="18" y="26" width="22" height="2.5" rx="1.5" fill="#94a3b8" opacity="0.5"/>
+  <rect x="18" y="32" width="16" height="2.5" rx="1.5" fill="#94a3b8" opacity="0.4"/>
+  <rect x="18" y="38" width="19" height="2.5" rx="1.5" fill="#94a3b8" opacity="0.3"/>
+
+  <!-- zelený check -->
+  <circle cx="46" cy="46" r="12" fill="#00d68f"/>
+  <path d="M40 46 L44 50 L52 40" fill="none" stroke="#07080f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

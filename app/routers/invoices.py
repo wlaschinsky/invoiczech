@@ -93,16 +93,24 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
     due_date = parse_date(form.get("due_date", ""))
     duzp = parse_date(form.get("duzp", ""))
 
+    today = date.today()
+    next_number = generate_invoice_number(db)
+    form_ctx = {
+        "request": request, "invoice": None, "contacts": contacts,
+        "today": today, "due_default": today + timedelta(days=10),
+        "next_number": next_number, "default_text": settings.DEFAULT_INVOICE_TEXT,
+    }
+
     if not issue_date or not due_date:
         flash(request, "Datum vystavení a splatnosti jsou povinné.", "error")
-        return templates.TemplateResponse("invoices/form.html", {"request": request, "invoice": None, "contacts": contacts})
+        return templates.TemplateResponse("invoices/form.html", form_ctx)
 
     # Kontakt
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
     contact = db.query(Contact).filter(Contact.id == contact_id).first() if contact_id else None
 
-    number = generate_invoice_number(db)
+    number = next_number
     variable_symbol = number.replace("FA ", "")
 
     invoice = Invoice(
@@ -132,7 +140,7 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
     if not invoice.items:
         db.rollback()
         flash(request, "Faktura musí mít alespoň jednu položku.", "error")
-        return templates.TemplateResponse("invoices/form.html", {"request": request, "invoice": None, "contacts": contacts})
+        return templates.TemplateResponse("invoices/form.html", form_ctx)
 
     db.commit()
     flash(request, f"Faktura {invoice.number} byla vystavena.", "success")
@@ -191,9 +199,15 @@ async def update_invoice(request: Request, invoice_id: int, db: Session = Depend
     due_date = parse_date(form.get("due_date", ""))
     duzp = parse_date(form.get("duzp", ""))
 
+    form_ctx = {
+        "request": request, "invoice": invoice, "contacts": contacts,
+        "today": date.today(), "due_default": invoice.due_date,
+        "next_number": invoice.number, "default_text": settings.DEFAULT_INVOICE_TEXT,
+    }
+
     if not issue_date or not due_date:
         flash(request, "Datum vystavení a splatnosti jsou povinné.", "error")
-        return templates.TemplateResponse("invoices/form.html", {"request": request, "invoice": invoice, "contacts": contacts})
+        return templates.TemplateResponse("invoices/form.html", form_ctx)
 
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
@@ -223,7 +237,7 @@ async def update_invoice(request: Request, invoice_id: int, db: Session = Depend
     if not invoice.items:
         db.rollback()
         flash(request, "Faktura musí mít alespoň jednu položku.", "error")
-        return templates.TemplateResponse("invoices/form.html", {"request": request, "invoice": invoice, "contacts": contacts})
+        return templates.TemplateResponse("invoices/form.html", form_ctx)
 
     db.commit()
     flash(request, "Faktura byla uložena.", "success")

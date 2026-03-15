@@ -25,6 +25,21 @@ def _fmt_czk(value) -> str:
     return formatted
 
 
+def _fmt_date(value) -> str:
+    if value is None:
+        return ""
+    if hasattr(value, "strftime"):
+        return value.strftime("%d.%m.%Y")
+    return str(value)
+
+
+def _fmt_num(value, decimals: int = 2) -> str:
+    if value is None:
+        return "0"
+    d = Decimal(str(value))
+    return f"{d:.{decimals}f}".replace(".", ",")
+
+
 def generate_invoice_pdf(invoice: Invoice) -> bytes:
     """Vygeneruje PDF faktury a vrátí bytes."""
     env = _get_template_env()

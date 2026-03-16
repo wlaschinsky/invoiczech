@@ -12,6 +12,12 @@ class InvoiceTemplate(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     contact_id = Column(Integer, ForeignKey("contacts.id"), nullable=True)
+    contact_name = Column(String)
+    contact_ico = Column(String)
+    contact_dic = Column(String)
+    contact_street = Column(String)
+    contact_city = Column(String)
+    contact_zip = Column(String)
     payment_method = Column(String, default="Bankovní převod")
     due_days = Column(Integer, default=10)
 

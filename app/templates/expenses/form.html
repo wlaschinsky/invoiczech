@@ -26,6 +26,12 @@
           {% for c in contacts %}
           <option value="{{ c.id }}"
                   data-name="{{ c.name }}"
+                  data-ico="{{ c.ico or '' }}"
+                  data-dic="{{ c.dic or '' }}"
+                  data-street="{{ c.street or '' }}"
+                  data-city="{{ c.city or '' }}"
+                  data-zip="{{ c.zip_code or '' }}"
+                  data-email="{{ c.email or '' }}"
                   {% if expense and expense.contact_id == c.id %}selected{% endif %}>
             {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
           </option>
@@ -38,6 +44,7 @@
           <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
           <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
         </div>
+        <div id="ares-status" class="mt-1"></div>
       </div>
     </div>
     <div class="form-row">
@@ -302,25 +309,6 @@ function removeRow(btn) {
   }
 }
 
-function fillContactFromSelect(sel) {
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt.value) return;
-  document.getElementById('contact_name').value = opt.dataset.name || '';
-}
-
-async function loadFromAres() {
-  const ico = document.getElementById('ares_ico').value.trim();
-  if (!ico) { alert('Zadejte IČO'); return; }
-  try {
-    const resp = await fetch(`/adresar/ares/${ico}`);
-    const data = await resp.json();
-    if (data.error) { alert('ARES: ' + data.error); return; }
-    document.getElementById('contact_name').value = data.name || '';
-    document.getElementById('contact_id').value = '';
-  } catch(e) {
-    alert('Chyba při komunikaci s ARES');
-  }
-}
 
 document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
 document.addEventListener('DOMContentLoaded', recalcTotals);

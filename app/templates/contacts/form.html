@@ -118,6 +118,7 @@
 
 {% block scripts %}
 <script>
+// Contacts form má vlastní ID polí (name, ico, dic...) — přepíšeme sdílenou funkci
 async function loadFromAres() {
   const ico = document.getElementById('ares_ico').value.trim();
   if (!ico) { alert('Zadejte IČO'); return; }
@@ -125,13 +126,14 @@ async function loadFromAres() {
     const resp = await fetch(`/adresar/ares/${ico}`);
     const data = await resp.json();
     if (data.error) { alert('ARES: ' + data.error); return; }
-    document.getElementById('name').value = data.name || '';
-    document.getElementById('ico').value = data.ico || '';
-    document.getElementById('dic').value = data.dic || '';
-    document.getElementById('street').value = data.street || '';
-    document.getElementById('zip_code').value = data.zip_code || '';
-    document.getElementById('city').value = data.city || '';
-    document.getElementById('country').value = data.country || 'Česká republika';
+    const src = data.source === 'adresar' ? data : data;
+    document.getElementById('name').value = src.name || '';
+    document.getElementById('ico').value = src.ico || '';
+    document.getElementById('dic').value = src.dic || '';
+    document.getElementById('street').value = src.street || '';
+    document.getElementById('zip_code').value = src.zip_code || '';
+    document.getElementById('city').value = src.city || '';
+    document.getElementById('country').value = src.country || 'Česká republika';
   } catch(e) {
     alert('Chyba při komunikaci s ARES');
   }

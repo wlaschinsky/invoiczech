@@ -48,6 +48,8 @@ async def invoices_list(
         reverse=True,
     )
 
+    total_count = db.query(Invoice).count()
+
     return templates.TemplateResponse(
         "invoices/list.html",
         {
@@ -58,6 +60,7 @@ async def invoices_list(
             "rok_filter": rok,
             "q": q,
             "years": years,
+            "total_count": total_count,
         },
     )
 

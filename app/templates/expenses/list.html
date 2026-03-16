@@ -4,9 +4,10 @@
 {% block content %}
 <div class="page-header">
   <h1>Přijaté doklady (Náklady)</h1>
-  <a href="/naklady/novy" class="btn btn-primary">+ Nový náklad</a>
+  {% if total_count %}<a href="/naklady/novy" class="btn btn-primary">+ Nový náklad</a>{% endif %}
 </div>
 
+{% if total_count %}
 <div class="filter-bar">
   <form method="get" action="/naklady" class="filter-form">
     <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm">
@@ -28,6 +29,7 @@
     {% endif %}
   </form>
 </div>
+{% endif %}
 
 {% if expenses %}
 <table class="table table-hover">
@@ -83,9 +85,15 @@
   </tfoot>
 </table>
 {% else %}
-<div class="empty-state">
-  <p>Žádné náklady nenalezeny.</p>
-  <a href="/naklady/novy" class="btn btn-primary">Přidat první náklad</a>
-</div>
+  {% if total_count %}
+  <div class="empty-state">
+    <p>Žádné náklady nenalezeny.</p>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>Žádné náklady nenalezeny.</p>
+    <a href="/naklady/novy" class="btn btn-primary">Přidat první náklad</a>
+  </div>
+  {% endif %}
 {% endif %}
 {% endblock %}

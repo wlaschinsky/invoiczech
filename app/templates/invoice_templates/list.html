@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <h1>Šablony faktur</h1>
-  <a href="/sablony/nova" class="btn btn-primary">+ Nová šablona</a>
+  {% if templates %}<a href="/sablony/nova" class="btn btn-primary">+ Nová šablona</a>{% endif %}
 </div>
 
 {% if templates %}

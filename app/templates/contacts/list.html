@@ -11,7 +11,9 @@
   <form method="get" action="/adresar" class="filter-form">
     <input type="text" name="q" value="{{ q }}" placeholder="Hledat podle názvu nebo IČO…" class="form-control form-control-sm">
     <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
-    <a href="/adresar" class="btn btn-ghost btn-sm">Zrušit</a>
+    {% if q %}
+    <a href="/adresar" class="btn btn-danger btn-sm">Zrušit filtr</a>
+    {% endif %}
   </form>
 </div>
 

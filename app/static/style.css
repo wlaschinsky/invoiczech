@@ -397,6 +397,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1.25;
+  font-family: inherit;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.2s ease;
@@ -446,6 +448,13 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .btn-ghost:hover { background: rgba(99, 102, 241, 0.06); color: var(--color-text-primary); }
+
+.btn-warning {
+  background: transparent;
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+.btn-warning:hover { background: rgba(99, 102, 241, 0.1); }
 
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 .btn-lg { padding: 12px 24px; font-size: 1rem; }

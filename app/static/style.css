@@ -757,6 +757,13 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   flex-wrap: wrap;
   align-items: center;
 }
+.detail-actions-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
 .inline-form {
   display: flex;
   gap: 8px;

@@ -30,10 +30,10 @@
     <nav class="sidebar">
       <div class="sidebar-user" id="sidebar-user">
         <div class="user-toggle" onclick="document.getElementById('sidebar-user').classList.toggle('open')">
-          <div class="user-avatar">SW</div>
+          <div class="user-avatar">{{ settings.OWNER_NAME[:1] }}{{ settings.OWNER_NAME.split(' ')[-1][:1] if ' ' in settings.OWNER_NAME else '' }}</div>
           <div class="user-info">
-            <div class="user-name">Samuel Wlaschinský</div>
-            <div class="user-email">samuel@invoiczech.cz</div>
+            <div class="user-name">{{ settings.OWNER_NAME }}</div>
+            <div class="user-email">{{ settings.OWNER_EMAIL }}</div>
           </div>
           <span class="user-chevron">›</span>
         </div>

@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./faktury.db"
     UPLOAD_DIR: str = "uploads"
 
+    # Vlastník aplikace (login stránka, sidebar)
+    OWNER_NAME: str = "Samuel Wlaschinský"
+    OWNER_EMAIL: str = "samuel@invoiczech.cz"
+
     # Údaje dodavatele
     SUPPLIER_NAME: str = "Samuel Wlaschinský"
     SUPPLIER_STREET: str = "Kovanecká 2284/21"

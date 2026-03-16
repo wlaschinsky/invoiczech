@@ -122,9 +122,52 @@ async def delete_contact(request: Request, contact_id: int, db: Session = Depend
 
 
 @router.get("/ares/{ico}")
-async def ares_lookup(ico: str):
-    """AJAX endpoint pro načtení dat z ARES."""
+async def ares_lookup(ico: str, db: Session = Depends(get_db)):
+    """AJAX endpoint — zkontroluj adresář, pokud tam není, dotáhni z ARES."""
+    existing = db.query(Contact).filter(Contact.ico == ico).first()
+    if existing:
+        return JSONResponse({
+            "source": "adresar",
+            "id": existing.id,
+            "name": existing.name,
+            "ico": existing.ico or "",
+            "dic": existing.dic or "",
+            "street": existing.street or "",
+            "zip_code": existing.zip_code or "",
+            "city": existing.city or "",
+            "email": existing.email or "",
+        })
+
     result = await lookup_ico(ico)
     if result is None:
         return JSONResponse({"error": "Nepodařilo se načíst data z ARES"}, status_code=503)
+    result["source"] = "ares"
     return JSONResponse(result)
+
+
+@router.post("/ares/ulozit")
+async def save_ares_contact(request: Request, db: Session = Depends(get_db)):
+    """AJAX endpoint — uloží kontakt načtený z ARES do adresáře."""
+    data = await request.json()
+    ico = data.get("ico", "").strip()
+    if not ico:
+        return JSONResponse({"error": "IČO je povinné"}, status_code=400)
+
+    existing = db.query(Contact).filter(Contact.ico == ico).first()
+    if existing:
+        return JSONResponse({"id": existing.id, "name": existing.name})
+
+    contact = Contact(
+        name=data.get("name", "").strip(),
+        ico=ico,
+        dic=data.get("dic", "").strip(),
+        street=data.get("street", "").strip(),
+        city=data.get("city", "").strip(),
+        zip_code=data.get("zip_code", "").strip(),
+        country="Česká republika",
+        contact_type=data.get("contact_type", "Obojí"),
+    )
+    db.add(contact)
+    db.commit()
+    db.refresh(contact)
+    return JSONResponse({"id": contact.id, "name": contact.name})

@@ -39,7 +39,13 @@
       "Bash(sqlite3 faktury.db \".tables\")",
       "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN payment_method TEXT DEFAULT ''Bankovní převod'';\")",
       "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN due_days INTEGER DEFAULT 10;\")",
-      "Bash(python -c \"from app.main import app; print\\(''OK''\\)\")"
+      "Bash(python -c \"from app.main import app; print\\(''OK''\\)\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_name TEXT;\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_ico TEXT;\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_dic TEXT;\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_street TEXT;\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_city TEXT;\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN contact_zip TEXT;\")"
     ]
   }
 }

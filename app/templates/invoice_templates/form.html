@@ -53,6 +53,47 @@
           <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
           <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
         </div>
+        <div id="ares-status" class="mt-1"></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_name">Název</label>
+        <input type="text" id="contact_name" name="contact_name"
+               value="{{ tpl.contact_name if tpl else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_ico">IČO</label>
+        <input type="text" id="contact_ico" name="contact_ico"
+               value="{{ tpl.contact_ico if tpl else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_dic">DIČ</label>
+        <input type="text" id="contact_dic" name="contact_dic"
+               value="{{ tpl.contact_dic if tpl else '' }}"
+               class="form-control">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_street">Ulice a číslo</label>
+        <input type="text" id="contact_street" name="contact_street"
+               value="{{ tpl.contact_street if tpl else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="contact_zip">PSČ</label>
+        <input type="text" id="contact_zip" name="contact_zip"
+               value="{{ tpl.contact_zip if tpl else '' }}"
+               class="form-control">
+      </div>
+      <div class="form-group form-group-lg">
+        <label for="contact_city">Město</label>
+        <input type="text" id="contact_city" name="contact_city"
+               value="{{ tpl.contact_city if tpl else '' }}"
+               class="form-control">
       </div>
     </div>
   </div>
@@ -223,36 +264,5 @@ function removeRow(btn) {
 }
 
 document.addEventListener('DOMContentLoaded', recalcAllRows);
-
-function fillContactFromSelect(sel) {
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt.value) return;
-  document.getElementById('ares_ico').value = opt.dataset.ico || '';
-}
-
-async function loadFromAres() {
-  const ico = document.getElementById('ares_ico').value.trim();
-  if (!ico) { alert('Zadejte IČO'); return; }
-  try {
-    const resp = await fetch(`/adresar/ares/${ico}`);
-    const data = await resp.json();
-    if (data.error) { alert('ARES: ' + data.error); return; }
-    // Pokud kontakt existuje v adresáři, vyber ho
-    const sel = document.getElementById('contact_id');
-    let found = false;
-    for (const opt of sel.options) {
-      if (opt.dataset.ico === data.ico) {
-        sel.value = opt.value;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      alert('Kontakt nalezen v ARES: ' + data.name + '\nNejdříve ho přidejte do adresáře.');
-    }
-  } catch(e) {
-    alert('Chyba při komunikaci s ARES');
-  }
-}
 </script>
 {% endblock %}

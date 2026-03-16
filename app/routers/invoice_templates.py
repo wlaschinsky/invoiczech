@@ -60,6 +60,12 @@ async def create_template(request: Request, db: Session = Depends(get_db)):
     tpl = InvoiceTemplate(
         name=name,
         contact_id=contact_id,
+        contact_name=form.get("contact_name", "").strip() or None,
+        contact_ico=form.get("contact_ico", "").strip() or None,
+        contact_dic=form.get("contact_dic", "").strip() or None,
+        contact_street=form.get("contact_street", "").strip() or None,
+        contact_city=form.get("contact_city", "").strip() or None,
+        contact_zip=form.get("contact_zip", "").strip() or None,
         payment_method=payment_method,
         due_days=due_days,
     )
@@ -108,6 +114,12 @@ async def update_template(request: Request, tpl_id: int, db: Session = Depends(g
     contact_id_raw = form.get("contact_id", "").strip()
     tpl.name = name
     tpl.contact_id = int(contact_id_raw) if contact_id_raw else None
+    tpl.contact_name = form.get("contact_name", "").strip() or None
+    tpl.contact_ico = form.get("contact_ico", "").strip() or None
+    tpl.contact_dic = form.get("contact_dic", "").strip() or None
+    tpl.contact_street = form.get("contact_street", "").strip() or None
+    tpl.contact_city = form.get("contact_city", "").strip() or None
+    tpl.contact_zip = form.get("contact_zip", "").strip() or None
     tpl.payment_method = form.get("payment_method", "Bankovní převod")
     try:
         tpl.due_days = int(form.get("due_days", "10"))
@@ -147,12 +159,12 @@ async def template_json(tpl_id: int, db: Session = Depends(get_db)):
         "payment_method": tpl.payment_method or "Bankovní převod",
         "due_days": tpl.due_days or 10,
         "contact_id": tpl.contact_id,
-        "contact_name": contact.name if contact else "",
-        "contact_ico": contact.ico if contact else "",
-        "contact_dic": contact.dic if contact else "",
-        "contact_street": contact.street if contact else "",
-        "contact_city": contact.city if contact else "",
-        "contact_zip": contact.zip_code if contact else "",
+        "contact_name": tpl.contact_name or (contact.name if contact else ""),
+        "contact_ico": tpl.contact_ico or (contact.ico if contact else ""),
+        "contact_dic": tpl.contact_dic or (contact.dic if contact else ""),
+        "contact_street": tpl.contact_street or (contact.street if contact else ""),
+        "contact_city": tpl.contact_city or (contact.city if contact else ""),
+        "contact_zip": tpl.contact_zip or (contact.zip_code if contact else ""),
         "contact_email": contact.email if contact else "",
         "items": [
             {

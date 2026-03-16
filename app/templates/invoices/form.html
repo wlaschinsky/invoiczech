@@ -61,6 +61,7 @@
           <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
           <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
         </div>
+        <div id="ares-status" class="mt-1"></div>
       </div>
     </div>
     <div class="form-row">
@@ -340,36 +341,6 @@ function removeRow(btn) {
   if (tbody.rows.length > 1) {
     btn.closest('tr').remove();
     recalcTotals();
-  }
-}
-
-function fillContactFromSelect(sel) {
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt.value) return;
-  document.getElementById('contact_name').value = opt.dataset.name || '';
-  document.getElementById('contact_ico').value = opt.dataset.ico || '';
-  document.getElementById('contact_dic').value = opt.dataset.dic || '';
-  document.getElementById('contact_street').value = opt.dataset.street || '';
-  document.getElementById('contact_zip').value = opt.dataset.zip || '';
-  document.getElementById('contact_city').value = opt.dataset.city || '';
-}
-
-async function loadFromAres() {
-  const ico = document.getElementById('ares_ico').value.trim();
-  if (!ico) { alert('Zadejte IČO'); return; }
-  try {
-    const resp = await fetch(`/adresar/ares/${ico}`);
-    const data = await resp.json();
-    if (data.error) { alert('ARES: ' + data.error); return; }
-    document.getElementById('contact_name').value = data.name || '';
-    document.getElementById('contact_ico').value = data.ico || '';
-    document.getElementById('contact_dic').value = data.dic || '';
-    document.getElementById('contact_street').value = data.street || '';
-    document.getElementById('contact_zip').value = data.zip_code || '';
-    document.getElementById('contact_city').value = data.city || '';
-    document.getElementById('contact_id').value = '';
-  } catch(e) {
-    alert('Chyba při komunikaci s ARES');
   }
 }
 

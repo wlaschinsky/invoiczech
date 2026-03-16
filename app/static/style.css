@@ -521,6 +521,7 @@ h1, h2, h3, h4, h5, h6 {
 .text-muted { color: var(--color-text-secondary); }
 .text-secondary { color: var(--color-text-secondary); }
 .text-danger { color: #ef4444; }
+.text-success { color: var(--color-accent-green); }
 .font-medium { font-weight: 600; color: var(--color-accent-green); font-family: ui-monospace, "SF Mono", monospace; }
 .link-strong { font-weight: 600; color: var(--color-accent-purple-light); font-family: ui-monospace, "SF Mono", monospace; }
 .link-strong:hover { color: var(--color-accent-primary); }
@@ -736,6 +737,7 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   color: var(--color-text-primary);
   border-bottom: none;
 }
+.mt-1 { margin-top: 6px; }
 .mt-4 { margin-top: 16px; }
 
 /* VAT summary in detail */

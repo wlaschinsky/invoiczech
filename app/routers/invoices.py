@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.invoice import Invoice, InvoiceItem
 from ..models.contact import Contact
+from ..models.invoice_template import InvoiceTemplate
 from ..tmpl import templates
 from ..config import get_settings
 from .utils import flash, parse_date, parse_decimal, generate_invoice_number
@@ -66,6 +67,7 @@ async def new_invoice_form(request: Request, db: Session = Depends(get_db)):
     contacts = db.query(Contact).filter(
         Contact.contact_type.in_(["Odběratel", "Obojí"])
     ).order_by(Contact.name).all()
+    inv_templates = db.query(InvoiceTemplate).order_by(InvoiceTemplate.name).all()
     today = date.today()
     next_number = generate_invoice_number(db)
     return templates.TemplateResponse(
@@ -74,6 +76,7 @@ async def new_invoice_form(request: Request, db: Session = Depends(get_db)):
             "request": request,
             "invoice": None,
             "contacts": contacts,
+            "inv_templates": inv_templates,
             "today": today,
             "due_default": today + timedelta(days=10),
             "next_number": next_number,
@@ -93,10 +96,12 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
     due_date = parse_date(form.get("due_date", ""))
     duzp = parse_date(form.get("duzp", ""))
 
+    inv_templates = db.query(InvoiceTemplate).order_by(InvoiceTemplate.name).all()
     today = date.today()
     next_number = generate_invoice_number(db)
     form_ctx = {
         "request": request, "invoice": None, "contacts": contacts,
+        "inv_templates": inv_templates,
         "today": today, "due_default": today + timedelta(days=10),
         "next_number": next_number, "default_text": settings.DEFAULT_INVOICE_TEXT,
     }

@@ -26,7 +26,17 @@
       "Bash(venv/bin/python3 -c \":*)",
       "Bash(timeout 5 venv/bin/python3 -m uvicorn app.main:app --port 9999)",
       "Bash(sqlite3 /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/faktury.db \"PRAGMA table_info\\(invoices\\);\")",
-      "Bash(sqlite3 /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/faktury.db \"ALTER TABLE invoices ADD COLUMN internal_note TEXT;\")"
+      "Bash(sqlite3 /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/faktury.db \"ALTER TABLE invoices ADD COLUMN internal_note TEXT;\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find /Users/samuelwlaschinsky/Development/samko_dev/invoiczech -name *template* -o -name *sablon*)",
+      "Bash(python3 -c \"from app.models.invoice_template import InvoiceTemplate, InvoiceTemplateItem; print\\(''Model OK''\\)\")",
+      "Bash(source venv/bin/activate)",
+      "Bash(python -c \"from app.models.invoice_template import InvoiceTemplate, InvoiceTemplateItem; print\\(''Model OK''\\)\")",
+      "Bash(python -c \"from app.routers.invoice_templates import router; print\\(''Router OK''\\)\")",
+      "Bash(python -c \"from app.main import app; print\\(''App OK''\\)\")",
+      "Bash(python -c \"from app.database import create_tables; create_tables\\(\\); print\\(''Tables created''\\)\")",
+      "Bash(sqlite3 faktury.db \".tables\")"
     ]
   }
 }

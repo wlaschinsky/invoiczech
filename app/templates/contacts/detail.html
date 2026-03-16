@@ -31,22 +31,27 @@
   </div>
 
   <div class="detail-card">
-    <h3>Aktivity</h3>
+    <h3>Přehled</h3>
     <div class="activity-stats">
-      <div>
+      <div style="text-align:center">
         <span class="stat-label">Faktur celkem:</span>
         <strong>{{ inv_count }}</strong>
+        {% if inv_count %}
+        <div class="mt-1">
+          <a href="/faktury?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit faktury</a>
+        </div>
+        {% endif %}
       </div>
-      <div>
+      <div style="text-align:center">
         <span class="stat-label">Nákladů celkem:</span>
         <strong>{{ exp_count }}</strong>
+        {% if exp_count %}
+        <div class="mt-1">
+          <a href="/naklady?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit náklady</a>
+        </div>
+        {% endif %}
       </div>
     </div>
-    {% if inv_count %}
-    <div class="mt-2">
-      <a href="/faktury?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit faktury</a>
-    </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
@@ -20,6 +22,15 @@ class InvoiceTemplate(Base):
         order_by="InvoiceTemplateItem.position",
     )
     contact = relationship("Contact", foreign_keys=[contact_id])
+
+    @property
+    def total(self) -> Decimal:
+        return sum(
+            (Decimal(str(i.quantity)) * Decimal(str(i.unit_price))
+             * (1 + Decimal(str(i.vat_rate)) / 100)
+             for i in self.items),
+            Decimal("0"),
+        )
 
 
 class InvoiceTemplateItem(Base):

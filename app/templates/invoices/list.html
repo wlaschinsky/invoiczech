@@ -4,9 +4,10 @@
 {% block content %}
 <div class="page-header">
   <h1>Vydané faktury</h1>
-  <a href="/faktury/nova" class="btn btn-primary">+ Nová faktura</a>
+  {% if total_count %}<a href="/faktury/nova" class="btn btn-primary">+ Nová faktura</a>{% endif %}
 </div>
 
+{% if total_count %}
 <!-- Filtry -->
 <div class="filter-bar">
   <form method="get" action="/faktury" class="filter-form">
@@ -29,6 +30,7 @@
     {% endif %}
   </form>
 </div>
+{% endif %}
 
 {% if invoices %}
 <table class="table table-hover">
@@ -83,9 +85,15 @@
   </tfoot>
 </table>
 {% else %}
-<div class="empty-state">
-  <p>Žádné faktury nenalezeny.</p>
-  <a href="/faktury/nova" class="btn btn-primary">Vystavit první fakturu</a>
-</div>
+  {% if total_count %}
+  <div class="empty-state">
+    <p>Žádné faktury nenalezeny.</p>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>Žádné faktury nenalezeny.</p>
+    <a href="/faktury/nova" class="btn btn-primary">Vystavit první fakturu</a>
+  </div>
+  {% endif %}
 {% endif %}
 {% endblock %}

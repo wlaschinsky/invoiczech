@@ -58,6 +58,8 @@ async def contacts_list(request: Request, q: str = "", typ: str = "", db: Sessio
         inv_counts[c.id] = inv_by_id.get(c.id, 0) + inv_by_name.get(c.name, 0)
         exp_counts[c.id] = exp_by_id.get(c.id, 0) + exp_by_name.get(c.name, 0)
 
+    total_count = db.query(Contact).count()
+
     return templates.TemplateResponse(
         "contacts/list.html",
         {
@@ -67,6 +69,7 @@ async def contacts_list(request: Request, q: str = "", typ: str = "", db: Sessio
             "typ": typ,
             "inv_counts": inv_counts,
             "exp_counts": exp_counts,
+            "total_count": total_count,
         },
     )
 

@@ -50,6 +50,8 @@ async def expenses_list(
         reverse=True,
     )
 
+    total_count = db.query(Expense).count()
+
     return templates.TemplateResponse(
         "expenses/list.html",
         {
@@ -59,6 +61,7 @@ async def expenses_list(
             "rok_filter": rok,
             "q": q,
             "years": years,
+            "total_count": total_count,
         },
     )
 

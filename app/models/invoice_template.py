@@ -10,6 +10,8 @@ class InvoiceTemplate(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     contact_id = Column(Integer, ForeignKey("contacts.id"), nullable=True)
+    payment_method = Column(String, default="Bankovní převod")
+    due_days = Column(Integer, default=10)
 
     items = relationship(
         "InvoiceTemplateItem",

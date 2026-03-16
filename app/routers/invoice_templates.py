@@ -51,7 +51,18 @@ async def create_template(request: Request, db: Session = Depends(get_db)):
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
 
-    tpl = InvoiceTemplate(name=name, contact_id=contact_id)
+    payment_method = form.get("payment_method", "Bankovní převod")
+    try:
+        due_days = int(form.get("due_days", "10"))
+    except ValueError:
+        due_days = 10
+
+    tpl = InvoiceTemplate(
+        name=name,
+        contact_id=contact_id,
+        payment_method=payment_method,
+        due_days=due_days,
+    )
     db.add(tpl)
     db.flush()
 
@@ -97,6 +108,11 @@ async def update_template(request: Request, tpl_id: int, db: Session = Depends(g
     contact_id_raw = form.get("contact_id", "").strip()
     tpl.name = name
     tpl.contact_id = int(contact_id_raw) if contact_id_raw else None
+    tpl.payment_method = form.get("payment_method", "Bankovní převod")
+    try:
+        tpl.due_days = int(form.get("due_days", "10"))
+    except ValueError:
+        tpl.due_days = 10
 
     for item in list(tpl.items):
         db.delete(item)
@@ -128,6 +144,8 @@ async def template_json(tpl_id: int, db: Session = Depends(get_db)):
 
     contact = tpl.contact
     return JSONResponse({
+        "payment_method": tpl.payment_method or "Bankovní převod",
+        "due_days": tpl.due_days or 10,
         "contact_id": tpl.contact_id,
         "contact_name": contact.name if contact else "",
         "contact_ico": contact.ico if contact else "",

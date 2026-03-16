@@ -148,26 +148,21 @@
     (function() {
       var form = document.querySelector('form.form-card');
       if (!form) return;
-      var initial = new FormData(form);
-      var initialStr = {};
-      for (var pair of initial.entries()) {
-        initialStr[pair[0]] = pair[1];
-      }
-      var dirty = false;
       var submitting = false;
 
-      form.addEventListener('input', function() { dirty = true; });
-      form.addEventListener('change', function() { dirty = true; });
+      function snapshot() {
+        var entries = [];
+        for (var pair of new FormData(form).entries()) {
+          entries.push(pair[0] + '\0' + pair[1]);
+        }
+        return entries.join('\n');
+      }
+      var initialSnap = snapshot();
+
       form.addEventListener('submit', function() { submitting = true; });
 
       function isDirty() {
-        if (dirty) {
-          var current = new FormData(form);
-          for (var pair of current.entries()) {
-            if (initialStr[pair[0]] !== pair[1]) return true;
-          }
-        }
-        return false;
+        return snapshot() !== initialSnap;
       }
 
       // Intercept link clicks and back navigation
@@ -180,17 +175,26 @@
         if (!isDirty()) return;
         e.preventDefault();
         appConfirm('Máte neuložené změny. Opravdu chcete odejít?', function() {
-          dirty = false;
+          submitting = true;
           window.location.href = href;
         }, {cancel: 'Zůstat', ok: 'Opustit'});
       });
 
-      // Browser back / beforeunload fallback
-      window.addEventListener('beforeunload', function(e) {
-        if (!submitting && isDirty()) {
-          e.preventDefault();
-          e.returnValue = '';
+      // Intercept browser back/forward with custom dialog
+      history.pushState({formGuard: true}, '');
+      window.addEventListener('popstate', function(e) {
+        if (submitting || !isDirty()) {
+          // No unsaved changes — allow navigation
+          history.back();
+          return;
         }
+        // Re-push so we stay on the page while dialog is shown
+        history.pushState({formGuard: true}, '');
+        appConfirm('Máte neuložené změny. Opravdu chcete odejít?', function() {
+          submitting = true;
+          // Go back twice: once for our guard state, once for the real back
+          history.go(-2);
+        }, {cancel: 'Zůstat', ok: 'Opustit'});
       });
     })();
 

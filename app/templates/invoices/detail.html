@@ -19,7 +19,7 @@
     <a href="/faktury/{{ invoice.id }}/pdf" class="btn btn-primary">Stáhnout PDF</a>
     {% if invoice.status == 'Uhrazena' %}
     <form method="post" action="/faktury/{{ invoice.id }}/neuhrazena" class="inline-form">
-      <button type="submit" class="btn btn-ghost">Zrušit uhrazení</button>
+      <button type="submit" class="btn btn-warning">Zrušit uhrazení</button>
     </form>
     {% endif %}
     <a href="/faktury" class="btn btn-ghost">Zpět</a>

@@ -104,10 +104,30 @@ async def create_contact(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/{contact_id}", response_class=HTMLResponse)
 async def contact_detail(request: Request, contact_id: int, db: Session = Depends(get_db)):
+    from ..models.invoice import Invoice
+    from ..models.expense import Expense
+
     contact = db.query(Contact).filter(Contact.id == contact_id).first()
     if not contact:
         raise HTTPException(status_code=404, detail="Kontakt nenalezen")
-    return templates.TemplateResponse("contacts/detail.html", {"request": request, "contact": contact})
+
+    inv_count = (
+        db.query(Invoice).filter(
+            (Invoice.contact_id == contact_id) |
+            ((Invoice.contact_id.is_(None)) & (Invoice.contact_name == contact.name))
+        ).count()
+    )
+    exp_count = (
+        db.query(Expense).filter(
+            (Expense.contact_id == contact_id) |
+            ((Expense.contact_id.is_(None)) & (Expense.contact_name == contact.name))
+        ).count()
+    )
+
+    return templates.TemplateResponse(
+        "contacts/detail.html",
+        {"request": request, "contact": contact, "inv_count": inv_count, "exp_count": exp_count},
+    )
 
 
 @router.get("/{contact_id}/upravit", response_class=HTMLResponse)

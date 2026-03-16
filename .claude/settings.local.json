@@ -36,7 +36,10 @@
       "Bash(python -c \"from app.routers.invoice_templates import router; print\\(''Router OK''\\)\")",
       "Bash(python -c \"from app.main import app; print\\(''App OK''\\)\")",
       "Bash(python -c \"from app.database import create_tables; create_tables\\(\\); print\\(''Tables created''\\)\")",
-      "Bash(sqlite3 faktury.db \".tables\")"
+      "Bash(sqlite3 faktury.db \".tables\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN payment_method TEXT DEFAULT ''Bankovní převod'';\")",
+      "Bash(sqlite3 faktury.db \"ALTER TABLE invoice_templates ADD COLUMN due_days INTEGER DEFAULT 10;\")",
+      "Bash(python -c \"from app.main import app; print\\(''OK''\\)\")"
     ]
   }
 }

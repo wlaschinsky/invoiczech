@@ -355,6 +355,17 @@ async function applyTemplate(tplId) {
       fillContactFromSelect(sel);
     }
 
+    // Způsob úhrady
+    if (data.payment_method) {
+      document.getElementById('payment_method').value = data.payment_method;
+    }
+
+    // Splatnost
+    if (data.due_days) {
+      document.getElementById('due_days').value = data.due_days;
+      updateDueDate();
+    }
+
     // Položky — vymazat stávající a naplnit ze šablony
     const tbody = document.getElementById('items-tbody');
     tbody.innerHTML = '';

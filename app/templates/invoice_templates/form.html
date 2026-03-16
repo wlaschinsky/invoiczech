@@ -11,26 +11,69 @@
       action="{% if tpl %}/sablony/{{ tpl.id }}/upravit{% else %}/sablony/nova{% endif %}"
       class="form-card">
 
+  <!-- Název -->
   <div class="form-section">
-    <h2 class="form-section-title">Základní údaje</h2>
+    <h2 class="form-section-title">Název šablony</h2>
     <div class="form-row">
       <div class="form-group form-group-lg">
-        <label for="name">Název šablony *</label>
+        <label for="name">Název *</label>
         <input type="text" id="name" name="name"
                value="{{ tpl.name if tpl else '' }}"
                class="form-control" required>
       </div>
+    </div>
+  </div>
+
+  <!-- Odběratel -->
+  <div class="form-section">
+    <h2 class="form-section-title">Odběratel</h2>
+    <div class="form-row">
       <div class="form-group">
-        <label for="contact_id">Odběratel</label>
-        <select id="contact_id" name="contact_id" class="form-control">
+        <label for="contact_id">Vybrat z adresáře</label>
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
           <option value="">— Bez odběratele —</option>
           {% for c in contacts %}
           <option value="{{ c.id }}"
+                  data-name="{{ c.name }}"
+                  data-ico="{{ c.ico or '' }}"
+                  data-dic="{{ c.dic or '' }}"
+                  data-street="{{ c.street or '' }}"
+                  data-city="{{ c.city or '' }}"
+                  data-zip="{{ c.zip_code or '' }}"
+                  data-email="{{ c.email or '' }}"
                   {% if tpl and tpl.contact_id == c.id %}selected{% endif %}>
             {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
           </option>
           {% endfor %}
         </select>
+      </div>
+      <div class="form-group">
+        <label>IČO pro ARES</label>
+        <div class="input-group">
+          <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Způsob úhrady a splatnost -->
+  <div class="form-section">
+    <h2 class="form-section-title">Platební podmínky</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="payment_method">Způsob úhrady</label>
+        <select id="payment_method" name="payment_method" class="form-control">
+          {% set pm = tpl.payment_method if tpl and tpl.payment_method else 'Bankovní převod' %}
+          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="due_days">Splatnost (dní)</label>
+        <input type="number" id="due_days" name="due_days" min="1" step="1"
+               value="{{ tpl.due_days if tpl and tpl.due_days else 10 }}"
+               class="form-control w-24">
       </div>
     </div>
   </div>
@@ -122,6 +165,37 @@ function removeRow(btn) {
   const tbody = document.getElementById('items-tbody');
   if (tbody.rows.length > 1) {
     btn.closest('tr').remove();
+  }
+}
+
+function fillContactFromSelect(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById('ares_ico').value = opt.dataset.ico || '';
+}
+
+async function loadFromAres() {
+  const ico = document.getElementById('ares_ico').value.trim();
+  if (!ico) { alert('Zadejte IČO'); return; }
+  try {
+    const resp = await fetch(`/adresar/ares/${ico}`);
+    const data = await resp.json();
+    if (data.error) { alert('ARES: ' + data.error); return; }
+    // Pokud kontakt existuje v adresáři, vyber ho
+    const sel = document.getElementById('contact_id');
+    let found = false;
+    for (const opt of sel.options) {
+      if (opt.dataset.ico === data.ico) {
+        sel.value = opt.value;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      alert('Kontakt nalezen v ARES: ' + data.name + '\nNejdříve ho přidejte do adresáře.');
+    }
+  } catch(e) {
+    alert('Chyba při komunikaci s ARES');
   }
 }
 </script>

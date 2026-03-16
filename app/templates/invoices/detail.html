@@ -140,7 +140,7 @@
 </div>
 
 <div class="detail-actions-bottom mt-4">
-  <a href="/faktury" class="btn btn-ghost">Zpět na seznam</a>
+  <a href="/faktury" class="btn btn-ghost">Zpět</a>
   <form method="post" action="/faktury/{{ invoice.id }}/smazat"
         onsubmit="return confirm('Opravdu smazat fakturu {{ invoice.number }}? Tato akce je nevratná.')">
     <button type="submit" class="btn btn-danger">Smazat fakturu</button>

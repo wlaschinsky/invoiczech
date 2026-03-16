@@ -118,6 +118,13 @@
 </div>
 {% endif %}
 
+{% if invoice.internal_note %}
+<div class="detail-card mt-4">
+  <h3>Interní poznámka</h3>
+  <p>{{ invoice.internal_note }}</p>
+</div>
+{% endif %}
+
 <!-- Akce -->
 <div class="detail-card mt-4">
   <h3>Akce</h3>

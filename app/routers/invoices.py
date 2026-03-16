@@ -129,6 +129,7 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
         payment_method=form.get("payment_method", "Bankovní převod"),
         variable_symbol=variable_symbol,
         invoice_text=form.get("invoice_text", settings.DEFAULT_INVOICE_TEXT).strip(),
+        internal_note=form.get("internal_note", "").strip() or None,
         status="Vystavena",
     )
 
@@ -228,6 +229,7 @@ async def update_invoice(request: Request, invoice_id: int, db: Session = Depend
     invoice.duzp = duzp or issue_date
     invoice.payment_method = form.get("payment_method", "Bankovní převod")
     invoice.invoice_text = form.get("invoice_text", "").strip()
+    invoice.internal_note = form.get("internal_note", "").strip() or None
 
     # Smaž staré položky a ulož nové
     for item in list(invoice.items):

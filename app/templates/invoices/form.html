@@ -209,6 +209,14 @@
     </div>
   </div>
 
+  <!-- Interní poznámka -->
+  <div class="form-section">
+    <h2 class="form-section-title">Interní poznámka</h2>
+    <div class="form-group">
+      <textarea name="internal_note" rows="2" class="form-control" placeholder="Poznámka se nezobrazí na PDF">{{ invoice.internal_note if invoice and invoice.internal_note else '' }}</textarea>
+    </div>
+  </div>
+
   <div class="form-actions">
     <button type="submit" class="btn btn-primary btn-lg">
       {% if invoice %}Uložit změny{% else %}Vystavit fakturu{% endif %}

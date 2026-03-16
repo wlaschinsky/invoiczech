@@ -24,7 +24,9 @@
       "Bash(ls /Users/samuelwlaschinsky/Development/samko_dev/account_app/.venv/bin/python*)",
       "Bash(ls /Users/samuelwlaschinsky/Development/samko_dev/account_app/venv/bin/python*)",
       "Bash(venv/bin/python3 -c \":*)",
-      "Bash(timeout 5 venv/bin/python3 -m uvicorn app.main:app --port 9999)"
+      "Bash(timeout 5 venv/bin/python3 -m uvicorn app.main:app --port 9999)",
+      "Bash(sqlite3 /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/faktury.db \"PRAGMA table_info\\(invoices\\);\")",
+      "Bash(sqlite3 /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/faktury.db \"ALTER TABLE invoices ADD COLUMN internal_note TEXT;\")"
     ]
   }
 }

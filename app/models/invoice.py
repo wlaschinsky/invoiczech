@@ -30,6 +30,7 @@ class Invoice(Base):
     payment_method = Column(String, default="Bankovní převod")
     variable_symbol = Column(String)
     invoice_text = Column(Text)
+    internal_note = Column(Text)
     status = Column(String, default="Vystavena")  # Vystavena / Uhrazena / Stornována
     paid_date = Column(Date)
     created_at = Column(DateTime, server_default=func.now())

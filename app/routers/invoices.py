@@ -285,6 +285,17 @@ async def cancel_invoice(request: Request, invoice_id: int, db: Session = Depend
     return RedirectResponse(url=f"/faktury/{invoice_id}", status_code=302)
 
 
+@router.post("/{invoice_id}/smazat")
+async def delete_invoice(request: Request, invoice_id: int, db: Session = Depends(get_db)):
+    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Faktura nenalezena")
+    db.delete(invoice)
+    db.commit()
+    flash(request, f"Faktura {invoice.number} byla smazána.", "success")
+    return RedirectResponse(url="/faktury", status_code=302)
+
+
 @router.get("/{invoice_id}/pdf")
 async def download_pdf(request: Request, invoice_id: int, db: Session = Depends(get_db)):
     invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()

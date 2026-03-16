@@ -99,6 +99,12 @@
                class="form-control" required>
       </div>
       <div class="form-group">
+        <label for="due_days">Splatnost (dní)</label>
+        <input type="number" id="due_days" min="1" step="1"
+               value="{% if invoice %}{{ (invoice.due_date - invoice.issue_date).days }}{% else %}10{% endif %}"
+               class="form-control w-24" oninput="updateDueDate()">
+      </div>
+      <div class="form-group">
         <label for="due_date">Datum splatnosti *</label>
         <input type="date" id="due_date" name="due_date"
                value="{{ invoice.due_date.isoformat() if invoice else due_default.isoformat() }}"
@@ -310,7 +316,20 @@ async function loadFromAres() {
   }
 }
 
+function updateDueDate() {
+  const issueDate = document.getElementById('issue_date').value;
+  const days = parseInt(document.getElementById('due_days').value) || 0;
+  if (issueDate && days > 0) {
+    const d = new Date(issueDate);
+    d.setDate(d.getDate() + days);
+    document.getElementById('due_date').value = d.toISOString().slice(0, 10);
+  }
+}
+
 // Inicializace
-document.addEventListener('DOMContentLoaded', recalcTotals);
+document.addEventListener('DOMContentLoaded', function() {
+  recalcTotals();
+  document.getElementById('issue_date').addEventListener('change', updateDueDate);
+});
 </script>
 {% endblock %}

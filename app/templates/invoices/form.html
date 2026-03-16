@@ -148,6 +148,15 @@
   <!-- Položky -->
   <div class="form-section">
     <h2 class="form-section-title">Položky faktury</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="price_mode">Výpočet DPH</label>
+        <select id="price_mode" class="form-control" onchange="recalcAllRows()">
+          <option value="bez" selected>Cenu uvádím bez DPH (základ daně)</option>
+          <option value="s_dph">Cenu uvádím s DPH (koncová cena)</option>
+        </select>
+      </div>
+    </div>
     <table class="table items-table" id="items-table">
       <thead>
         <tr>
@@ -254,16 +263,39 @@ function fmtCzk(val) {
   return val.toLocaleString('cs-CZ', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' Kč';
 }
 
+function getPriceMode() {
+  const sel = document.getElementById('price_mode');
+  return sel ? sel.value : 'bez';
+}
+
+function calcRow(qty, price, vatRate) {
+  if (getPriceMode() === 's_dph') {
+    // cena zadána s DPH — zpětný výpočet základu
+    const totalLine = qty * price;
+    const subtotal = totalLine / (1 + vatRate / 100);
+    return { subtotal: subtotal, total: totalLine };
+  }
+  // cena bez DPH (default)
+  const subtotal = qty * price;
+  return { subtotal: subtotal, total: subtotal + subtotal * vatRate / 100 };
+}
+
 function recalcRow(el) {
   const row = el.closest('tr');
   const qty = parseFloat(row.querySelector('[name=quantity]').value) || 0;
   const price = parseFloat(row.querySelector('[name=unit_price]').value) || 0;
-  const vat = parseFloat(row.querySelector('[name=vat_rate]').value) || 0;
-  const subtotal = qty * price;
-  const total = subtotal + subtotal * vat / 100;
-  row.querySelector('.row-subtotal').textContent = fmtCzk(subtotal);
-  row.querySelector('.row-total').textContent = fmtCzk(total);
+  const vatRate = parseFloat(row.querySelector('[name=vat_rate]').value) || 0;
+  const r = calcRow(qty, price, vatRate);
+  row.querySelector('.row-subtotal').textContent = fmtCzk(r.subtotal);
+  row.querySelector('.row-total').textContent = fmtCzk(r.total);
   recalcTotals();
+}
+
+function recalcAllRows() {
+  document.querySelectorAll('#items-tbody tr').forEach(row => {
+    const el = row.querySelector('[name=quantity]');
+    if (el) recalcRow(el);
+  });
 }
 
 function recalcTotals() {
@@ -272,9 +304,9 @@ function recalcTotals() {
     const qty = parseFloat(row.querySelector('[name=quantity]')?.value) || 0;
     const price = parseFloat(row.querySelector('[name=unit_price]')?.value) || 0;
     const vatRate = parseFloat(row.querySelector('[name=vat_rate]')?.value) || 0;
-    const s = qty * price;
-    subtotal += s;
-    vat += s * vatRate / 100;
+    const r = calcRow(qty, price, vatRate);
+    subtotal += r.subtotal;
+    vat += r.total - r.subtotal;
   });
   document.getElementById('total-subtotal').textContent = fmtCzk(subtotal);
   document.getElementById('total-vat').textContent = fmtCzk(vat);
@@ -388,7 +420,7 @@ async function applyTemplate(tplId) {
       `;
       tbody.appendChild(row);
     });
-    recalcTotals();
+    recalcAllRows();
   } catch(e) {
     alert('Chyba při načítání šablony');
   }
@@ -406,7 +438,7 @@ function updateDueDate() {
 
 // Inicializace
 document.addEventListener('DOMContentLoaded', function() {
-  recalcTotals();
+  recalcAllRows();
   document.getElementById('issue_date').addEventListener('change', updateDueDate);
 });
 </script>

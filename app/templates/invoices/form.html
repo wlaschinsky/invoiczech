@@ -15,6 +15,23 @@
       action="{% if invoice %}/faktury/{{ invoice.id }}/upravit{% else %}/faktury/nova{% endif %}"
       class="form-card">
 
+  {% if not invoice and inv_templates %}
+  <!-- Šablona -->
+  <div class="form-section">
+    <h2 class="form-section-title">Použít šablonu</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <select id="template_select" class="form-control" onchange="applyTemplate(this.value)">
+          <option value="">— Bez šablony —</option>
+          {% for t in inv_templates %}
+          <option value="{{ t.id }}">{{ t.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Odběratel -->
   <div class="form-section">
     <h2 class="form-section-title">Odběratel</h2>
@@ -321,6 +338,48 @@ async function loadFromAres() {
     document.getElementById('contact_id').value = '';
   } catch(e) {
     alert('Chyba při komunikaci s ARES');
+  }
+}
+
+async function applyTemplate(tplId) {
+  if (!tplId) return;
+  try {
+    const resp = await fetch(`/sablony/${tplId}/json`);
+    const data = await resp.json();
+    if (data.error) return;
+
+    // Odběratel
+    if (data.contact_id) {
+      const sel = document.getElementById('contact_id');
+      sel.value = data.contact_id;
+      fillContactFromSelect(sel);
+    }
+
+    // Položky — vymazat stávající a naplnit ze šablony
+    const tbody = document.getElementById('items-tbody');
+    tbody.innerHTML = '';
+    data.items.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="text" name="description" value="${item.description}" class="form-control" required></td>
+        <td><input type="number" name="quantity" value="${item.quantity}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+        <td><input type="number" name="unit_price" value="${item.unit_price}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
+        <td>
+          <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+            <option value="21" ${item.vat_rate == 21 ? 'selected' : ''}>21 %</option>
+            <option value="12" ${item.vat_rate == 12 ? 'selected' : ''}>12 %</option>
+            <option value="0" ${item.vat_rate == 0 ? 'selected' : ''}>0 %</option>
+          </select>
+        </td>
+        <td class="text-right row-subtotal">—</td>
+        <td class="text-right row-total">—</td>
+        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+    recalcTotals();
+  } catch(e) {
+    alert('Chyba při načítání šablony');
   }
 }
 

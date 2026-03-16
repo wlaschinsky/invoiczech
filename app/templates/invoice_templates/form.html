@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{% if tpl %}Upravit šablonu{% else %}Nová šablona{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% if tpl %}Upravit šablonu{% else %}Nová šablona{% endif %}</h1>
+  <a href="/sablony" class="btn btn-ghost">Zpět</a>
+</div>
+
+<form method="post"
+      action="{% if tpl %}/sablony/{{ tpl.id }}/upravit{% else %}/sablony/nova{% endif %}"
+      class="form-card">
+
+  <div class="form-section">
+    <h2 class="form-section-title">Základní údaje</h2>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="name">Název šablony *</label>
+        <input type="text" id="name" name="name"
+               value="{{ tpl.name if tpl else '' }}"
+               class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="contact_id">Odběratel</label>
+        <select id="contact_id" name="contact_id" class="form-control">
+          <option value="">— Bez odběratele —</option>
+          {% for c in contacts %}
+          <option value="{{ c.id }}"
+                  {% if tpl and tpl.contact_id == c.id %}selected{% endif %}>
+            {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Položky -->
+  <div class="form-section">
+    <h2 class="form-section-title">Položky</h2>
+    <table class="table items-table" id="items-table">
+      <thead>
+        <tr>
+          <th>Popis *</th>
+          <th>Množství</th>
+          <th>Cena / MJ (Kč)</th>
+          <th>DPH %</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="items-tbody">
+        {% if tpl and tpl.items %}
+          {% for item in tpl.items %}
+          <tr>
+            <td><input type="text" name="description" value="{{ item.description }}" class="form-control" required></td>
+            <td><input type="number" name="quantity" value="{{ item.quantity }}" step="0.001" min="0.001" class="form-control w-24"></td>
+            <td><input type="number" name="unit_price" value="{{ item.unit_price }}" step="0.01" min="0" class="form-control w-32"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20">
+                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+              </select>
+            </td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td><input type="text" name="description" class="form-control" placeholder="Popis služby/zboží" required></td>
+            <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24"></td>
+            <td><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00"></td>
+            <td>
+              <select name="vat_rate" class="form-control w-20">
+                <option value="21" selected>21 %</option>
+                <option value="12">12 %</option>
+                <option value="0">0 %</option>
+              </select>
+            </td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <div class="items-actions">
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">
+      {% if tpl %}Uložit změny{% else %}Vytvořit šablonu{% endif %}
+    </button>
+    <a href="/sablony" class="btn btn-ghost">Zrušit</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addItemRow() {
+  const tbody = document.getElementById('items-tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+    <td><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24"></td>
+    <td><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00"></td>
+    <td>
+      <select name="vat_rate" class="form-control w-20">
+        <option value="21" selected>21 %</option>
+        <option value="12">12 %</option>
+        <option value="0">0 %</option>
+      </select>
+    </td>
+    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+  `;
+  tbody.appendChild(row);
+  row.querySelector('[name=description]').focus();
+}
+
+function removeRow(btn) {
+  const tbody = document.getElementById('items-tbody');
+  if (tbody.rows.length > 1) {
+    btn.closest('tr').remove();
+  }
+}
+</script>
+{% endblock %}

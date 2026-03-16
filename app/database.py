@@ -26,5 +26,5 @@ def get_db():
 
 
 def create_tables():
-    from .models import contact, invoice, expense  # noqa — import side effects
+    from .models import contact, invoice, expense, invoice_template  # noqa — import side effects
     Base.metadata.create_all(bind=engine)

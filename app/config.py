@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./faktury.db"
     UPLOAD_DIR: str = "uploads"
 
+    # Vlastník aplikace (login stránka, sidebar)
+    OWNER_NAME: str = "Vlastník Aplikace"
+    OWNER_EMAIL: str = "owner@example.com"
+
     # Údaje dodavatele
     SUPPLIER_NAME: str = "Vlastník Aplikace"
     SUPPLIER_STREET: str = "Ulice XX"

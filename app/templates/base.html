@@ -180,21 +180,12 @@
         }, {cancel: 'Zůstat', ok: 'Opustit'});
       });
 
-      // Intercept browser back/forward with custom dialog
-      history.pushState({formGuard: true}, '');
-      window.addEventListener('popstate', function(e) {
-        if (submitting || !isDirty()) {
-          // No unsaved changes — allow navigation
-          history.back();
-          return;
+      // Browser back / swipe gesture fallback (native dialog — can't be styled)
+      window.addEventListener('beforeunload', function(e) {
+        if (!submitting && isDirty()) {
+          e.preventDefault();
+          e.returnValue = '';
         }
-        // Re-push so we stay on the page while dialog is shown
-        history.pushState({formGuard: true}, '');
-        appConfirm('Máte neuložené změny. Opravdu chcete odejít?', function() {
-          submitting = true;
-          // Go back twice: once for our guard state, once for the real back
-          history.go(-2);
-        }, {cancel: 'Zůstat', ok: 'Opustit'});
       });
     })();
 

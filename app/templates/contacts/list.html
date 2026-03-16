@@ -10,12 +10,6 @@
 <div class="filter-bar">
   <form method="get" action="/adresar" class="filter-form">
     <input type="text" name="q" value="{{ q }}" placeholder="Hledat podle názvu nebo IČO…" class="form-control form-control-sm">
-    <select name="typ" class="form-control form-control-sm">
-      <option value="" {% if not typ %}selected{% endif %}>Všechny typy</option>
-      <option value="Odběratel" {% if typ == 'Odběratel' %}selected{% endif %}>Odběratel</option>
-      <option value="Dodavatel" {% if typ == 'Dodavatel' %}selected{% endif %}>Dodavatel</option>
-      <option value="Obojí" {% if typ == 'Obojí' %}selected{% endif %}>Obojí</option>
-    </select>
     <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
     <a href="/adresar" class="btn btn-ghost btn-sm">Zrušit</a>
   </form>
@@ -29,7 +23,8 @@
       <th>IČO</th>
       <th>DIČ</th>
       <th>Adresa</th>
-      <th>Typ</th>
+      <th>Faktury</th>
+      <th>Náklady</th>
       <th></th>
     </tr>
   </thead>
@@ -40,7 +35,8 @@
       <td>{{ c.ico or '—' }}</td>
       <td>{{ c.dic or '—' }}</td>
       <td class="text-muted">{{ c.full_address or '—' }}</td>
-      <td><span class="badge badge-neutral">{{ c.contact_type }}</span></td>
+      <td><span class="badge badge-neutral">{{ inv_counts.get(c.id, 0) }}</span></td>
+      <td><span class="badge badge-neutral">{{ exp_counts.get(c.id, 0) }}</span></td>
       <td class="actions">
         <a href="/adresar/{{ c.id }}/upravit" class="btn btn-sm btn-ghost">Upravit</a>
       </td>

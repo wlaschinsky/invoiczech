@@ -13,6 +13,10 @@ router = APIRouter(prefix="/adresar")
 
 @router.get("", response_class=HTMLResponse)
 async def contacts_list(request: Request, q: str = "", typ: str = "", db: Session = Depends(get_db)):
+    from ..models.invoice import Invoice
+    from ..models.expense import Expense
+    from sqlalchemy import func
+
     query = db.query(Contact)
     if q:
         query = query.filter(
@@ -21,9 +25,49 @@ async def contacts_list(request: Request, q: str = "", typ: str = "", db: Sessio
     if typ:
         query = query.filter(Contact.contact_type == typ)
     contacts = query.order_by(Contact.name).all()
+
+    # Počítat podle contact_id i contact_name (starší záznamy nemají FK)
+    inv_by_id = dict(
+        db.query(Invoice.contact_id, func.count())
+        .filter(Invoice.contact_id.isnot(None))
+        .group_by(Invoice.contact_id)
+        .all()
+    )
+    inv_by_name = dict(
+        db.query(Invoice.contact_name, func.count())
+        .filter(Invoice.contact_name.isnot(None), Invoice.contact_id.is_(None))
+        .group_by(Invoice.contact_name)
+        .all()
+    )
+    exp_by_id = dict(
+        db.query(Expense.contact_id, func.count())
+        .filter(Expense.contact_id.isnot(None))
+        .group_by(Expense.contact_id)
+        .all()
+    )
+    exp_by_name = dict(
+        db.query(Expense.contact_name, func.count())
+        .filter(Expense.contact_name.isnot(None), Expense.contact_id.is_(None))
+        .group_by(Expense.contact_name)
+        .all()
+    )
+
+    inv_counts = {}
+    exp_counts = {}
+    for c in contacts:
+        inv_counts[c.id] = inv_by_id.get(c.id, 0) + inv_by_name.get(c.name, 0)
+        exp_counts[c.id] = exp_by_id.get(c.id, 0) + exp_by_name.get(c.name, 0)
+
     return templates.TemplateResponse(
         "contacts/list.html",
-        {"request": request, "contacts": contacts, "q": q, "typ": typ},
+        {
+            "request": request,
+            "contacts": contacts,
+            "q": q,
+            "typ": typ,
+            "inv_counts": inv_counts,
+            "exp_counts": exp_counts,
+        },
     )
 
 

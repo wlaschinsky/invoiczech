@@ -2,9 +2,10 @@
  * Sdílená logika pro práci s kontakty a ARES.
  *
  * Očekává v DOM:
- *   #contact_id   — <select> s kontakty (data-ico, data-name, data-dic, ...)
- *   #ares_ico      — <input> pro IČO
- *   #ares-status   — <div> pro zobrazení stavu (upozornění, tlačítko uložit)
+ *   #contact_id      — <select> s kontakty (data-ico, data-name, data-dic, ...)
+ *   #ares_ico        — <input> pro IČO
+ *   #ares-status     — <div> pro zobrazení stavu (upozornění, tlačítko uložit)
+ *   #contact-fields  — <div> obalující ruční pole (skryje se při výběru z adresáře)
  *
  * Pole pro vyplnění (volitelná — pokud neexistují, přeskočí se):
  *   #contact_name, #contact_ico, #contact_dic,
@@ -27,11 +28,6 @@ function _fillContactFields(data) {
   _setVal('contact_city', data.city);
 }
 
-function _selectContactInDropdown(id) {
-  const sel = document.getElementById('contact_id');
-  if (sel) sel.value = id;
-}
-
 function _findContactByIco(ico) {
   const sel = document.getElementById('contact_id');
   if (!sel) return null;
@@ -50,11 +46,22 @@ function _clearStatus() {
   _showStatus('');
 }
 
+function _toggleContactFields(show) {
+  const fields = document.getElementById('contact-fields');
+  if (fields) fields.style.display = show ? '' : 'none';
+}
+
 /* ---------- veřejné funkce ---------- */
 
 function fillContactFromSelect(sel) {
   const opt = sel.options[sel.selectedIndex];
-  if (!opt || !opt.value) return;
+  if (!opt.value) {
+    // "Zadat ručně" — zobrazit pole
+    _toggleContactFields(true);
+    _clearStatus();
+    return;
+  }
+  // Vybraný kontakt z adresáře — vyplnit skrytá pole (pro submit) a skrýt
   _fillContactFields({
     name: opt.dataset.name,
     ico: opt.dataset.ico,
@@ -63,6 +70,7 @@ function fillContactFromSelect(sel) {
     zip_code: opt.dataset.zip,
     city: opt.dataset.city,
   });
+  _toggleContactFields(false);
   _clearStatus();
 }
 
@@ -81,25 +89,27 @@ async function loadFromAres() {
     }
 
     if (data.source === 'adresar') {
-      // Kontakt už existuje v adresáři
+      // Kontakt existuje v adresáři — vybrat v dropdownu, skrýt pole
       const opt = _findContactByIco(data.ico);
       if (opt) {
-        _selectContactInDropdown(opt.value);
-        fillContactFromSelect(document.getElementById('contact_id'));
+        const sel = document.getElementById('contact_id');
+        sel.value = opt.value;
+        fillContactFromSelect(sel);
       } else {
         _fillContactFields(data);
+        _toggleContactFields(true);
       }
       _showStatus('<span class="text-success">Kontakt nalezen v adresáři</span>');
     } else {
-      // Nový kontakt z ARES — vyplnit pole a nabídnout uložení
+      // Nový kontakt z ARES — vyplnit pole, zobrazit, nabídnout uložení
       document.getElementById('contact_id').value = '';
       _fillContactFields(data);
+      _toggleContactFields(true);
       _showStatus(
         '<span class="text-success">Načteno z ARES</span> ' +
         '<button type="button" class="btn btn-sm btn-secondary" ' +
         'onclick="saveAresContact()">Uložit do adresáře</button>'
       );
-      // Uložit data pro pozdější uložení
       window._aresData = data;
     }
   } catch(e) {
@@ -140,6 +150,8 @@ async function saveAresContact() {
       sel.value = result.id;
     }
 
+    // Skrýt ruční pole — kontakt je nyní v adresáři
+    _toggleContactFields(false);
     _showStatus('<span class="text-success">Uloženo do adresáře</span>');
     window._aresData = null;
   } catch(e) {

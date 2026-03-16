@@ -56,6 +56,7 @@
         <div id="ares-status" class="mt-1"></div>
       </div>
     </div>
+    <div id="contact-fields" {% if tpl and tpl.contact_id %}style="display:none"{% endif %}>
     <div class="form-row">
       <div class="form-group form-group-lg">
         <label for="contact_name">Název</label>
@@ -95,6 +96,7 @@
                value="{{ tpl.contact_city if tpl else '' }}"
                class="form-control">
       </div>
+    </div>
     </div>
   </div>
 

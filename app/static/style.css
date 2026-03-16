@@ -432,6 +432,13 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 .btn-danger:hover { background: #f87171; }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  line-height: 1;
+}
 
 .btn-ghost {
   background: transparent;
@@ -510,7 +517,7 @@ h1, h2, h3, h4, h5, h6 {
 .link-strong:hover { color: var(--color-accent-primary); }
 
 .row-danger td { background: rgba(239, 68, 68, 0.06) !important; }
-.actions { white-space: nowrap; text-align: right; }
+.actions { white-space: nowrap; text-align: right; display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
 
 /* ============================================================
    Forms

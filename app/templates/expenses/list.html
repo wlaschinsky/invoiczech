@@ -23,7 +23,9 @@
       {% endfor %}
     </select>
     <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
-    <a href="/naklady" class="btn btn-ghost btn-sm">Zrušit</a>
+    {% if q or typ_filter or rok_filter %}
+    <a href="/naklady" class="btn btn-danger btn-sm">Zrušit filtr</a>
+    {% endif %}
   </form>
 </div>
 

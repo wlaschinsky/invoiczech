@@ -16,11 +16,6 @@
   </div>
   <div class="header-actions">
     <a href="/naklady/{{ expense.id }}/upravit" class="btn btn-secondary">Upravit</a>
-    <form method="post" action="/naklady/{{ expense.id }}/smazat"
-          onsubmit="return confirm('Opravdu smazat náklad {{ expense.number }}?')"
-          style="display:inline">
-      <button type="submit" class="btn btn-danger">Smazat</button>
-    </form>
     <a href="/naklady" class="btn btn-ghost">Zpět</a>
   </div>
 </div>
@@ -126,4 +121,12 @@
   </a>
 </div>
 {% endif %}
+
+<div class="detail-actions-bottom mt-4">
+  <a href="/naklady" class="btn btn-ghost">Zpět na seznam</a>
+  <form method="post" action="/naklady/{{ expense.id }}/smazat"
+        onsubmit="return confirm('Opravdu smazat náklad {{ expense.number }}? Tato akce je nevratná.')">
+    <button type="submit" class="btn btn-danger">Smazat náklad</button>
+  </form>
+</div>
 {% endblock %}

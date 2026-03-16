@@ -411,7 +411,7 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--color-accent-primary);
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
 }
-.btn-primary:hover { background: var(--color-accent-purple-light); border-color: var(--color-accent-purple-light); }
+.btn-primary:hover { background: var(--color-accent-purple-light); border-color: var(--color-accent-purple-light); color: #fff; }
 
 .btn-secondary {
   background: transparent;
@@ -443,7 +443,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-ghost {
   background: transparent;
   color: var(--color-text-secondary);
-  border-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .btn-ghost:hover { background: rgba(99, 102, 241, 0.06); color: var(--color-text-primary); }
 

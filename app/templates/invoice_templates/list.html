@@ -13,7 +13,7 @@
     <tr>
       <th>Název</th>
       <th>Odběratel</th>
-      <th>Položek</th>
+      <th class="text-right">Částka</th>
       <th></th>
     </tr>
   </thead>
@@ -22,7 +22,7 @@
     <tr>
       <td><a href="/sablony/{{ t.id }}/upravit" class="link-strong">{{ t.name }}</a></td>
       <td>{{ t.contact.name if t.contact else '—' }}</td>
-      <td>{{ t.items | length }}</td>
+      <td class="text-right">{{ t.total | czk }}</td>
       <td class="actions">
         <a href="/sablony/{{ t.id }}/upravit" class="btn btn-sm btn-ghost">Upravit</a>
         <form method="post" action="/sablony/{{ t.id }}/smazat" class="inline-form"

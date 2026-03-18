@@ -24,16 +24,10 @@
       <option value="Účtenka" {% if typ_filter == 'Účtenka' %}selected{% endif %}>Účtenka</option>
       <option value="Jiný" {% if typ_filter == 'Jiný' %}selected{% endif %}>Jiný</option>
     </select>
-    <select name="rok" class="form-control form-control-sm">
-      <option value="">Všechny roky</option>
-      {% for year in years %}
-      <option value="{{ year }}" {% if rok_filter == year|string %}selected{% endif %}>{{ year }}</option>
-      {% endfor %}
-    </select>
-    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm" placeholder="Od" title="Datum od">
-    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm" placeholder="Do" title="Datum do">
+    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm form-control-date" title="Datum od">
+    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm form-control-date" title="Datum do">
     <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
-    {% if q or typ_filter or rok_filter or od or do %}
+    {% if q or typ_filter or od or do %}
     <a href="/naklady" class="btn btn-danger btn-sm">Zrušit filtr</a>
     {% endif %}
   </form>

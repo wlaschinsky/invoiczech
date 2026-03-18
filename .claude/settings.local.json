@@ -50,7 +50,12 @@
       "Bash(sqlite3 faktury.db \"SELECT contact_id, COUNT\\(*\\) FROM expenses WHERE contact_id IS NOT NULL GROUP BY contact_id LIMIT 10;\")",
       "Bash(sqlite3 faktury.db \"SELECT id, name FROM contacts LIMIT 10;\")",
       "Bash(sqlite3 faktury.db \"SELECT id, contact_id, contact_name FROM invoices LIMIT 10;\")",
-      "Bash(sqlite3 faktury.db \"SELECT id, contact_id, contact_name FROM expenses LIMIT 10;\")"
+      "Bash(sqlite3 faktury.db \"SELECT id, contact_id, contact_name FROM expenses LIMIT 10;\")",
+      "Bash(python migrate.py)",
+      "Bash(python3 migrate.py)",
+      "Bash(ls .venv/bin/python*)",
+      "Bash(ls venv/bin/python*)",
+      "Bash(venv/bin/python migrate.py)"
     ]
   }
 }

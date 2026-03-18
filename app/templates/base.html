@@ -292,8 +292,39 @@
         'Adresář': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
       };
 
+      var allResults = [];
+      var activeFilter = 'Vše';
+
+      function renderItems(filter) {
+        activeFilter = filter;
+        var list = dropdown.querySelector('.search-results');
+        if (!list) return;
+        var filtered = filter === 'Vše' ? allResults : allResults.filter(function(r) { return r.category === filter; });
+        var html = '';
+        if (!filtered.length) {
+          html = '<div class="search-empty">Nic nenalezeno</div>';
+        } else {
+          filtered.forEach(function(r) {
+            var icon = catIcons[r.category] || '';
+            html += '<a href="' + r.url + '" class="search-item" data-cat="' + r.category + '">' +
+              '<span class="search-item-icon">' + icon + '</span>' +
+              '<span class="search-item-label">' + r.label + '</span>' +
+              (r.detail ? '<span class="search-item-detail">' + r.detail + '</span>' : '') +
+              '</a>';
+          });
+        }
+        list.innerHTML = html;
+        items = Array.from(list.querySelectorAll('.search-item'));
+        activeIdx = -1;
+        // Update active tab
+        dropdown.querySelectorAll('.search-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.filter === filter);
+        });
+      }
+
       function render(results) {
         close();
+        allResults = results;
         if (!results.length) {
           dropdown = document.createElement('div');
           dropdown.className = 'search-dropdown';
@@ -304,19 +335,30 @@
         }
         dropdown = document.createElement('div');
         dropdown.className = 'search-dropdown';
-        var html = '';
+        // Build tabs from categories present in results
+        var cats = [];
         results.forEach(function(r) {
-          var icon = catIcons[r.category] || '';
-          html += '<a href="' + r.url + '" class="search-item">' +
-            '<span class="search-item-icon">' + icon + '</span>' +
-            '<span class="search-item-label">' + r.label + '</span>' +
-            (r.detail ? '<span class="search-item-detail">' + r.detail + '</span>' : '') +
-            '</a>';
+          if (cats.indexOf(r.category) === -1) cats.push(r.category);
         });
-        dropdown.innerHTML = html;
+        var tabsHtml = '<div class="search-tabs">';
+        tabsHtml += '<button class="search-tab active" data-filter="Vše">Vše</button>';
+        cats.forEach(function(c) {
+          tabsHtml += '<button class="search-tab" data-filter="' + c + '">' + c + '</button>';
+        });
+        tabsHtml += '</div>';
+        dropdown.innerHTML = tabsHtml + '<div class="search-results"></div>';
         container.appendChild(dropdown);
+        // Tab click handlers
+        dropdown.querySelectorAll('.search-tab').forEach(function(tab) {
+          tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            renderItems(tab.dataset.filter);
+          });
+        });
+        activeFilter = 'Vše';
+        renderItems('Vše');
         setBlur(true);
-        items = Array.from(dropdown.querySelectorAll('.search-item'));
       }
 
       function setActive(idx) {

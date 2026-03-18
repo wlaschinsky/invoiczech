@@ -4,7 +4,7 @@ from decimal import Decimal
 from fastapi.templating import Jinja2Templates
 
 from .flash import get_flashes
-from .config import get_settings
+from .config import get_settings, APP_VERSION
 
 settings = get_settings()
 
@@ -44,6 +44,9 @@ def _fmt_num(value, decimals: int = 2) -> str:
 templates.env.filters["czk"] = _fmt_czk
 templates.env.filters["date_cs"] = _fmt_date
 templates.env.filters["num"] = _fmt_num
+
+# ---- Global variables ----
+templates.env.globals["app_version"] = APP_VERSION
 
 
 # ---- Flash injection ----

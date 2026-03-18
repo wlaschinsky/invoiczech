@@ -1,3 +1,6 @@
+import os
+import subprocess
+
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
@@ -37,3 +40,17 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def get_version() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "describe", "--tags", "--abbrev=0"],
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+    except Exception:
+        return "dev"
+
+
+APP_VERSION = get_version()

@@ -20,8 +20,8 @@
       <span class="logo-full"><span class="logo-invoi">Invoi</span><span class="logo-dot">·</span><span class="logo-czech">Czech</span></span>
       <span class="logo-short"><span class="logo-invoi">i</span><span class="logo-czech">C</span><span class="logo-dot logo-dot--sm">·</span></span>
     </a>
-    <div class="topbar-search">
-      <input type="text" class="topbar-search-input" placeholder="Hledat...">
+    <div class="topbar-search" id="global-search">
+      <input type="text" class="topbar-search-input" id="global-search-input" placeholder="Hledat..." autocomplete="off">
     </div>
     <div class="topbar-right"></div>
   </header>
@@ -243,6 +243,93 @@
       // Load saved state
       var saved = localStorage.getItem('sidebar_collapsed') === 'true';
       if (saved) setSidebar(true);
+    })();
+
+    // Global search
+    (function() {
+      var input = document.getElementById('global-search-input');
+      var container = document.getElementById('global-search');
+      if (!input || !container) return;
+      var dropdown = null;
+      var timer = null;
+      var activeIdx = -1;
+      var items = [];
+
+      function close() {
+        if (dropdown) { dropdown.remove(); dropdown = null; }
+        activeIdx = -1;
+        items = [];
+      }
+
+      function render(results) {
+        close();
+        if (!results.length) {
+          dropdown = document.createElement('div');
+          dropdown.className = 'search-dropdown';
+          dropdown.innerHTML = '<div class="search-empty">Nic nenalezeno</div>';
+          container.appendChild(dropdown);
+          return;
+        }
+        dropdown = document.createElement('div');
+        dropdown.className = 'search-dropdown';
+        var html = '';
+        var lastCat = '';
+        results.forEach(function(r) {
+          if (r.category !== lastCat) {
+            lastCat = r.category;
+            html += '<div class="search-category">' + r.category + '</div>';
+          }
+          html += '<a href="' + r.url + '" class="search-item">' +
+            '<span>' + r.label + '</span>' +
+            (r.detail ? '<span class="search-item-detail">' + r.detail + '</span>' : '') +
+            '</a>';
+        });
+        dropdown.innerHTML = html;
+        container.appendChild(dropdown);
+        items = Array.from(dropdown.querySelectorAll('.search-item'));
+      }
+
+      function setActive(idx) {
+        items.forEach(function(el) { el.classList.remove('active'); });
+        if (idx >= 0 && idx < items.length) {
+          items[idx].classList.add('active');
+          items[idx].scrollIntoView({block: 'nearest'});
+        }
+        activeIdx = idx;
+      }
+
+      input.addEventListener('input', function() {
+        clearTimeout(timer);
+        var q = input.value.trim();
+        if (q.length < 2) { close(); return; }
+        timer = setTimeout(function() {
+          fetch('/hledat?q=' + encodeURIComponent(q))
+            .then(function(r) { return r.json(); })
+            .then(function(data) { render(data.results); })
+            .catch(function() { close(); });
+        }, 250);
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (!dropdown) return;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setActive(Math.min(activeIdx + 1, items.length - 1));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setActive(Math.max(activeIdx - 1, 0));
+        } else if (e.key === 'Enter' && activeIdx >= 0) {
+          e.preventDefault();
+          window.location.href = items[activeIdx].getAttribute('href');
+        } else if (e.key === 'Escape') {
+          close();
+          input.blur();
+        }
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#global-search')) close();
+      });
     })();
   </script>
   {% block scripts %}{% endblock %}

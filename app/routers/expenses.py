@@ -45,7 +45,7 @@ async def expenses_list(
             pass
     if q:
         query = query.filter(
-            Expense.contact_name.ilike(f"%{q}%") | Expense.number.ilike(f"%{q}%")
+            Expense.contact_name.ilike(f"%{q}%") | Expense.number.ilike(f"%{q}%") | Expense.title.ilike(f"%{q}%")
         )
     if od:
         d = parse_date(od)
@@ -130,6 +130,7 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
 
     expense = Expense(
         number=next_number,
+        title=form.get("title", "").strip(),
         contact_id=contact_id,
         contact_name=contact_name,
         supplier_document_number=form.get("supplier_document_number", "").strip(),
@@ -194,10 +195,10 @@ async def bulk_csv(request: Request, db: Session = Depends(get_db)):
     expenses = db.query(Expense).filter(Expense.id.in_(ids)).order_by(Expense.issue_date.desc()).all()
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(["Číslo", "Dodavatel", "Typ", "Datum", "DUZP", "Základ", "DPH", "Celkem", "Daň. uznatelný"])
+    writer.writerow(["Číslo", "Název", "Dodavatel", "Typ", "Datum", "DUZP", "Základ", "DPH", "Celkem", "Daň. uznatelný"])
     for exp in expenses:
         writer.writerow([
-            exp.number, exp.contact_name or "", exp.document_type,
+            exp.number, exp.title or "", exp.contact_name or "", exp.document_type,
             exp.issue_date.isoformat(), exp.duzp.isoformat() if exp.duzp else "",
             str(exp.subtotal), str(exp.vat_total), str(exp.total), exp.tax_deductible,
         ])
@@ -268,6 +269,7 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     contact_id = int(contact_id_raw) if contact_id_raw else None
     contact = db.query(Contact).filter(Contact.id == contact_id).first() if contact_id else None
 
+    expense.title = form.get("title", "").strip()
     expense.contact_id = contact_id
     expense.contact_name = contact.name if contact else form.get("contact_name", "").strip()
     expense.supplier_document_number = form.get("supplier_document_number", "").strip()

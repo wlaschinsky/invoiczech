@@ -35,7 +35,7 @@ async def global_search(q: str = "", db: Session = Depends(get_db)):
 
     expenses = (
         db.query(Expense)
-        .filter(Expense.number.ilike(term) | Expense.contact_name.ilike(term))
+        .filter(Expense.number.ilike(term) | Expense.contact_name.ilike(term) | Expense.title.ilike(term))
         .order_by(Expense.issue_date.desc())
         .limit(5)
         .all()

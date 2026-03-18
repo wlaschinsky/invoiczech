@@ -13,7 +13,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <h1>{{ expense.number }}</h1>
+    <h1>{{ expense.number }}{% if expense.title %} — {{ expense.title }}{% endif %}</h1>
     <span class="badge badge-neutral badge-lg">{{ expense.document_type }}</span>
     {% if expense.tax_deductible == 'Ano' %}
     <span class="badge badge-uhrazena badge-lg">Daň. uznatelný</span>

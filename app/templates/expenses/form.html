@@ -30,6 +30,17 @@
       action="{% if expense %}/naklady/{{ expense.id }}/upravit{% else %}/naklady/novy{% endif %}"
       class="form-card">
 
+  <!-- Název nákladu -->
+  <div class="form-section">
+    <h2 class="form-section-title">Základní údaje</h2>
+    <div class="form-group">
+      <label for="title">Název nákladu *</label>
+      <input type="text" id="title" name="title"
+             value="{{ expense.title if expense else '' }}"
+             class="form-control" placeholder="Např. Hosting, Kancelářské potřeby, Licence…" required>
+    </div>
+  </div>
+
   <!-- Dodavatel -->
   <div class="form-section">
     <h2 class="form-section-title">Dodavatel</h2>

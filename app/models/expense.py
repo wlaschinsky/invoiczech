@@ -11,6 +11,7 @@ class Expense(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     number = Column(String, unique=True, nullable=False, index=True)
+    title = Column(String, nullable=False, default="")
 
     contact_id = Column(Integer, ForeignKey("contacts.id"), nullable=True)
     contact_name = Column(String)  # denormalizovaný název pro rychlé zobrazení

@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block title %}{% if tpl %}Upravit šablonu{% else %}Nová šablona{% endif %}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/sablony">Šablony</a>
+  <span class="breadcrumb-sep">›</span>
+  {% if tpl %}
+  <span class="breadcrumb-current">{{ tpl.name }}</span>
+  {% else %}
+  <span class="breadcrumb-current">Nová šablona</span>
+  {% endif %}
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <h1>{% if tpl %}Upravit šablonu{% else %}Nová šablona{% endif %}</h1>

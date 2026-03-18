@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block title %}{{ invoice.number }}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/faktury">Faktury</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">{{ invoice.number }}</span>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <div>

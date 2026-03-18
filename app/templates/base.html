@@ -465,6 +465,242 @@
       });
     })();
 
+    // Custom date picker
+    (function() {
+      var MONTHS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+      var DAYS = ['Po','Út','St','Čt','Pá','So','Ne'];
+      var valDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      var openWrap = null;
+
+      function closeAll() {
+        if (openWrap) {
+          var c = openWrap.querySelector('.dp-calendar');
+          if (c) c.remove();
+          openWrap = null;
+        }
+      }
+
+      function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+      function formatCs(iso) {
+        if (!iso) return '';
+        var p = iso.split('-');
+        return p[2] + '.' + p[1] + '.' + p[0];
+      }
+
+      function initOne(input) {
+        if (input.dataset.dpReady) return;
+        input.dataset.dpReady = '1';
+        input.classList.add('dp-native');
+
+        var wrap = document.createElement('div');
+        wrap.className = 'dp-wrap';
+        if (input.classList.contains('form-control-date')) {
+          wrap.classList.add('form-control-date');
+          input.classList.remove('form-control-date');
+        }
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(input);
+
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'dp-trigger';
+        if (input.classList.contains('form-control-sm')) trigger.classList.add('form-control-sm');
+        trigger.innerHTML = '<span class="dp-text"></span><span class="dp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>';
+        wrap.appendChild(trigger);
+
+        var textEl = trigger.querySelector('.dp-text');
+        var viewYear, viewMonth;
+
+        function updateText() {
+          var v = valDesc.get.call(input);
+          if (v) {
+            textEl.textContent = formatCs(v);
+            textEl.classList.remove('dp-placeholder');
+          } else {
+            textEl.textContent = input.placeholder || 'Vyberte datum';
+            textEl.classList.add('dp-placeholder');
+          }
+        }
+
+        function buildCalendar() {
+          var existing = wrap.querySelector('.dp-calendar');
+          if (existing) existing.remove();
+
+          var cal = document.createElement('div');
+          cal.className = 'dp-calendar';
+
+          var curVal = valDesc.get.call(input);
+          var sel = curVal ? new Date(curVal + 'T00:00:00') : null;
+          var today = new Date(); today.setHours(0,0,0,0);
+
+          // Header
+          var header = document.createElement('div');
+          header.className = 'dp-header';
+          header.innerHTML = '<button type="button" class="dp-nav dp-prev">‹</button>' +
+            '<span class="dp-header-title">' + MONTHS[viewMonth] + ' ' + viewYear + '</span>' +
+            '<button type="button" class="dp-nav dp-next">›</button>';
+          cal.appendChild(header);
+
+          header.querySelector('.dp-prev').addEventListener('click', function(e) {
+            e.stopPropagation();
+            viewMonth--;
+            if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+            buildCalendar();
+          });
+          header.querySelector('.dp-next').addEventListener('click', function(e) {
+            e.stopPropagation();
+            viewMonth++;
+            if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+            buildCalendar();
+          });
+
+          // Weekday headers
+          var wk = document.createElement('div');
+          wk.className = 'dp-weekdays';
+          DAYS.forEach(function(d) {
+            var s = document.createElement('span');
+            s.textContent = d;
+            wk.appendChild(s);
+          });
+          cal.appendChild(wk);
+
+          // Days grid
+          var grid = document.createElement('div');
+          grid.className = 'dp-days';
+
+          var first = new Date(viewYear, viewMonth, 1);
+          var startDay = (first.getDay() + 6) % 7; // Monday=0
+          var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+          var prevDays = new Date(viewYear, viewMonth, 0).getDate();
+
+          // Previous month fill
+          for (var i = startDay - 1; i >= 0; i--) {
+            var d = document.createElement('div');
+            d.className = 'dp-day dp-other';
+            d.textContent = prevDays - i;
+            grid.appendChild(d);
+          }
+
+          // Current month
+          for (var day = 1; day <= daysInMonth; day++) {
+            var d = document.createElement('div');
+            d.className = 'dp-day';
+            d.textContent = day;
+            d.dataset.date = viewYear + '-' + pad(viewMonth + 1) + '-' + pad(day);
+
+            var thisDate = new Date(viewYear, viewMonth, day);
+            if (thisDate.getTime() === today.getTime()) d.classList.add('dp-today');
+            if (sel && thisDate.getTime() === sel.getTime()) d.classList.add('dp-selected');
+
+            d.addEventListener('click', function(e) {
+              e.stopPropagation();
+              var iso = this.dataset.date;
+              valDesc.set.call(input, iso);
+              updateText();
+              input.dispatchEvent(new Event('change', {bubbles: true}));
+              closeAll();
+            });
+            grid.appendChild(d);
+          }
+
+          // Next month fill
+          var total = startDay + daysInMonth;
+          var remaining = (7 - total % 7) % 7;
+          for (var i = 1; i <= remaining; i++) {
+            var d = document.createElement('div');
+            d.className = 'dp-day dp-other';
+            d.textContent = i;
+            grid.appendChild(d);
+          }
+
+          cal.appendChild(grid);
+
+          // Clear button (only if value is set and input is not required)
+          if (curVal && !input.required) {
+            var clr = document.createElement('button');
+            clr.type = 'button';
+            clr.className = 'dp-clear';
+            clr.textContent = 'Vymazat';
+            clr.addEventListener('click', function(e) {
+              e.stopPropagation();
+              valDesc.set.call(input, '');
+              updateText();
+              input.dispatchEvent(new Event('change', {bubbles: true}));
+              closeAll();
+            });
+            cal.appendChild(clr);
+          }
+
+          wrap.appendChild(cal);
+        }
+
+        function toggle() {
+          var isOpen = wrap.querySelector('.dp-calendar');
+          closeAll();
+          if (!isOpen) {
+            var v = valDesc.get.call(input);
+            if (v) {
+              var p = v.split('-');
+              viewYear = parseInt(p[0]);
+              viewMonth = parseInt(p[1]) - 1;
+            } else {
+              var now = new Date();
+              viewYear = now.getFullYear();
+              viewMonth = now.getMonth();
+            }
+            buildCalendar();
+            openWrap = wrap;
+          }
+        }
+
+        trigger.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggle();
+        });
+
+        trigger.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          } else if (e.key === 'Escape') {
+            closeAll();
+          }
+        });
+
+        // Override value to keep trigger in sync
+        Object.defineProperty(input, 'value', {
+          get: function() { return valDesc.get.call(this); },
+          set: function(v) { valDesc.set.call(this, v); updateText(); }
+        });
+
+        updateText();
+      }
+
+      // Init all existing date inputs
+      document.querySelectorAll('input[type=date].form-control').forEach(initOne);
+
+      // Auto-init date inputs added later
+      var obs = new MutationObserver(function(muts) {
+        muts.forEach(function(m) {
+          m.addedNodes.forEach(function(node) {
+            if (node.nodeType !== 1) return;
+            if (node.matches && node.matches('input[type=date].form-control')) initOne(node);
+            if (node.querySelectorAll) {
+              node.querySelectorAll('input[type=date].form-control').forEach(initOne);
+            }
+          });
+        });
+      });
+      obs.observe(document.body, {childList: true, subtree: true});
+
+      // Close on outside click
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dp-wrap')) closeAll();
+      });
+    })();
+
     // Custom styled selects
     (function() {
       var valDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');

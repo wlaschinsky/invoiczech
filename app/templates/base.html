@@ -404,6 +404,67 @@
         if (!e.target.closest('#global-search')) close();
       });
     })();
+    // Bulk selection & actions
+    (function() {
+      var table = document.getElementById('bulk-table');
+      var bar = document.getElementById('bulk-bar');
+      var countEl = document.getElementById('bulk-count');
+      var selectAll = document.getElementById('select-all');
+      if (!table || !bar || !selectAll) return;
+
+      var checks = Array.from(table.querySelectorAll('.row-check'));
+
+      function update() {
+        var selected = checks.filter(function(c) { return c.checked; });
+        var count = selected.length;
+        countEl.textContent = count;
+        bar.style.display = count > 0 ? '' : 'none';
+        selectAll.checked = count === checks.length && count > 0;
+        selectAll.indeterminate = count > 0 && count < checks.length;
+      }
+
+      selectAll.addEventListener('change', function() {
+        checks.forEach(function(c) { c.checked = selectAll.checked; });
+        update();
+      });
+
+      checks.forEach(function(c) {
+        c.addEventListener('change', update);
+      });
+
+      // Bulk action buttons
+      bar.querySelectorAll('[data-bulk-action]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var url = btn.dataset.bulkAction;
+          var msg = btn.dataset.bulkConfirm;
+          var selected = checks.filter(function(c) { return c.checked; });
+          if (!selected.length) return;
+
+          function doAction() {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            form.style.display = 'none';
+            selected.forEach(function(c) {
+              var input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = 'ids';
+              input.value = c.value;
+              form.appendChild(input);
+            });
+            document.body.appendChild(form);
+            form.submit();
+          }
+
+          if (msg) {
+            appConfirm(msg, doAction, {cancel: 'Zrušit', ok: 'Potvrdit'});
+          } else {
+            doAction();
+          }
+        });
+      });
+    })();
+
     // Custom styled selects
     (function() {
       var valDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');

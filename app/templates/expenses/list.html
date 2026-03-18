@@ -30,8 +30,10 @@
       <option value="{{ year }}" {% if rok_filter == year|string %}selected{% endif %}>{{ year }}</option>
       {% endfor %}
     </select>
+    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm" placeholder="Od" title="Datum od">
+    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm" placeholder="Do" title="Datum do">
     <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
-    {% if q or typ_filter or rok_filter %}
+    {% if q or typ_filter or rok_filter or od or do %}
     <a href="/naklady" class="btn btn-danger btn-sm">Zrušit filtr</a>
     {% endif %}
   </form>
@@ -39,9 +41,21 @@
 {% endif %}
 
 {% if expenses %}
-<table class="table table-hover">
+<!-- Bulk actions bar -->
+<div class="bulk-bar" id="bulk-bar" style="display:none">
+  <div class="bulk-bar-inner">
+    <span class="bulk-count"><strong id="bulk-count">0</strong> vybráno z {{ expenses | length }}</span>
+    <div class="bulk-actions">
+      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/naklady/hromadne/csv">Exportovat CSV</button>
+      <button type="button" class="btn btn-sm btn-danger" data-bulk-action="/naklady/hromadne/smazat" data-bulk-confirm="Smazat vybrané náklady? Tato akce je nevratná.">Smazat</button>
+    </div>
+  </div>
+</div>
+
+<table class="table table-hover" id="bulk-table">
   <thead>
     <tr>
+      <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
       <th>Číslo</th>
       <th>Dodavatel</th>
       <th>Typ</th>
@@ -55,6 +69,7 @@
   <tbody>
     {% for exp in expenses %}
     <tr>
+      <td class="col-check"><input type="checkbox" class="row-check" value="{{ exp.id }}"></td>
       <td><a href="/naklady/{{ exp.id }}" class="link-strong">{{ exp.number }}</a></td>
       <td>{{ exp.contact_name or '—' }}</td>
       <td><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
@@ -84,6 +99,7 @@
   </tbody>
   <tfoot>
     <tr>
+      <td></td>
       <td colspan="5" class="text-right text-muted">Celkem ({{ expenses | length }}):</td>
       <td class="text-right">{{ expenses | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ expenses | sum(attribute='total') | czk }}</td>

@@ -896,8 +896,48 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   align-items: center;
 }
 .filter-form .form-control { max-width: 220px; }
+.filter-form input[type=date].form-control { max-width: 160px; }
 .filter-form .cs-wrap { width: auto; max-width: 220px; }
 .filter-form .cs-trigger { width: auto; min-width: 140px; }
+
+/* ---- Bulk selection ---- */
+.col-check {
+  width: 36px;
+  text-align: center;
+}
+.col-check input[type=checkbox],
+.row-check {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--color-accent-primary);
+}
+.bulk-bar {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+}
+.bulk-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bulk-count {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.bulk-count strong {
+  color: var(--color-text-primary);
+}
+.bulk-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
 /* ============================================================
    Detail view

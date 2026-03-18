@@ -728,13 +728,94 @@ select.form-control {
   cursor: pointer;
   appearance: auto;
 }
-select.form-control option {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
+select.form-control.cs-native {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  width: 0;
+  padding: 0;
+  border: 0;
 }
-select.form-control option:hover,
-select.form-control option:checked {
+/* Custom select */
+.cs-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.cs-wrap.w-20 { width: 70px !important; flex: none !important; }
+.cs-wrap.w-24 { width: 85px !important; flex: none !important; }
+.cs-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
   background: var(--color-bg-secondary);
+  width: 100%;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cs-trigger:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.cs-trigger .cs-arrow {
+  flex-shrink: 0;
+  opacity: 0.5;
+  font-size: 0.65rem;
+  transition: transform 0.15s;
+}
+.cs-wrap.open .cs-arrow { transform: rotate(180deg); }
+.cs-trigger.form-control-sm {
+  padding: 7px 10px;
+  font-size: 0.8rem;
+}
+.cs-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  min-width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  z-index: 1001;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 4px 0;
+}
+.cs-option {
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.1s;
+}
+.cs-option:hover,
+.cs-option.cs-active {
+  background: var(--color-bg-secondary);
+}
+.cs-option.cs-selected {
+  color: var(--color-accent-primary);
+}
+.cs-trigger.form-control-sm + .cs-dropdown .cs-option {
+  padding: 6px 10px;
+  font-size: 0.8rem;
 }
 textarea.form-control { resize: vertical; min-height: 70px; }
 .form-control-sm { padding: 7px 10px; font-size: 0.8rem; }
@@ -815,6 +896,8 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   align-items: center;
 }
 .filter-form .form-control { max-width: 220px; }
+.filter-form .cs-wrap { width: auto; max-width: 220px; }
+.filter-form .cs-trigger { width: auto; min-width: 140px; }
 
 /* ============================================================
    Detail view

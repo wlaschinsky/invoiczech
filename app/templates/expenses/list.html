@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<table class="table table-hover" id="bulk-table">
+<table class="table table-hover" id="bulk-table" data-testid="expense-list">
   <thead>
     <tr>
       <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
@@ -63,7 +63,7 @@
   </thead>
   <tbody>
     {% for exp in expenses %}
-    <tr>
+    <tr data-testid="expense-row-{{ exp.id }}">
       <td class="col-check"><input type="checkbox" class="row-check" value="{{ exp.id }}"></td>
       <td><a href="/naklady/{{ exp.id }}" class="link-strong">{{ exp.number }}</a></td>
       <td>{{ exp.title or '—' }}</td>

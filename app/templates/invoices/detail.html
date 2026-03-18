@@ -25,7 +25,7 @@
     {% if invoice.status != 'Stornována' %}
     <a href="/faktury/{{ invoice.id }}/upravit" class="btn btn-secondary">Upravit</a>
     {% endif %}
-    <a href="/faktury/{{ invoice.id }}/pdf" class="btn btn-primary">Stáhnout PDF</a>
+    <a href="/faktury/{{ invoice.id }}/pdf" class="btn btn-primary" data-testid="invoice-download-pdf">Stáhnout PDF</a>
     {% if invoice.status == 'Uhrazena' %}
     <form method="post" action="/faktury/{{ invoice.id }}/neuhrazena" class="inline-form">
       <button type="submit" class="btn btn-warning">Zrušit uhrazení</button>

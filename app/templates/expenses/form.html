@@ -28,7 +28,7 @@
 
 <form method="post" enctype="multipart/form-data"
       action="{% if expense %}/naklady/{{ expense.id }}/upravit{% else %}/naklady/novy{% endif %}"
-      class="form-card">
+      class="form-card" data-testid="expense-form">
 
   <!-- Název nákladu -->
   <div class="form-section">
@@ -47,7 +47,7 @@
     <div class="form-row">
       <div class="form-group">
         <label for="contact_id">Vybrat z adresáře</label>
-        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="expense-contact">
           <option value="">— Zadat ručně —</option>
           {% for c in contacts %}
           <option value="{{ c.id }}"
@@ -97,7 +97,7 @@
         <label for="issue_date">Datum vystavení *</label>
         <input type="date" id="issue_date" name="issue_date"
                value="{{ expense.issue_date.isoformat() if expense else today.isoformat() }}"
-               class="form-control" required>
+               class="form-control" required data-testid="expense-date">
       </div>
       <div class="form-group">
         <label for="duzp">DUZP</label>
@@ -124,7 +124,7 @@
       </div>
       <div class="form-group">
         <label for="document_type">Typ dokladu</label>
-        <select name="document_type" class="form-control">
+        <select name="document_type" class="form-control" data-testid="expense-type">
           {% set dt = expense.document_type if expense else 'Faktura' %}
           <option {% if dt == 'Faktura' %}selected{% endif %}>Faktura</option>
           <option {% if dt == 'Účtenka' %}selected{% endif %}>Účtenka</option>
@@ -133,7 +133,7 @@
       </div>
       <div class="form-group">
         <label for="tax_deductible">Daňově uznatelný</label>
-        <select name="tax_deductible" class="form-control">
+        <select name="tax_deductible" class="form-control" data-testid="expense-tax-deductible">
           {% set td = expense.tax_deductible if expense else 'Nevím' %}
           <option {% if td == 'Ano' %}selected{% endif %}>Ano</option>
           <option {% if td == 'Ne' %}selected{% endif %}>Ne</option>
@@ -244,7 +244,7 @@
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary btn-lg">
+    <button type="submit" class="btn btn-primary btn-lg" data-testid="expense-submit">
       {% if expense %}Uložit změny{% else %}Přidat náklad{% endif %}
     </button>
     {% if expense %}

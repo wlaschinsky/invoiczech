@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block title %}{{ contact.name }}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/adresar">Adresář</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">{{ contact.name }}</span>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <div>

@@ -90,6 +90,7 @@
     <!-- Main content -->
     <main class="main-content">
       <div class="content-inner">
+        {% block breadcrumb %}{% endblock %}
         {% for flash in flashes %}
         <div class="alert alert-{{ flash.category }}">{{ flash.message }}</div>
         {% endfor %}

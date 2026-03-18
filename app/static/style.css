@@ -372,6 +372,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
+   Breadcrumbs
+   ============================================================ */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 24px -112px;
+}
+.breadcrumb a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: var(--color-text-primary);
+}
+.breadcrumb-sep {
+  opacity: 0.6;
+  font-size: 1rem;
+}
+.breadcrumb-current {
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
    Alerts / Flash messages
    ============================================================ */
 .alert {
@@ -999,4 +1025,5 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { flex-direction: column; }
   .filter-form { flex-direction: column; }
+  .breadcrumb { margin-left: 0; }
 }

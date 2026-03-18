@@ -1,6 +1,22 @@
 {% extends "base.html" %}
 {% block title %}{% if invoice %}Upravit fakturu{% else %}Nová faktura{% endif %}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/faktury">Faktury</a>
+  <span class="breadcrumb-sep">›</span>
+  {% if invoice %}
+  <a href="/faktury/{{ invoice.id }}">{{ invoice.number }}</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">Upravit</span>
+  {% else %}
+  <span class="breadcrumb-current">Nová faktura</span>
+  {% endif %}
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <h1>{% if invoice %}Upravit fakturu {{ invoice.number }}{% else %}Nová faktura ({{ next_number }}){% endif %}</h1>

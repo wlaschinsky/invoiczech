@@ -1,6 +1,22 @@
 {% extends "base.html" %}
 {% block title %}{% if contact %}Upravit kontakt{% else %}Nový kontakt{% endif %}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/adresar">Adresář</a>
+  <span class="breadcrumb-sep">›</span>
+  {% if contact and contact.id %}
+  <a href="/adresar/{{ contact.id }}">{{ contact.name }}</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">Upravit</span>
+  {% else %}
+  <span class="breadcrumb-current">Nový kontakt</span>
+  {% endif %}
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <h1>{% if contact %}Upravit kontakt{% else %}Nový kontakt{% endif %}</h1>

@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Náklady{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="/">InvoiCzech</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">Náklady</span>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <h1>Přijaté doklady (Náklady)</h1>

@@ -301,23 +301,34 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--color-bg-tertiary);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  padding: 4px;
+  padding: 8px;
   z-index: 300;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   display: none;
 }
 .sidebar-user.open .user-dropdown { display: block; }
+.sidebar-user.open ~ .sidebar-separator,
+.sidebar-user.open ~ .nav-list {
+  filter: blur(1px);
+  pointer-events: none;
+}
 .user-dropdown-item {
   display: block;
-  padding: 8px 12px;
-  font-size: 13px;
-  color: var(--color-text-secondary);
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: center;
+  text-decoration: none;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  transition: all 0.15s ease;
 }
 .user-dropdown-item:hover {
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
 }
 
 /* ---- Sidebar separator with toggle ---- */

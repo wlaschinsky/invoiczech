@@ -28,7 +28,7 @@
 
 <form method="post"
       action="{% if contact %}/adresar/{{ contact.id }}/upravit{% else %}/adresar/novy{% endif %}"
-      class="form-card">
+      class="form-card" data-testid="contact-form">
 
   <div class="form-section">
     <h2 class="form-section-title">Základní údaje</h2>
@@ -40,7 +40,7 @@
           <input type="text" id="ares_ico"
                  value="{{ contact.ico if contact else '' }}"
                  placeholder="12345678" class="form-control">
-          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()" data-testid="contact-ares-load">Načíst z ARES</button>
         </div>
       </div>
     </div>
@@ -50,13 +50,13 @@
         <label for="name">Název / Jméno *</label>
         <input type="text" id="name" name="name"
                value="{{ contact.name if contact else '' }}"
-               class="form-control" required>
+               class="form-control" required data-testid="contact-name">
       </div>
       <div class="form-group">
         <label for="ico">IČO</label>
         <input type="text" id="ico" name="ico"
                value="{{ contact.ico if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-ico">
       </div>
       <div class="form-group">
         <label for="dic">DIČ</label>
@@ -119,7 +119,7 @@
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary btn-lg">
+    <button type="submit" class="btn btn-primary btn-lg" data-testid="contact-submit">
       {% if contact %}Uložit změny{% else %}Přidat kontakt{% endif %}
     </button>
     {% if contact %}

@@ -48,7 +48,7 @@
   </div>
 </div>
 
-<table class="table table-hover" id="bulk-table">
+<table class="table table-hover" id="bulk-table" data-testid="invoice-list">
   <thead>
     <tr>
       <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
@@ -64,7 +64,7 @@
   </thead>
   <tbody>
     {% for inv in invoices %}
-    <tr class="{% if inv.status == 'Vystavena' and inv.due_date < today %}row-danger{% endif %}">
+    <tr class="{% if inv.status == 'Vystavena' and inv.due_date < today %}row-danger{% endif %}" data-testid="invoice-row-{{ inv.id }}">
       <td class="col-check"><input type="checkbox" class="row-check" value="{{ inv.id }}"></td>
       <td><a href="/faktury/{{ inv.id }}" class="link-strong">{{ inv.number }}</a></td>
       <td>{{ inv.contact_name or '—' }}</td>

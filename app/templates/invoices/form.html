@@ -28,7 +28,7 @@
 
 <form method="post"
       action="{% if invoice %}/faktury/{{ invoice.id }}/upravit{% else %}/faktury/nova{% endif %}"
-      class="form-card">
+      class="form-card" data-testid="invoice-form">
 
   {% if not invoice and inv_templates %}
   <!-- Šablona -->
@@ -53,7 +53,7 @@
     <div class="form-row">
       <div class="form-group">
         <label for="contact_id">Vybrat z adresáře</label>
-        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="invoice-contact">
           <option value="">— Zadat ručně —</option>
           {% for c in contacts %}
           <option value="{{ c.id }}"
@@ -131,13 +131,13 @@
         <label for="issue_date">Datum vystavení *</label>
         <input type="date" id="issue_date" name="issue_date"
                value="{{ invoice.issue_date.isoformat() if invoice else today.isoformat() }}"
-               class="form-control" required>
+               class="form-control" required data-testid="invoice-date">
       </div>
       <div class="form-group">
         <label for="due_days">Splatnost (dní)</label>
         <input type="number" id="due_days" min="1" step="1"
                value="{% if invoice %}{{ (invoice.due_date - invoice.issue_date).days }}{% else %}10{% endif %}"
-               class="form-control w-24" oninput="updateDueDate()">
+               class="form-control w-24" oninput="updateDueDate()" data-testid="invoice-due-days">
       </div>
       <div class="form-group">
         <label for="due_date">Datum splatnosti *</label>
@@ -149,11 +149,11 @@
         <label for="duzp">DUZP</label>
         <input type="date" id="duzp" name="duzp"
                value="{{ invoice.duzp.isoformat() if invoice and invoice.duzp else today.isoformat() }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-duzp">
       </div>
       <div class="form-group">
         <label for="payment_method">Způsob úhrady</label>
-        <select id="payment_method" name="payment_method" class="form-control">
+        <select id="payment_method" name="payment_method" class="form-control" data-testid="invoice-payment-method">
           {% set pm = invoice.payment_method if invoice else 'Bankovní převod' %}
           <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
           <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
@@ -262,7 +262,7 @@
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary btn-lg">
+    <button type="submit" class="btn btn-primary btn-lg" data-testid="invoice-submit">
       {% if invoice %}Uložit změny{% else %}Vystavit fakturu{% endif %}
     </button>
     {% if invoice %}

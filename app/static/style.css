@@ -375,12 +375,13 @@ h1, h2, h3, h4, h5, h6 {
    Breadcrumbs
    ============================================================ */
 .breadcrumb {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.82rem;
   color: var(--color-text-secondary);
-  margin: 0 0 24px -112px;
+  margin: 0 0 24px 0;
 }
 .breadcrumb a {
   color: var(--color-text-secondary);
@@ -388,6 +389,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 .breadcrumb a:hover {
   color: var(--color-text-primary);
+}
+.breadcrumb-home {
+  position: absolute;
+  right: calc(100% + 8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 .breadcrumb-sep {
   opacity: 0.6;
@@ -1025,5 +1034,5 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { flex-direction: column; }
   .filter-form { flex-direction: column; }
-  .breadcrumb { margin-left: 0; }
+  .breadcrumb-home { position: static; }
 }

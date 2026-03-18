@@ -897,6 +897,13 @@ textarea.form-control { resize: vertical; min-height: 70px; }
 }
 .filter-form .form-control { max-width: 220px; }
 .form-control-date { max-width: 130px !important; }
+input[type=date].form-control {
+  color-scheme: dark;
+}
+input[type=date].form-control::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(0.5) hue-rotate(200deg) saturate(3);
+  cursor: pointer;
+}
 .filter-form .cs-wrap { width: auto; max-width: 220px; }
 .filter-form .cs-trigger { width: auto; min-width: 140px; }
 
@@ -906,15 +913,63 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   text-align: center;
 }
 .col-check input[type=checkbox],
-.row-check {
-  width: 15px;
-  height: 15px;
+.row-check,
+#select-all {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(99, 102, 241, 0.35);
+  border-radius: 3px;
+  background: rgba(99, 102, 241, 0.08);
   cursor: pointer;
-  accent-color: var(--color-accent-primary);
+  position: relative;
+  vertical-align: middle;
+  transition: background 0.15s, border-color 0.15s;
+}
+.col-check input[type=checkbox]:hover,
+.row-check:hover,
+#select-all:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(99, 102, 241, 0.15);
+}
+.col-check input[type=checkbox]:checked,
+.row-check:checked,
+#select-all:checked {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+.col-check input[type=checkbox]:checked::after,
+.row-check:checked::after,
+#select-all:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+#select-all:indeterminate {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+#select-all:indeterminate::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 5px;
+  width: 8px;
+  height: 2px;
+  background: #fff;
+  border: none;
+  transform: none;
 }
 .bulk-bar {
-  background: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border);
+  background: rgba(217, 169, 56, 0.07);
+  border: 1px solid rgba(217, 169, 56, 0.25);
   border-radius: var(--radius-sm);
   padding: 10px 16px;
   margin-bottom: 12px;
@@ -928,10 +983,10 @@ textarea.form-control { resize: vertical; min-height: 70px; }
 }
 .bulk-count {
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: #d9a938;
 }
 .bulk-count strong {
-  color: var(--color-text-primary);
+  color: #d9a938;
 }
 .bulk-actions {
   display: flex;

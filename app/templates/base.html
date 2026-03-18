@@ -273,10 +273,17 @@
       }
       var items = [];
 
+      var mainContent = document.querySelector('.main-content');
+
+      function setBlur(on) {
+        if (mainContent) mainContent.style.filter = on ? 'blur(1px)' : '';
+      }
+
       function close() {
         if (dropdown) { dropdown.remove(); dropdown = null; }
         activeIdx = -1;
         items = [];
+        setBlur(false);
       }
 
       function render(results) {
@@ -286,6 +293,7 @@
           dropdown.className = 'search-dropdown';
           dropdown.innerHTML = '<div class="search-empty">Nic nenalezeno</div>';
           container.appendChild(dropdown);
+          setBlur(true);
           return;
         }
         dropdown = document.createElement('div');
@@ -304,6 +312,7 @@
         });
         dropdown.innerHTML = html;
         container.appendChild(dropdown);
+        setBlur(true);
         items = Array.from(dropdown.querySelectorAll('.search-item'));
       }
 

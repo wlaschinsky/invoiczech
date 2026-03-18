@@ -404,6 +404,169 @@
         if (!e.target.closest('#global-search')) close();
       });
     })();
+    // Custom styled selects
+    (function() {
+      var valDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+      var idxDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+      var openWrap = null;
+
+      function closeAll() {
+        if (openWrap) {
+          openWrap.classList.remove('open');
+          var d = openWrap.querySelector('.cs-dropdown');
+          if (d) d.style.display = 'none';
+          openWrap = null;
+        }
+      }
+
+      function initOne(sel) {
+        if (sel.dataset.csReady) return;
+        sel.dataset.csReady = '1';
+        sel.classList.add('cs-native');
+
+        var wrap = document.createElement('div');
+        wrap.className = 'cs-wrap';
+        // Transfer width classes
+        ['w-20','w-24','w-32'].forEach(function(c) {
+          if (sel.classList.contains(c)) { wrap.classList.add(c); sel.classList.remove(c); }
+        });
+        sel.parentNode.insertBefore(wrap, sel);
+        wrap.appendChild(sel);
+
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'cs-trigger';
+        if (sel.classList.contains('form-control-sm')) trigger.classList.add('form-control-sm');
+        trigger.innerHTML = '<span class="cs-text"></span><span class="cs-arrow">▼</span>';
+        wrap.appendChild(trigger);
+
+        var dd = document.createElement('div');
+        dd.className = 'cs-dropdown';
+        dd.style.display = 'none';
+        wrap.appendChild(dd);
+
+        var textEl = trigger.querySelector('.cs-text');
+
+        function updateText() {
+          var opt = sel.options[sel.selectedIndex];
+          textEl.textContent = opt ? opt.textContent : '';
+        }
+
+        function buildOptions() {
+          dd.innerHTML = '';
+          Array.from(sel.options).forEach(function(opt, i) {
+            var div = document.createElement('div');
+            div.className = 'cs-option';
+            if (i === sel.selectedIndex) div.classList.add('cs-selected');
+            div.textContent = opt.textContent;
+            div.dataset.index = i;
+            dd.appendChild(div);
+          });
+        }
+
+        function selectByIndex(i) {
+          idxDesc.set.call(sel, i);
+          updateText();
+          markSelected();
+          // Trigger onchange attribute handler directly (inline handlers may not fire via dispatchEvent)
+          var oc = sel.getAttribute('onchange');
+          if (oc) { (new Function('event', oc)).call(sel, {target: sel}); }
+          sel.dispatchEvent(new Event('change', {bubbles: true}));
+        }
+
+        function markSelected() {
+          var opts = dd.querySelectorAll('.cs-option');
+          opts.forEach(function(o) {
+            o.classList.toggle('cs-selected', +o.dataset.index === sel.selectedIndex);
+          });
+        }
+
+        function toggle() {
+          var isOpen = wrap.classList.contains('open');
+          closeAll();
+          if (!isOpen) {
+            buildOptions();
+            dd.style.display = '';
+            wrap.classList.add('open');
+            openWrap = wrap;
+            // Scroll selected into view
+            var selOpt = dd.querySelector('.cs-selected');
+            if (selOpt) selOpt.scrollIntoView({block: 'nearest'});
+          }
+        }
+
+        trigger.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggle();
+        });
+
+        dd.addEventListener('click', function(e) {
+          var opt = e.target.closest('.cs-option');
+          if (!opt) return;
+          e.stopPropagation();
+          selectByIndex(+opt.dataset.index);
+          closeAll();
+          dd.style.display = 'none';
+        });
+
+        // Keyboard nav
+        trigger.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          } else if (e.key === 'Escape') {
+            closeAll();
+            dd.style.display = 'none';
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            var next = Math.min(sel.selectedIndex + 1, sel.options.length - 1);
+            selectByIndex(next);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            var prev = Math.max(sel.selectedIndex - 1, 0);
+            selectByIndex(prev);
+          }
+        });
+
+        // Override value/selectedIndex to keep trigger in sync
+        Object.defineProperty(sel, 'value', {
+          get: function() { return valDesc.get.call(this); },
+          set: function(v) { valDesc.set.call(this, v); updateText(); }
+        });
+        Object.defineProperty(sel, 'selectedIndex', {
+          get: function() { return idxDesc.get.call(this); },
+          set: function(v) { idxDesc.set.call(this, v); updateText(); }
+        });
+
+        // Watch for dynamically added options
+        var optObserver = new MutationObserver(function() { updateText(); });
+        optObserver.observe(sel, {childList: true, subtree: true});
+
+        updateText();
+        buildOptions();
+      }
+
+      // Init all existing selects
+      document.querySelectorAll('select.form-control').forEach(initOne);
+
+      // Auto-init selects added later (e.g. new item rows)
+      var bodyObserver = new MutationObserver(function(muts) {
+        muts.forEach(function(m) {
+          m.addedNodes.forEach(function(node) {
+            if (node.nodeType !== 1) return;
+            if (node.matches && node.matches('select.form-control')) initOne(node);
+            if (node.querySelectorAll) {
+              node.querySelectorAll('select.form-control').forEach(initOne);
+            }
+          });
+        });
+      });
+      bodyObserver.observe(document.body, {childList: true, subtree: true});
+
+      // Close on outside click
+      document.addEventListener('click', function() { closeAll(); });
+    })();
   </script>
   {% block scripts %}{% endblock %}
 </body>

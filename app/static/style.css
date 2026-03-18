@@ -298,7 +298,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 100%;
   left: 16px;
   right: 16px;
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-tertiary);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 4px;
@@ -316,7 +316,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s ease;
 }
 .user-dropdown-item:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--color-bg-secondary);
   color: var(--color-text-primary);
 }
 
@@ -727,6 +727,14 @@ h1, h2, h3, h4, h5, h6 {
 select.form-control {
   cursor: pointer;
   appearance: auto;
+}
+select.form-control option {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+select.form-control option:hover,
+select.form-control option:checked {
+  background: var(--color-bg-secondary);
 }
 textarea.form-control { resize: vertical; min-height: 70px; }
 .form-control-sm { padding: 7px 10px; font-size: 0.8rem; }

@@ -1,10 +1,12 @@
+import csv
+import io
 import os
 import shutil
 from datetime import date
 from decimal import Decimal
 
 from fastapi import APIRouter, Request, Depends, HTTPException, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse, Response
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -25,6 +27,8 @@ async def expenses_list(
     typ: str = "",
     rok: str = "",
     q: str = "",
+    od: str = "",
+    do: str = "",
     db: Session = Depends(get_db),
 ):
     query = db.query(Expense)
@@ -43,6 +47,14 @@ async def expenses_list(
         query = query.filter(
             Expense.contact_name.ilike(f"%{q}%") | Expense.number.ilike(f"%{q}%")
         )
+    if od:
+        d = parse_date(od)
+        if d:
+            query = query.filter(Expense.issue_date >= d)
+    if do:
+        d = parse_date(do)
+        if d:
+            query = query.filter(Expense.issue_date <= d)
 
     expenses = query.order_by(Expense.issue_date.desc(), Expense.number.desc()).all()
     years = sorted(
@@ -60,6 +72,8 @@ async def expenses_list(
             "typ_filter": typ,
             "rok_filter": rok,
             "q": q,
+            "od": od,
+            "do": do,
             "years": years,
             "total_count": total_count,
         },
@@ -150,6 +164,49 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     db.commit()
     flash(request, f"Náklad {expense.number} byl přidán.", "success")
     return RedirectResponse(url=f"/naklady/{expense.id}", status_code=302)
+
+
+@router.post("/hromadne/smazat")
+async def bulk_delete(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    ids = [int(x) for x in form.getlist("ids") if x.isdigit()]
+    if not ids:
+        flash(request, "Nejsou vybrány žádné náklady.", "error")
+        return RedirectResponse(url="/naklady", status_code=302)
+    expenses = db.query(Expense).filter(Expense.id.in_(ids)).all()
+    count = len(expenses)
+    for exp in expenses:
+        if exp.attachment_path and os.path.exists(exp.attachment_path):
+            os.remove(exp.attachment_path)
+        db.delete(exp)
+    db.commit()
+    flash(request, f"{count} nákladů smazáno.", "success")
+    return RedirectResponse(url="/naklady", status_code=302)
+
+
+@router.post("/hromadne/csv")
+async def bulk_csv(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    ids = [int(x) for x in form.getlist("ids") if x.isdigit()]
+    if not ids:
+        flash(request, "Nejsou vybrány žádné náklady.", "error")
+        return RedirectResponse(url="/naklady", status_code=302)
+    expenses = db.query(Expense).filter(Expense.id.in_(ids)).order_by(Expense.issue_date.desc()).all()
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["Číslo", "Dodavatel", "Typ", "Datum", "DUZP", "Základ", "DPH", "Celkem", "Daň. uznatelný"])
+    for exp in expenses:
+        writer.writerow([
+            exp.number, exp.contact_name or "", exp.document_type,
+            exp.issue_date.isoformat(), exp.duzp.isoformat() if exp.duzp else "",
+            str(exp.subtotal), str(exp.vat_total), str(exp.total), exp.tax_deductible,
+        ])
+    content = buf.getvalue().encode("utf-8-sig")
+    return Response(
+        content=content,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="naklady_export.csv"'},
+    )
 
 
 @router.get("/{expense_id}", response_class=HTMLResponse)

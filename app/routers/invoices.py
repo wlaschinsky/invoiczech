@@ -1,3 +1,5 @@
+import csv
+import io
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -23,6 +25,8 @@ async def invoices_list(
     status: str = "",
     rok: str = "",
     q: str = "",
+    od: str = "",
+    do: str = "",
     db: Session = Depends(get_db),
 ):
     query = db.query(Invoice)
@@ -39,6 +43,14 @@ async def invoices_list(
             pass
     if q:
         query = query.filter(Invoice.contact_name.ilike(f"%{q}%") | Invoice.number.ilike(f"%{q}%"))
+    if od:
+        d = parse_date(od)
+        if d:
+            query = query.filter(Invoice.issue_date >= d)
+    if do:
+        d = parse_date(do)
+        if d:
+            query = query.filter(Invoice.issue_date <= d)
 
     invoices = query.order_by(Invoice.issue_date.desc(), Invoice.number.desc()).all()
     today = date.today()
@@ -59,6 +71,8 @@ async def invoices_list(
             "status_filter": status,
             "rok_filter": rok,
             "q": q,
+            "od": od,
+            "do": do,
             "years": years,
             "total_count": total_count,
         },
@@ -156,6 +170,67 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
     db.commit()
     flash(request, f"Faktura {invoice.number} byla vystavena.", "success")
     return RedirectResponse(url=f"/faktury/{invoice.id}", status_code=302)
+
+
+@router.post("/hromadne/uhradit")
+async def bulk_mark_paid(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    ids = [int(x) for x in form.getlist("ids") if x.isdigit()]
+    if not ids:
+        flash(request, "Nejsou vybrány žádné faktury.", "error")
+        return RedirectResponse(url="/faktury", status_code=302)
+    today = date.today()
+    count = 0
+    for inv in db.query(Invoice).filter(Invoice.id.in_(ids)).all():
+        if inv.status == "Vystavena":
+            inv.status = "Uhrazena"
+            inv.paid_date = today
+            count += 1
+    db.commit()
+    flash(request, f"{count} faktur označeno jako uhrazených.", "success")
+    return RedirectResponse(url="/faktury", status_code=302)
+
+
+@router.post("/hromadne/smazat")
+async def bulk_delete(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    ids = [int(x) for x in form.getlist("ids") if x.isdigit()]
+    if not ids:
+        flash(request, "Nejsou vybrány žádné faktury.", "error")
+        return RedirectResponse(url="/faktury", status_code=302)
+    invoices = db.query(Invoice).filter(Invoice.id.in_(ids)).all()
+    count = len(invoices)
+    for inv in invoices:
+        db.delete(inv)
+    db.commit()
+    flash(request, f"{count} faktur smazáno.", "success")
+    return RedirectResponse(url="/faktury", status_code=302)
+
+
+@router.post("/hromadne/csv")
+async def bulk_csv(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    ids = [int(x) for x in form.getlist("ids") if x.isdigit()]
+    if not ids:
+        flash(request, "Nejsou vybrány žádné faktury.", "error")
+        return RedirectResponse(url="/faktury", status_code=302)
+    invoices = db.query(Invoice).filter(Invoice.id.in_(ids)).order_by(Invoice.issue_date.desc()).all()
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["Číslo", "Odběratel", "IČO", "Vystavení", "Splatnost", "DUZP", "Základ", "DPH", "Celkem", "Stav"])
+    for inv in invoices:
+        writer.writerow([
+            inv.number, inv.contact_name or "", inv.contact_ico or "",
+            inv.issue_date.isoformat(), inv.due_date.isoformat(),
+            inv.duzp.isoformat() if inv.duzp else "",
+            str(inv.subtotal), str(inv.vat_total), str(inv.total), inv.status,
+        ])
+    content = buf.getvalue().encode("utf-8-sig")
+    return Response(
+        content=content,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="faktury_export.csv"'},
+    )
 
 
 @router.get("/{invoice_id}", response_class=HTMLResponse)

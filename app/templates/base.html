@@ -21,7 +21,10 @@
       <span class="logo-short"><span class="logo-invoi">i</span><span class="logo-czech">C</span><span class="logo-dot logo-dot--sm">·</span></span>
     </a>
     <div class="topbar-search" id="global-search">
-      <input type="text" class="topbar-search-input" id="global-search-input" placeholder="Hledat..." autocomplete="off">
+      <div class="search-input-wrap">
+        <input type="text" class="topbar-search-input" id="global-search-input" placeholder="Hledat..." autocomplete="off">
+        <button type="button" class="search-clear" id="search-clear" title="Vymazat">&times;</button>
+      </div>
     </div>
     <div class="topbar-right"></div>
   </header>
@@ -249,10 +252,25 @@
     (function() {
       var input = document.getElementById('global-search-input');
       var container = document.getElementById('global-search');
+      var clearBtn = document.getElementById('search-clear');
       if (!input || !container) return;
       var dropdown = null;
       var timer = null;
       var activeIdx = -1;
+
+      function toggleClear() {
+        if (clearBtn) clearBtn.style.display = input.value ? 'block' : 'none';
+      }
+      toggleClear();
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+          input.value = '';
+          toggleClear();
+          close();
+          input.focus();
+        });
+      }
       var items = [];
 
       function close() {
@@ -299,6 +317,7 @@
       }
 
       input.addEventListener('input', function() {
+        toggleClear();
         clearTimeout(timer);
         var q = input.value.trim();
         if (q.length < 2) { close(); return; }

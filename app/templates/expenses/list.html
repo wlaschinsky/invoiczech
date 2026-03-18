@@ -51,6 +51,7 @@
     <tr>
       <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
       <th>Číslo</th>
+      <th>Název</th>
       <th>Dodavatel</th>
       <th>Typ</th>
       <th>Datum</th>
@@ -65,6 +66,7 @@
     <tr>
       <td class="col-check"><input type="checkbox" class="row-check" value="{{ exp.id }}"></td>
       <td><a href="/naklady/{{ exp.id }}" class="link-strong">{{ exp.number }}</a></td>
+      <td>{{ exp.title or '—' }}</td>
       <td>{{ exp.contact_name or '—' }}</td>
       <td><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
       <td>{{ exp.issue_date | date_cs }}</td>
@@ -94,7 +96,7 @@
   <tfoot>
     <tr>
       <td></td>
-      <td colspan="5" class="text-right text-muted">Celkem ({{ expenses | length }}):</td>
+      <td colspan="6" class="text-right text-muted">Celkem ({{ expenses | length }}):</td>
       <td class="text-right">{{ expenses | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ expenses | sum(attribute='total') | czk }}</td>
       <td></td>

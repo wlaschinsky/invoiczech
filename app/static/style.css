@@ -139,6 +139,34 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 1000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
+.search-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  padding: 6px 8px 0;
+  gap: 2px;
+  position: sticky;
+  top: 0;
+  background: var(--color-bg-secondary);
+  z-index: 1;
+}
+.search-tab {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.search-tab:hover {
+  color: var(--color-text-primary);
+}
+.search-tab.active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-accent);
+}
 .search-item {
   display: flex;
   align-items: center;

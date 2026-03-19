@@ -1595,8 +1595,9 @@ input[type=date].form-control.dp-native {
   .breadcrumb-home { position: static; }
   /* Hide less important table columns on mobile */
   .mobile-hide { display: none !important; }
-  /* Content padding */
-  .content-inner { padding: 16px; }
+  /* Content padding + prevent overflow */
+  .content-inner { padding: 16px; overflow-x: hidden; }
+  .table-wrap { max-width: 100%; }
   /* Page header stacks on mobile */
   .page-header { flex-direction: column; align-items: flex-start; }
   .page-header h1 { font-size: 1.25rem; }
@@ -1622,6 +1623,41 @@ input[type=date].form-control.dp-native {
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
   /* Action buttons stack vertically */
   .actions { white-space: nowrap; }
+  /* Detail cards: reduce padding */
+  .detail-card { padding: 16px; }
+  .detail-card h3 { margin-bottom: 12px; padding-bottom: 8px; }
+  /* Grand total: full width, no min-width */
+  .grand-total { min-width: 0; align-items: center; }
+  .grand-total-value { font-size: 1.2rem; }
+  /* List tables: compact on mobile */
+  .table th, .table td { padding: 8px 6px; font-size: 0.8rem; }
+  .table .btn-sm { padding: 4px 8px; font-size: 0.75rem; min-height: 32px; }
+  /* Badge smaller */
+  .badge { font-size: 0.7rem; padding: 2px 6px; }
+  /* Detail page items table: card layout like forms */
+  .detail-card > .table-wrap > .table thead { display: none; }
+  .detail-card > .table-wrap > .table,
+  .detail-card > .table-wrap > .table tbody { display: block; width: 100%; }
+  .detail-card > .table-wrap > .table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    padding: 10px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .detail-card > .table-wrap > .table tr:last-child { border-bottom: none; }
+  .detail-card > .table-wrap > .table td {
+    display: block;
+    padding: 2px 0;
+    border: none;
+    font-size: 0.85rem;
+  }
+  /* First column (description) spans full width */
+  .detail-card > .table-wrap > .table td:first-child { grid-column: 1 / -1; font-weight: 600; }
+  .detail-card > .table-wrap { border: none; }
+  /* Detail table (key-value pairs): tighter */
+  .detail-table th { width: 40%; font-size: 0.8rem; }
+  .detail-table td { font-size: 0.8rem; }
   /* Filter form: full width inputs */
   .filter-form .form-control { max-width: none; }
   .form-control-date { max-width: none !important; }

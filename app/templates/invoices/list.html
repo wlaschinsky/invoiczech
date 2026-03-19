@@ -81,8 +81,8 @@
         </span>
       </td>
       <td class="actions">
-        <a href="/faktury/{{ inv.id }}" class="btn btn-sm btn-ghost">Detail</a>
-        <a href="/faktury/{{ inv.id }}/pdf" class="btn btn-sm btn-ghost">PDF</a>
+        <a href="/faktury/{{ inv.id }}" class="btn btn-sm btn-ghost mobile-hide">Detail</a>
+        <a href="/faktury/{{ inv.id }}/pdf" class="btn btn-sm btn-ghost mobile-hide">PDF</a>
         <form method="post" action="/faktury/{{ inv.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat fakturu {{ inv.number }}?')">
           <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Smazat">

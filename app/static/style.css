@@ -1593,6 +1593,19 @@ a.attachment-filename:hover {
 }
 .export-card h2 { font-size: 1rem; font-weight: 700; color: var(--color-text-primary); }
 .export-form { margin-top: 16px; }
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--color-accent-primary);
+  width: 16px;
+  height: 16px;
+}
 .info-box {
   background: rgba(99, 102, 241, 0.1);
   border: 1px solid rgba(99, 102, 241, 0.25);

@@ -305,3 +305,89 @@ def generate_dp3(
     )
 
     return _prettify(pisemnost)
+
+
+def generate_dpfdp7(
+    db: Session,
+    year: int,
+    pausal: int = 60,
+    sleva: int = 30840,
+    zalohy: int = 0,
+    submission_date: date | None = None,
+) -> str:
+    """Vygeneruje XML Přiznání k dani z příjmů FO (DPFDP7)."""
+    from ..config import get_settings
+    settings = get_settings()
+
+    if submission_date is None:
+        submission_date = date.today()
+
+    year_start = date(year, 1, 1)
+    year_end = date(year, 12, 31)
+
+    # Příjmy = uhrazené faktury podle paid_date, bez DPH
+    invoices: List[Invoice] = (
+        db.query(Invoice)
+        .filter(
+            Invoice.status == "Uhrazena",
+            Invoice.paid_date >= year_start,
+            Invoice.paid_date <= year_end,
+        )
+        .all()
+    )
+
+    prijmy = _round_czk(sum(i.subtotal for i in invoices))
+    vydaje = _round_czk(Decimal(str(prijmy)) * Decimal(str(pausal)) / Decimal("100"))
+    zaklad = max(0, prijmy - vydaje)
+    dan_15 = _round_czk(Decimal(str(zaklad)) * Decimal("0.15"))
+    dan_po_sleve = max(0, dan_15 - sleva)
+    vysledna = dan_po_sleve - zalohy  # kladné = platit, záporné = přeplatek
+
+    # --- XML ---
+    pisemnost = ET.Element("Pisemnost", nazevSW="InvoiCzech", verzeSW="1.0")
+    dpfdp7 = ET.SubElement(pisemnost, "DPFDP7", verzePis="01.01.02")
+
+    ET.SubElement(
+        dpfdp7,
+        "VetaD",
+        dokument="DPFDP7",
+        rok=str(year),
+        d_poddp=submission_date.strftime("%Y-%m-%d"),
+        k_uladis="DPF",
+    )
+    ET.SubElement(
+        dpfdp7,
+        "VetaP",
+        c_pracufo=settings.SUPPLIER_FU_PRACUFO,
+        c_ufo=settings.SUPPLIER_FU_UFO,
+        email=settings.SUPPLIER_EMAIL,
+        typ_ds="F",
+        dic=settings.SUPPLIER_DIC.replace("CZ", ""),
+        naz_obce=settings.SUPPLIER_CITY,
+        psc=settings.SUPPLIER_ZIP.replace(" ", ""),
+        stat="Česká republika",
+    )
+
+    # Příloha č. 1 — příjmy §7
+    ET.SubElement(
+        dpfdp7,
+        "PrilohaC1",
+        r101=str(prijmy),
+        r102=str(vydaje),
+        r113=str(zaklad),
+    )
+
+    # Výpočet daně
+    ET.SubElement(
+        dpfdp7,
+        "VypocetDane",
+        r37=str(zaklad),
+        r45=str(zaklad),
+        r56=str(dan_15),
+        r58=str(sleva),
+        r60=str(dan_po_sleve),
+        r85=str(zalohy),
+        r91=str(vysledna),
+    )
+
+    return _prettify(pisemnost)

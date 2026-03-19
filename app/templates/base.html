@@ -16,6 +16,11 @@
 <body>
   <!-- Topbar -->
   <header class="topbar">
+    <button type="button" class="hamburger" id="hamburger" aria-label="Menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
     <a href="/" class="logo-wordmark">
       <span class="logo-full"><span class="logo-invoi">Invoi</span><span class="logo-dot">·</span><span class="logo-czech">Czech</span></span>
       <span class="logo-short"><span class="logo-invoi">i</span><span class="logo-czech">C</span><span class="logo-dot logo-dot--sm">·</span></span>
@@ -89,6 +94,7 @@
         </li>
       </ul>
     </nav>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <!-- Main content -->
     <main class="main-content">
@@ -226,13 +232,15 @@
       }
     });
 
-    // Sidebar collapse toggle
+    // Sidebar collapse toggle + mobile hamburger
     (function() {
       const sidebar = document.querySelector('.sidebar');
       const sidebarToggle = document.getElementById('sidebarToggle');
       const mainContent = document.querySelector('.main-content');
       const logoFull = document.querySelector('.logo-full');
       const logoShort = document.querySelector('.logo-short');
+      const hamburger = document.getElementById('hamburger');
+      const overlay = document.getElementById('sidebar-overlay');
 
       function setSidebar(collapsed) {
         sidebar.classList.toggle('collapsed', collapsed);
@@ -247,7 +255,48 @@
         setSidebar(!isCollapsed);
       });
 
-      // Load saved state
+      // Mobile menu
+      function isMobile() { return window.innerWidth <= 768; }
+
+      function openMobileMenu() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('visible');
+        hamburger.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileMenu() {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('visible');
+        hamburger.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      hamburger.addEventListener('click', function() {
+        if (sidebar.classList.contains('mobile-open')) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+
+      overlay.addEventListener('click', closeMobileMenu);
+
+      // Close mobile menu on nav link click
+      sidebar.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (isMobile()) closeMobileMenu();
+        });
+      });
+
+      // Close on resize to desktop
+      window.addEventListener('resize', function() {
+        if (!isMobile() && sidebar.classList.contains('mobile-open')) {
+          closeMobileMenu();
+        }
+      });
+
+      // Load saved state (desktop only)
       var saved = localStorage.getItem('sidebar_collapsed') === 'true';
       if (saved) setSidebar(true);
     })();

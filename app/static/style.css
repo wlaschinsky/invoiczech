@@ -1568,7 +1568,7 @@ a.attachment-filename:hover {
 .dashboard-actions {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 /* ============================================================
@@ -1809,8 +1809,8 @@ a.attachment-filename:hover {
   /* Form groups min-width reset */
   .form-group-lg { min-width: 0; }
   /* Dashboard actions */
-  .dashboard-actions { flex-direction: column; }
-  .dashboard-actions .btn { width: 100%; justify-content: center; }
+  .dashboard-actions { width: 100%; }
+  .dashboard-actions .btn { flex: 1; justify-content: center; }
   /* Ensure collapsed sidebar labels are visible in mobile drawer */
   .sidebar.collapsed .nav-label,
   .sidebar.collapsed .user-info,

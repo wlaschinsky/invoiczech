@@ -83,7 +83,7 @@
       <td class="text-right mobile-hide">{{ exp.subtotal | czk }}</td>
       <td class="text-right font-medium">{{ exp.total | czk }}</td>
       <td class="actions">
-        <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost">Detail</a>
+        <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost mobile-hide">Detail</a>
         <form method="post" action="/naklady/{{ exp.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat náklad {{ exp.number }}?')">
           <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Smazat">

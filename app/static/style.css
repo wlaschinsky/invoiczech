@@ -1324,7 +1324,18 @@ input[type=date].form-control.dp-native {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- Attachment preview ---- */
+/* ---- Attachment ---- */
+.attachment-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.attachment-delete-label {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
 .attachment-preview {
   margin-bottom: 12px;
 }

@@ -299,6 +299,12 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     _save_items(form, expense, expense.price_includes_vat, db)
     db.flush()
 
+    # Smazání přílohy
+    if form.get("delete_attachment") == "1" and expense.attachment_path:
+        if os.path.exists(expense.attachment_path):
+            os.remove(expense.attachment_path)
+        expense.attachment_path = None
+
     # Nová příloha
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:

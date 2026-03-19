@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from .config import get_settings
 from .database import create_tables
 from .tmpl import templates  # noqa — importem se zaregistrují filtry a flash injection
-from .routers import auth, dashboard, invoices, expenses, contacts, exports, invoice_templates, search, overview
+from .routers import auth, dashboard, invoices, expenses, contacts, exports, invoice_templates, search, overview, profile
 
 settings = get_settings()
 
@@ -75,6 +75,7 @@ app.include_router(exports.router)
 app.include_router(invoice_templates.router)
 app.include_router(search.router)
 app.include_router(overview.router)
+app.include_router(profile.router)
 
 
 # --- Startup ---

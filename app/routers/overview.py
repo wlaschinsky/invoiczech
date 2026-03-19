@@ -180,9 +180,12 @@ async def yearly_pdf(
     env.filters["czk"] = _fmt_czk
     env.filters["date_cs"] = _fmt_date
 
+    from .profile import get_profile
+    profile = get_profile(db)
+
     template = env.get_template("overview/year_pdf.html")
     html_content = template.render(
-        settings=settings,
+        profile=profile,
         **data,
     )
 

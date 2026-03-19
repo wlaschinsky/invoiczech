@@ -5,11 +5,8 @@ from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML, CSS
 
-from ..config import get_settings
 from ..models.invoice import Invoice
 from .qr_code import generate_payment_qr
-
-settings = get_settings()
 
 
 def _get_template_env() -> Environment:
@@ -40,8 +37,27 @@ def _fmt_num(value, decimals: int = 2) -> str:
     return f"{d:.{decimals}f}".replace(".", ",")
 
 
+def _get_profile():
+    from ..database import SessionLocal
+    from ..models.profile import Profile
+    db = SessionLocal()
+    try:
+        profile = db.query(Profile).first()
+        if not profile:
+            profile = Profile(id=1)
+            db.add(profile)
+            db.commit()
+            db.refresh(profile)
+        db.expunge(profile)
+        return profile
+    finally:
+        db.close()
+
+
 def generate_invoice_pdf(invoice: Invoice) -> bytes:
     """Vygeneruje PDF faktury a vrátí bytes."""
+    profile = _get_profile()
+
     env = _get_template_env()
     env.filters["czk"] = _fmt_czk
     env.filters["date_cs"] = _fmt_date
@@ -51,14 +67,14 @@ def generate_invoice_pdf(invoice: Invoice) -> bytes:
     qr_base64 = generate_payment_qr(
         amount=invoice.total,
         variable_symbol=invoice.variable_symbol or "",
-        iban=settings.SUPPLIER_IBAN or None,
-        account_number=settings.SUPPLIER_ACCOUNT,
+        iban=profile.iban or None,
+        account_number=profile.bank_account,
         message=f"Faktura {invoice.number}",
     )
 
     html_content = template.render(
         invoice=invoice,
-        settings=settings,
+        profile=profile,
         qr_base64=qr_base64,
     )
 

@@ -39,15 +39,16 @@
     <nav class="sidebar">
       <div class="sidebar-user" id="sidebar-user">
         <div class="user-toggle" onclick="document.getElementById('sidebar-user').classList.toggle('open')">
-          <div class="user-avatar">{{ settings.OWNER_NAME[:1] }}{{ settings.OWNER_NAME.split(' ')[-1][:1] if ' ' in settings.OWNER_NAME else '' }}</div>
+          <div class="user-avatar">{{ profile.first_name[:1] if profile.first_name else '' }}{{ profile.last_name[:1] if profile.last_name else '' }}</div>
           <div class="user-info">
-            <div class="user-name">{{ settings.OWNER_NAME }}</div>
-            <div class="user-email">{{ settings.OWNER_EMAIL }}</div>
+            <div class="user-name">{{ profile.full_name or 'Nastavit profil' }}</div>
+            <div class="user-email">{{ profile.email }}</div>
           </div>
           <span class="user-chevron">›</span>
         </div>
         <div class="user-dropdown" id="user-dropdown">
-          <a href="/odhlaseni" class="user-dropdown-item">Odhlásit se</a>
+          <a href="/profil" class="user-dropdown-item">Profil</a>
+          <a href="/odhlaseni" class="user-dropdown-item user-dropdown-item--logout">Odhlásit se</a>
         </div>
       </div>
       <div class="sidebar-separator" id="sidebarToggle">

@@ -54,11 +54,31 @@ templates.env.globals["app_version"] = APP_VERSION
 _orig_response = templates.TemplateResponse
 
 
+def _get_profile():
+    """Načte profil z DB (lazy, singleton per request)."""
+    from .database import SessionLocal
+    from .models.profile import Profile
+    db = SessionLocal()
+    try:
+        profile = db.query(Profile).first()
+        if not profile:
+            profile = Profile(id=1)
+            db.add(profile)
+            db.commit()
+            db.refresh(profile)
+        # Detach from session so it can be used in templates
+        db.expunge(profile)
+        return profile
+    finally:
+        db.close()
+
+
 def _response_with_flash(name, context, *args, **kwargs):
     request = context.get("request")
     if request is not None:
         context.setdefault("flashes", get_flashes(request))
         context.setdefault("settings", settings)
+        context.setdefault("profile", _get_profile())
     return _orig_response(name, context, *args, **kwargs)
 
 

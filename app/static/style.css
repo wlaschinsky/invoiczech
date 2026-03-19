@@ -1622,4 +1622,28 @@ input[type=date].form-control.dp-native {
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
   /* Action buttons stack vertically */
   .actions { white-space: nowrap; }
+  /* Filter form: full width inputs */
+  .filter-form .form-control { max-width: none; }
+  .form-control-date { max-width: none !important; }
+  .filter-form .dp-wrap { width: 100%; }
+  /* Bulk bar stacks */
+  .bulk-bar-inner { flex-direction: column; gap: 8px; }
+  .bulk-actions { flex-wrap: wrap; }
+  /* Touch-friendly buttons: min 44px tap target */
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 36px; }
+  /* Confirm dialog responsive */
+  .confirm-box { min-width: auto; max-width: calc(100vw - 32px); margin: 0 16px; }
+  /* Search dropdown (when shown via JS on mobile) */
+  .search-dropdown { width: calc(100vw - 32px); max-width: 400px; }
+  /* Date picker: ensure it stays on screen */
+  .dp-calendar { width: min(260px, calc(100vw - 32px)); }
+  /* VAT summary responsive */
+  .vat-summary { flex-direction: column; }
+  .vat-table-wrap { min-width: 0; width: 100%; }
+  .grand-total { text-align: center; }
+}
+
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
 }

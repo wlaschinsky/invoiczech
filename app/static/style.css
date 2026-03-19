@@ -1325,6 +1325,71 @@ input[type=date].form-control.dp-native {
 }
 
 /* ---- Attachment ---- */
+.attachment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+.attachment-item.attachment-deleted {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+.attachment-filename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.attachment-filename:hover {
+  text-decoration: underline;
+}
+.attachment-delete-btn {
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.attachment-delete-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+.attachment-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+.attachment-detail-row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+.attachment-detail-row .attachment-filename {
+  color: var(--color-text-primary);
+}
 .attachment-current {
   display: flex;
   align-items: center;
@@ -1741,8 +1806,9 @@ input[type=date].form-control.dp-native {
   /* Footer padding for mobile */
   .app-footer { padding: 14px 16px; font-size: 13px; }
   /* Attachment */
-  .attachment-actions { flex-direction: column; }
-  .attachment-actions .btn { width: 100%; justify-content: center; }
+  .attachment-detail-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .attachment-actions { flex-direction: row; width: 100%; }
+  .attachment-actions .btn { flex: 1; justify-content: center; }
   /* Lightbox mobile */
   .lightbox-iframe { width: 95vw; height: 80vh; }
   .lightbox-close { top: 8px; right: 12px; font-size: 1.6rem; }

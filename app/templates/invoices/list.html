@@ -48,15 +48,16 @@
   </div>
 </div>
 
+<div class="table-wrap">
 <table class="table table-hover" id="bulk-table" data-testid="invoice-list">
   <thead>
     <tr>
-      <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
+      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
       <th>Číslo</th>
       <th>Odběratel</th>
-      <th>Vystavení</th>
+      <th class="mobile-hide">Vystavení</th>
       <th>Splatnost</th>
-      <th class="text-right">Bez DPH</th>
+      <th class="text-right mobile-hide">Bez DPH</th>
       <th class="text-right">Celkem s DPH</th>
       <th>Stav</th>
       <th></th>
@@ -65,14 +66,14 @@
   <tbody>
     {% for inv in invoices %}
     <tr class="{% if inv.status == 'Vystavena' and inv.due_date < today %}row-danger{% endif %}" data-testid="invoice-row-{{ inv.id }}">
-      <td class="col-check"><input type="checkbox" class="row-check" value="{{ inv.id }}"></td>
+      <td class="col-check mobile-hide"><input type="checkbox" class="row-check" value="{{ inv.id }}"></td>
       <td><a href="/faktury/{{ inv.id }}" class="link-strong">{{ inv.number }}</a></td>
       <td>{{ inv.contact_name or '—' }}</td>
-      <td>{{ inv.issue_date | date_cs }}</td>
+      <td class="mobile-hide">{{ inv.issue_date | date_cs }}</td>
       <td class="{% if inv.status == 'Vystavena' and inv.due_date < today %}text-danger{% endif %}">
         {{ inv.due_date | date_cs }}
       </td>
-      <td class="text-right">{{ inv.subtotal | czk }}</td>
+      <td class="text-right mobile-hide">{{ inv.subtotal | czk }}</td>
       <td class="text-right font-medium">{{ inv.total | czk }}</td>
       <td>
         <span class="badge badge-{{ inv.status | lower | replace('á', 'a') | replace('í', 'i') | replace('ó', 'o') }}">
@@ -94,14 +95,15 @@
   </tbody>
   <tfoot>
     <tr>
-      <td></td>
-      <td colspan="4" class="text-right text-muted">Celkem ({{ invoices | length }} faktur):</td>
-      <td class="text-right">{{ invoices | sum(attribute='subtotal') | czk }}</td>
+      <td class="mobile-hide"></td>
+      <td colspan="4" class="text-right text-muted"><span class="mobile-hide">Celkem ({{ invoices | length }} faktur):</span></td>
+      <td class="text-right mobile-hide">{{ invoices | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ invoices | sum(attribute='total') | czk }}</td>
       <td colspan="2"></td>
     </tr>
   </tfoot>
 </table>
+</div>
 {% else %}
   {% if total_count %}
   <div class="empty-state">

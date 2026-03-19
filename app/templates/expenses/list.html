@@ -46,17 +46,18 @@
   </div>
 </div>
 
+<div class="table-wrap">
 <table class="table table-hover" id="bulk-table" data-testid="expense-list">
   <thead>
     <tr>
-      <th class="col-check"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
+      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
       <th>Číslo</th>
       <th>Název</th>
-      <th>Dodavatel</th>
-      <th>Typ</th>
+      <th class="mobile-hide">Dodavatel</th>
+      <th class="mobile-hide">Typ</th>
       <th>Datum</th>
-      <th>Daň. uznatelný</th>
-      <th class="text-right">Bez DPH</th>
+      <th class="mobile-hide">Daň. uznatelný</th>
+      <th class="text-right mobile-hide">Bez DPH</th>
       <th class="text-right">Celkem s DPH</th>
       <th></th>
     </tr>
@@ -64,13 +65,13 @@
   <tbody>
     {% for exp in expenses %}
     <tr data-testid="expense-row-{{ exp.id }}">
-      <td class="col-check"><input type="checkbox" class="row-check" value="{{ exp.id }}"></td>
+      <td class="col-check mobile-hide"><input type="checkbox" class="row-check" value="{{ exp.id }}"></td>
       <td><a href="/naklady/{{ exp.id }}" class="link-strong">{{ exp.number }}</a></td>
       <td>{{ exp.title or '—' }}</td>
-      <td>{{ exp.contact_name or '—' }}</td>
-      <td><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
+      <td class="mobile-hide">{{ exp.contact_name or '—' }}</td>
+      <td class="mobile-hide"><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
       <td>{{ exp.issue_date | date_cs }}</td>
-      <td>
+      <td class="mobile-hide">
         {% if exp.tax_deductible == 'Ano' %}
         <span class="badge badge-uhrazena">Ano</span>
         {% elif exp.tax_deductible == 'Ne' %}
@@ -79,7 +80,7 @@
         <span class="badge badge-neutral">Nevím</span>
         {% endif %}
       </td>
-      <td class="text-right">{{ exp.subtotal | czk }}</td>
+      <td class="text-right mobile-hide">{{ exp.subtotal | czk }}</td>
       <td class="text-right font-medium">{{ exp.total | czk }}</td>
       <td class="actions">
         <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost">Detail</a>
@@ -95,14 +96,15 @@
   </tbody>
   <tfoot>
     <tr>
-      <td></td>
-      <td colspan="6" class="text-right text-muted">Celkem ({{ expenses | length }}):</td>
-      <td class="text-right">{{ expenses | sum(attribute='subtotal') | czk }}</td>
+      <td class="mobile-hide"></td>
+      <td colspan="6" class="text-right text-muted"><span class="mobile-hide">Celkem ({{ expenses | length }}):</span></td>
+      <td class="text-right mobile-hide">{{ expenses | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ expenses | sum(attribute='total') | czk }}</td>
       <td></td>
     </tr>
   </tfoot>
 </table>
+</div>
 {% else %}
   {% if total_count %}
   <div class="empty-state">

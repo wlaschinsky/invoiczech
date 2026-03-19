@@ -9,6 +9,7 @@ from xml.dom import minidom
 
 from sqlalchemy.orm import Session
 
+from ..models.contact import Contact  # noqa — potřeba pro SQLAlchemy relationship
 from ..models.invoice import Invoice
 from ..models.expense import Expense
 
@@ -28,8 +29,8 @@ def _period_dates(year: int, month: int, quarter: bool) -> tuple[date, date]:
     return date(year, first_month, 1), _next_month_start(year, last_month)
 
 
-def _round_czk(value: Decimal) -> int:
-    return int(value.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+def _round_czk(value) -> int:
+    return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
 def _prettify(root: ET.Element) -> str:

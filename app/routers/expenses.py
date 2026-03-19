@@ -154,6 +154,11 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     # Zpracování přílohy
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:
+        err = _validate_attachment(attachment)
+        if err:
+            db.rollback()
+            flash(request, err, "error")
+            return templates.TemplateResponse("expenses/form.html", form_ctx)
         expense.attachment_path = _save_attachment(attachment, expense.id)
 
     db.expire(expense, ["items"])
@@ -308,6 +313,11 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     # Nová příloha
     attachment = form.get("attachment")
     if attachment and hasattr(attachment, "filename") and attachment.filename:
+        err = _validate_attachment(attachment)
+        if err:
+            db.rollback()
+            flash(request, err, "error")
+            return templates.TemplateResponse("expenses/form.html", form_ctx)
         expense.attachment_path = _save_attachment(attachment, expense.id)
 
     db.expire(expense, ["items"])
@@ -393,6 +403,23 @@ def _save_items(form, expense: Expense, price_includes_vat: bool, db: Session) -
             position=i,
         )
         db.add(item)
+
+
+ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"}
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+def _validate_attachment(upload_file) -> str | None:
+    """Return error message or None if valid."""
+    ext = os.path.splitext(upload_file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return f"Nepodporovaný typ souboru ({ext}). Povolené: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
+    upload_file.file.seek(0, 2)
+    size = upload_file.file.tell()
+    upload_file.file.seek(0)
+    if size > MAX_UPLOAD_SIZE:
+        return f"Soubor je příliš velký ({size // (1024*1024)} MB). Maximum je 10 MB."
+    return None
 
 
 def _save_attachment(upload_file, expense_id: int) -> str:

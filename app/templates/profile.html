@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Profil{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <span class="breadcrumb-home">InvoiCzech <span class="breadcrumb-sep">›</span></span>
+  <span class="breadcrumb-current">Profil</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Profil podnikatele</h1>
+</div>
+
+<form method="post" action="/profil">
+
+  <div class="detail-grid">
+    <div class="detail-card">
+      <h3>Osobní údaje</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">Jméno</label>
+          <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="last_name">Příjmení</label>
+          <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" class="form-control">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" value="{{ profile.email }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="phone">Telefon</label>
+          <input type="text" id="phone" name="phone" value="{{ profile.phone }}" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>Adresa</h3>
+      <div class="form-group">
+        <label for="street">Ulice</label>
+        <input type="text" id="street" name="street" value="{{ profile.street }}" class="form-control">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="house_number">Č. popisné</label>
+          <input type="text" id="house_number" name="house_number" value="{{ profile.house_number }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="orientation_number">Č. orientační</label>
+          <input type="text" id="orientation_number" name="orientation_number" value="{{ profile.orientation_number }}" class="form-control">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">Město</label>
+          <input type="text" id="city" name="city" value="{{ profile.city }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="zip_code">PSČ</label>
+          <input type="text" id="zip_code" name="zip_code" value="{{ profile.zip_code }}" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-grid mt-4">
+    <div class="detail-card">
+      <h3>Podnikatelské údaje</h3>
+      <div class="form-group">
+        <label for="company_name">Název firmy / Jméno OSVČ</label>
+        <input type="text" id="company_name" name="company_name" value="{{ profile.company_name }}" class="form-control">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ico">IČO</label>
+          <input type="text" id="ico" name="ico" value="{{ profile.ico }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="dic">DIČ</label>
+          <input type="text" id="dic" name="dic" value="{{ profile.dic }}" class="form-control">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bank_account">Číslo účtu</label>
+          <input type="text" id="bank_account" name="bank_account" value="{{ profile.bank_account }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="iban">IBAN</label>
+          <input type="text" id="iban" name="iban" value="{{ profile.iban }}" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>Finanční úřad</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fu_ufo">Číslo FÚ (c_ufo)</label>
+          <input type="text" id="fu_ufo" name="fu_ufo" value="{{ profile.fu_ufo }}" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="fu_pracufo">Pracoviště (c_pracufo)</label>
+          <input type="text" id="fu_pracufo" name="fu_pracufo" value="{{ profile.fu_pracufo }}" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="okec">OKEČ</label>
+        <input type="text" id="okec" name="okec" value="{{ profile.okec }}" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="default_invoice_text">Výchozí text faktury</label>
+        <textarea id="default_invoice_text" name="default_invoice_text" rows="3" class="form-control">{{ profile.default_invoice_text }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-actions-bottom mt-4">
+    <button type="submit" class="btn btn-primary">Uložit profil</button>
+  </div>
+
+</form>
+{% endblock %}

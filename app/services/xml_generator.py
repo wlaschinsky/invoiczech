@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from ..models.contact import Contact  # noqa — potřeba pro SQLAlchemy relationship
 from ..models.invoice import Invoice
 from ..models.expense import Expense
+from ..models.profile import Profile
 
 
 def _next_month_start(year: int, month: int) -> date:
@@ -39,6 +40,40 @@ def _prettify(root: ET.Element) -> str:
     return parsed.toprettyxml(indent="  ", encoding="UTF-8").decode("utf-8")
 
 
+def _get_profile(db: Session) -> Profile:
+    profile = db.query(Profile).first()
+    if not profile:
+        profile = Profile(id=1)
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+    return profile
+
+
+def _veta_p(parent: ET.Element, profile: Profile) -> None:
+    """Společný element VetaP pro všechny exporty."""
+    street_name = profile.street or ""
+    ET.SubElement(
+        parent,
+        "VetaP",
+        c_pracufo=profile.fu_pracufo or "",
+        c_ufo=profile.fu_ufo or "",
+        email=profile.email or "",
+        typ_ds="F",
+        dic=(profile.dic or "").replace("CZ", ""),
+        ulice=street_name,
+        c_pop=profile.house_number or "",
+        c_orient=profile.orientation_number or "",
+        c_telef=profile.phone or "",
+        naz_obce=profile.city or "",
+        psc=(profile.zip_code or "").replace(" ", ""),
+        stat="Česká republika",
+        jmeno=profile.first_name or "",
+        prijmeni=profile.last_name or "",
+        titul="",
+    )
+
+
 def generate_kh1(
     db: Session,
     year: int,
@@ -47,8 +82,7 @@ def generate_kh1(
     submission_date: date | None = None,
 ) -> str:
     """Vygeneruje XML Kontrolního hlášení (KH1)."""
-    from ..config import get_settings
-    settings = get_settings()
+    profile = _get_profile(db)
 
     if submission_date is None:
         submission_date = date.today()
@@ -77,7 +111,7 @@ def generate_kh1(
     )
 
     # --- XML ---
-    pisemnost = ET.Element("Pisemnost", nazevSW="FakturacniApp", verzeSW="1.0")
+    pisemnost = ET.Element("Pisemnost", nazevSW="InvoiCzech", verzeSW="1.0")
     dphkh1 = ET.SubElement(pisemnost, "DPHKH1", verzePis="02.01")
 
     ET.SubElement(
@@ -90,25 +124,7 @@ def generate_kh1(
         k_uladis="DPH",
         khdph_forma="B",
     )
-    ET.SubElement(
-        dphkh1,
-        "VetaP",
-        c_pracufo=settings.SUPPLIER_FU_PRACUFO,
-        c_ufo=settings.SUPPLIER_FU_UFO,
-        email=settings.SUPPLIER_EMAIL,
-        typ_ds="F",
-        dic=settings.SUPPLIER_DIC.replace("CZ", ""),
-        ulice=settings.SUPPLIER_STREET.split(" ")[0] if " " in settings.SUPPLIER_STREET else settings.SUPPLIER_STREET,
-        c_pop="2284",
-        c_orient="21",
-        c_telef=settings.SUPPLIER_PHONE,
-        naz_obce=settings.SUPPLIER_CITY,
-        psc=settings.SUPPLIER_ZIP.replace(" ", ""),
-        stat="Česká republika",
-        jmeno="Samuel",
-        prijmeni="Wlaschinský",
-        titul="",
-    )
+    _veta_p(dphkh1, profile)
 
     ET.SubElement(dphkh1, "VetaA1")
 
@@ -182,8 +198,7 @@ def generate_dp3(
     submission_date: date | None = None,
 ) -> str:
     """Vygeneruje XML Přiznání k DPH (DP3)."""
-    from ..config import get_settings
-    settings = get_settings()
+    profile = _get_profile(db)
 
     if submission_date is None:
         submission_date = date.today()
@@ -237,7 +252,7 @@ def generate_dp3(
     nadmerny_odpocet = max(0, odpocet_zaokr - dan_vystupu_zaokr)
 
     # --- XML ---
-    pisemnost = ET.Element("Pisemnost", nazevSW="FakturacniApp", verzeSW="1.0")
+    pisemnost = ET.Element("Pisemnost", nazevSW="InvoiCzech", verzeSW="1.0")
     dphdp3 = ET.SubElement(pisemnost, "DPHDP3", verzePis="01.02")
 
     ET.SubElement(
@@ -250,27 +265,9 @@ def generate_dp3(
         d_poddp=submission_date.strftime("%Y-%m-%d"),
         k_uladis="DPH",
         typ_platce="P",
-        c_okec=settings.SUPPLIER_OKEC,
+        c_okec=profile.okec or "",
     )
-    ET.SubElement(
-        dphdp3,
-        "VetaP",
-        c_pracufo=settings.SUPPLIER_FU_PRACUFO,
-        c_ufo=settings.SUPPLIER_FU_UFO,
-        email=settings.SUPPLIER_EMAIL,
-        typ_ds="F",
-        dic=settings.SUPPLIER_DIC.replace("CZ", ""),
-        ulice=settings.SUPPLIER_STREET.split(" ")[0] if " " in settings.SUPPLIER_STREET else settings.SUPPLIER_STREET,
-        c_pop="2284",
-        c_orient="21",
-        c_telef=settings.SUPPLIER_PHONE,
-        naz_obce=settings.SUPPLIER_CITY,
-        psc=settings.SUPPLIER_ZIP.replace(" ", ""),
-        stat="Česká republika",
-        jmeno="Samuel",
-        prijmeni="Wlaschinský",
-        titul="",
-    )
+    _veta_p(dphdp3, profile)
 
     ET.SubElement(
         dphdp3,
@@ -316,8 +313,7 @@ def generate_dpfdp7(
     submission_date: date | None = None,
 ) -> str:
     """Vygeneruje XML Přiznání k dani z příjmů FO (DPFDP7)."""
-    from ..config import get_settings
-    settings = get_settings()
+    profile = _get_profile(db)
 
     if submission_date is None:
         submission_date = date.today()
@@ -355,18 +351,7 @@ def generate_dpfdp7(
         d_poddp=submission_date.strftime("%Y-%m-%d"),
         k_uladis="DPF",
     )
-    ET.SubElement(
-        dpfdp7,
-        "VetaP",
-        c_pracufo=settings.SUPPLIER_FU_PRACUFO,
-        c_ufo=settings.SUPPLIER_FU_UFO,
-        email=settings.SUPPLIER_EMAIL,
-        typ_ds="F",
-        dic=settings.SUPPLIER_DIC.replace("CZ", ""),
-        naz_obce=settings.SUPPLIER_CITY,
-        psc=settings.SUPPLIER_ZIP.replace(" ", ""),
-        stat="Česká republika",
-    )
+    _veta_p(dpfdp7, profile)
 
     # Příloha č. 1 — příjmy §7
     ET.SubElement(

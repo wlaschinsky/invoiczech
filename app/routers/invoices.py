@@ -14,6 +14,7 @@ from ..models.invoice_template import InvoiceTemplate
 from ..tmpl import templates
 from ..config import get_settings
 from .utils import flash, parse_date, parse_decimal, generate_invoice_number
+from .profile import get_profile
 
 router = APIRouter(prefix="/faktury")
 settings = get_settings()
@@ -97,7 +98,7 @@ async def new_invoice_form(request: Request, db: Session = Depends(get_db)):
             "today": today,
             "due_default": today + timedelta(days=10),
             "next_number": next_number,
-            "default_text": settings.DEFAULT_INVOICE_TEXT,
+            "default_text": get_profile(db).default_invoice_text,
         },
     )
 
@@ -120,7 +121,7 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
         "request": request, "invoice": None, "contacts": contacts,
         "inv_templates": inv_templates,
         "today": today, "due_default": today + timedelta(days=10),
-        "next_number": next_number, "default_text": settings.DEFAULT_INVOICE_TEXT,
+        "next_number": next_number, "default_text": get_profile(db).default_invoice_text,
     }
 
     if not issue_date or not due_date:
@@ -150,7 +151,7 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
         duzp=duzp or issue_date,
         payment_method=form.get("payment_method", "Bankovní převod"),
         variable_symbol=variable_symbol,
-        invoice_text=form.get("invoice_text", settings.DEFAULT_INVOICE_TEXT).strip(),
+        invoice_text=form.get("invoice_text", get_profile(db).default_invoice_text).strip(),
         internal_note=form.get("internal_note", "").strip() or None,
         status="Vystavena",
     )
@@ -265,7 +266,7 @@ async def edit_invoice_form(request: Request, invoice_id: int, db: Session = Dep
             "today": date.today(),
             "due_default": invoice.due_date,
             "next_number": invoice.number,
-            "default_text": settings.DEFAULT_INVOICE_TEXT,
+            "default_text": get_profile(db).default_invoice_text,
         },
     )
 
@@ -288,7 +289,7 @@ async def update_invoice(request: Request, invoice_id: int, db: Session = Depend
     form_ctx = {
         "request": request, "invoice": invoice, "contacts": contacts,
         "today": date.today(), "due_default": invoice.due_date,
-        "next_number": invoice.number, "default_text": settings.DEFAULT_INVOICE_TEXT,
+        "next_number": invoice.number, "default_text": get_profile(db).default_invoice_text,
     }
 
     if not issue_date or not due_date:

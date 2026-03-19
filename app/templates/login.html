@@ -14,7 +14,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="login-logo"><span class="brand-invoi">Invoi</span><span class="brand-dot">·</span><span class="brand-czech">Czech</span></div>
-        <p>{{ settings.OWNER_NAME }}</p>
+        <p>{{ profile.full_name if profile else '' }}</p>
       </div>
 
       {% if flashes is defined %}

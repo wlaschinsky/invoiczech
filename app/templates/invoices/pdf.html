@@ -267,11 +267,11 @@
 <div class="parties">
   <div class="party">
     <div class="party-label">Dodavatel</div>
-    <div class="party-name">{{ settings.SUPPLIER_NAME }}</div>
-    <div class="party-line">{{ settings.SUPPLIER_STREET }}</div>
-    <div class="party-line">{{ settings.SUPPLIER_ZIP }} {{ settings.SUPPLIER_CITY }}</div>
+    <div class="party-name">{{ profile.company_name or profile.full_name }}</div>
+    <div class="party-line">{{ profile.full_street }}</div>
+    <div class="party-line">{{ profile.zip_code }} {{ profile.city }}</div>
     <div class="party-ids">
-      IČO: {{ settings.SUPPLIER_ICO }} &nbsp;|&nbsp; DIČ: {{ settings.SUPPLIER_DIC }}<br>
+      IČO: {{ profile.ico }} &nbsp;|&nbsp; DIČ: {{ profile.dic }}<br>
       Plátce DPH
     </div>
   </div>
@@ -314,16 +314,16 @@
   <div class="payment-info">
     <div class="payment-row">
       <span class="payment-row-label">Číslo účtu:</span>
-      <span class="payment-row-value">{{ settings.SUPPLIER_ACCOUNT }}</span>
+      <span class="payment-row-value">{{ profile.bank_account }}</span>
     </div>
     <div class="payment-row">
       <span class="payment-row-label">Variabilní symbol:</span>
       <span class="payment-row-value">{{ invoice.variable_symbol }}</span>
     </div>
-    {% if settings.SUPPLIER_IBAN %}
+    {% if profile.iban %}
     <div class="payment-row">
       <span class="payment-row-label">IBAN:</span>
-      <span class="payment-row-value">{{ settings.SUPPLIER_IBAN }}</span>
+      <span class="payment-row-value">{{ profile.iban }}</span>
     </div>
     {% endif %}
     <div class="payment-total">

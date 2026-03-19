@@ -226,23 +226,31 @@
     </div>
   </div>
 
-  <!-- Příloha -->
+  <!-- Přílohy -->
   <div class="form-section">
-    <h2 class="form-section-title">Příloha</h2>
-    {% if expense and expense.attachment_path %}
-    <div class="attachment-current">
-      <span class="text-muted">Aktuální příloha:</span>
-      <a href="/naklady/{{ expense.id }}/priloha" target="_blank">Zobrazit</a>
-      <label class="check-label attachment-delete-label">
-        <input type="checkbox" name="delete_attachment" value="1"> Smazat přílohu
-      </label>
-    </div>
+    <h2 class="form-section-title">Přílohy</h2>
+    {% if expense and expense.attachments %}
+    <ul class="attachment-list">
+      {% for att in expense.attachments %}
+      <li class="attachment-item" id="att-{{ att.id }}">
+        <a href="/naklady/{{ expense.id }}/priloha/{{ att.id }}" target="_blank" class="attachment-filename">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          {{ att.filename }}
+        </a>
+        <label class="attachment-delete-btn" title="Smazat přílohu">
+          <input type="checkbox" name="delete_attachment" value="{{ att.id }}" hidden
+                 onchange="this.closest('.attachment-item').classList.toggle('attachment-deleted', this.checked)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </label>
+      </li>
+      {% endfor %}
+    </ul>
     {% endif %}
     <div class="form-group">
-      <label for="attachment">{% if expense and expense.attachment_path %}Nahrát novou přílohu{% else %}Nahrát přílohu{% endif %}</label>
-      <input type="file" id="attachment" name="attachment" class="form-control"
+      <label for="attachment">Nahrát {% if expense and expense.attachments %}další {% endif %}přílohy</label>
+      <input type="file" id="attachment" name="attachment" class="form-control" multiple
              accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic">
-      <small class="text-muted">PDF, JPG, PNG, GIF, WebP, HEIC — max 10 MB</small>
+      <small class="text-muted">PDF, JPG, PNG, GIF, WebP, HEIC — max 10 MB na soubor</small>
       <div id="attachment-error" class="text-danger" style="display:none; margin-top:4px; font-size:0.85rem;"></div>
     </div>
     <div class="form-group">
@@ -359,19 +367,21 @@ document.addEventListener('DOMContentLoaded', recalcTotals);
     errEl.style.display = 'none';
     errEl.textContent = '';
     if (!input.files.length) return;
-    var file = input.files[0];
-    var ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-    if (allowed.indexOf(ext) === -1) {
-      errEl.textContent = 'Nepodporovaný typ souboru (' + ext + '). Povolené: ' + allowed.join(', ');
-      errEl.style.display = 'block';
-      input.value = '';
-      return;
-    }
-    if (file.size > maxSize) {
-      errEl.textContent = 'Soubor je příliš velký (' + Math.round(file.size / 1024 / 1024) + ' MB). Maximum je 10 MB.';
-      errEl.style.display = 'block';
-      input.value = '';
-      return;
+    for (var i = 0; i < input.files.length; i++) {
+      var file = input.files[i];
+      var ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (allowed.indexOf(ext) === -1) {
+        errEl.textContent = 'Nepodporovaný typ souboru (' + ext + ') u "' + file.name + '". Povolené: ' + allowed.join(', ');
+        errEl.style.display = 'block';
+        input.value = '';
+        return;
+      }
+      if (file.size > maxSize) {
+        errEl.textContent = '"' + file.name + '" je příliš velký (' + Math.round(file.size / 1024 / 1024) + ' MB). Maximum je 10 MB.';
+        errEl.style.display = 'block';
+        input.value = '';
+        return;
+      }
     }
   });
 })();

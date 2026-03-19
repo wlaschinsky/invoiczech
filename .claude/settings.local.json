@@ -56,7 +56,13 @@
       "Bash(ls .venv/bin/python*)",
       "Bash(ls venv/bin/python*)",
       "Bash(venv/bin/python migrate.py)",
-      "Bash(in new window\" link. Mobile: smaller preview height, stacked buttons.:*)"
+      "Bash(in new window\" link. Mobile: smaller preview height, stacked buttons.:*)",
+      "Bash(python -c \"from app.models.expense import Expense, ExpenseItem, ExpenseAttachment; print\\(''Models OK''\\)\")",
+      "Bash(python3 -c \"from app.models.expense import Expense, ExpenseItem, ExpenseAttachment; print\\(''Models OK''\\)\")",
+      "Bash(venv/bin/python -c \"from app.models.expense import Expense, ExpenseItem, ExpenseAttachment; print\\(''Models OK''\\)\")",
+      "Bash(venv/bin/python -c \"from app.database import create_tables; create_tables\\(\\); print\\(''Tables OK''\\)\")",
+      "Bash(venv/bin/python -m pytest tests/ -x -q)",
+      "Bash(venv/bin/python -c \"from app.routers.expenses import router; print\\(''Router OK''\\)\")"
     ]
   }
 }

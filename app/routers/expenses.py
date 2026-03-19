@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse, Resp
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models.expense import Expense, ExpenseItem
+from ..models.expense import Expense, ExpenseItem, ExpenseAttachment
 from ..models.contact import Contact
 from ..tmpl import templates
 from ..config import get_settings
@@ -151,15 +151,26 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     _save_items(form, expense, price_includes_vat, db)
     db.flush()
 
-    # Zpracování přílohy
-    attachment = form.get("attachment")
-    if attachment and hasattr(attachment, "filename") and attachment.filename:
+    # Zpracování příloh (multiple)
+    attachments = form.getlist("attachment")
+    position = 0
+    for attachment in attachments:
+        if not attachment or not hasattr(attachment, "filename") or not attachment.filename:
+            continue
         err = _validate_attachment(attachment)
         if err:
             db.rollback()
             flash(request, err, "error")
             return templates.TemplateResponse("expenses/form.html", form_ctx)
-        expense.attachment_path = _save_attachment(attachment, expense.id)
+        filepath = _save_attachment(attachment, expense.id, position)
+        att = ExpenseAttachment(
+            expense_id=expense.id,
+            filename=attachment.filename,
+            filepath=filepath,
+            position=position,
+        )
+        db.add(att)
+        position += 1
 
     db.expire(expense, ["items"])
     if not expense.items:
@@ -182,6 +193,9 @@ async def bulk_delete(request: Request, db: Session = Depends(get_db)):
     expenses = db.query(Expense).filter(Expense.id.in_(ids)).all()
     count = len(expenses)
     for exp in expenses:
+        for att in exp.attachments:
+            if os.path.exists(att.filepath):
+                os.remove(att.filepath)
         if exp.attachment_path and os.path.exists(exp.attachment_path):
             os.remove(exp.attachment_path)
         db.delete(exp)
@@ -220,18 +234,19 @@ async def expense_detail(request: Request, expense_id: int, db: Session = Depend
     expense = db.query(Expense).filter(Expense.id == expense_id).first()
     if not expense:
         raise HTTPException(status_code=404, detail="Náklad nenalezen")
-    attachment_type = None
-    if expense.attachment_path:
-        ext = os.path.splitext(expense.attachment_path)[1].lower()
+    attachments_info = []
+    for att in expense.attachments:
+        ext = os.path.splitext(att.filepath)[1].lower()
         if ext in (".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"):
-            attachment_type = "image"
+            att_type = "image"
         elif ext == ".pdf":
-            attachment_type = "pdf"
+            att_type = "pdf"
         else:
-            attachment_type = "other"
+            att_type = "other"
+        attachments_info.append({"id": att.id, "filename": att.filename, "type": att_type})
     return templates.TemplateResponse(
         "expenses/detail.html",
-        {"request": request, "expense": expense, "attachment_type": attachment_type},
+        {"request": request, "expense": expense, "attachments_info": attachments_info},
     )
 
 
@@ -304,21 +319,43 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     _save_items(form, expense, expense.price_includes_vat, db)
     db.flush()
 
-    # Smazání přílohy
-    if form.get("delete_attachment") == "1" and expense.attachment_path:
-        if os.path.exists(expense.attachment_path):
-            os.remove(expense.attachment_path)
-        expense.attachment_path = None
+    # Smazání vybraných příloh
+    delete_ids = form.getlist("delete_attachment")
+    for att_id in delete_ids:
+        if not att_id.isdigit():
+            continue
+        att = db.query(ExpenseAttachment).filter(
+            ExpenseAttachment.id == int(att_id),
+            ExpenseAttachment.expense_id == expense.id,
+        ).first()
+        if att:
+            if os.path.exists(att.filepath):
+                os.remove(att.filepath)
+            db.delete(att)
+    db.flush()
 
-    # Nová příloha
-    attachment = form.get("attachment")
-    if attachment and hasattr(attachment, "filename") and attachment.filename:
+    # Nové přílohy
+    attachments = form.getlist("attachment")
+    max_pos = db.query(ExpenseAttachment).filter(
+        ExpenseAttachment.expense_id == expense.id
+    ).count()
+    for attachment in attachments:
+        if not attachment or not hasattr(attachment, "filename") or not attachment.filename:
+            continue
         err = _validate_attachment(attachment)
         if err:
             db.rollback()
             flash(request, err, "error")
             return templates.TemplateResponse("expenses/form.html", form_ctx)
-        expense.attachment_path = _save_attachment(attachment, expense.id)
+        filepath = _save_attachment(attachment, expense.id, max_pos)
+        att = ExpenseAttachment(
+            expense_id=expense.id,
+            filename=attachment.filename,
+            filepath=filepath,
+            position=max_pos,
+        )
+        db.add(att)
+        max_pos += 1
 
     db.expire(expense, ["items"])
     if not expense.items:
@@ -336,6 +373,9 @@ async def delete_expense(request: Request, expense_id: int, db: Session = Depend
     expense = db.query(Expense).filter(Expense.id == expense_id).first()
     if not expense:
         raise HTTPException(status_code=404, detail="Náklad nenalezen")
+    for att in expense.attachments:
+        if os.path.exists(att.filepath):
+            os.remove(att.filepath)
     if expense.attachment_path and os.path.exists(expense.attachment_path):
         os.remove(expense.attachment_path)
     db.delete(expense)
@@ -344,27 +384,32 @@ async def delete_expense(request: Request, expense_id: int, db: Session = Depend
     return RedirectResponse(url="/naklady", status_code=302)
 
 
-@router.get("/{expense_id}/priloha")
-async def view_attachment(expense_id: int, db: Session = Depends(get_db)):
-    expense = db.query(Expense).filter(Expense.id == expense_id).first()
-    if not expense or not expense.attachment_path:
+@router.get("/{expense_id}/priloha/{attachment_id}")
+async def view_attachment(expense_id: int, attachment_id: int, db: Session = Depends(get_db)):
+    att = db.query(ExpenseAttachment).filter(
+        ExpenseAttachment.id == attachment_id,
+        ExpenseAttachment.expense_id == expense_id,
+    ).first()
+    if not att:
         raise HTTPException(status_code=404, detail="Příloha nenalezena")
-    if not os.path.exists(expense.attachment_path):
+    if not os.path.exists(att.filepath):
         raise HTTPException(status_code=404, detail="Soubor přílohy neexistuje")
-    return FileResponse(expense.attachment_path)
+    return FileResponse(att.filepath)
 
 
-@router.get("/{expense_id}/priloha/stahnout")
-async def download_attachment(expense_id: int, db: Session = Depends(get_db)):
-    expense = db.query(Expense).filter(Expense.id == expense_id).first()
-    if not expense or not expense.attachment_path:
+@router.get("/{expense_id}/priloha/{attachment_id}/stahnout")
+async def download_attachment(expense_id: int, attachment_id: int, db: Session = Depends(get_db)):
+    att = db.query(ExpenseAttachment).filter(
+        ExpenseAttachment.id == attachment_id,
+        ExpenseAttachment.expense_id == expense_id,
+    ).first()
+    if not att:
         raise HTTPException(status_code=404, detail="Příloha nenalezena")
-    if not os.path.exists(expense.attachment_path):
+    if not os.path.exists(att.filepath):
         raise HTTPException(status_code=404, detail="Soubor přílohy neexistuje")
-    filename = os.path.basename(expense.attachment_path)
     return FileResponse(
-        expense.attachment_path,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        att.filepath,
+        headers={"Content-Disposition": f'attachment; filename="{att.filename}"'},
     )
 
 
@@ -422,10 +467,10 @@ def _validate_attachment(upload_file) -> str | None:
     return None
 
 
-def _save_attachment(upload_file, expense_id: int) -> str:
+def _save_attachment(upload_file, expense_id: int, position: int = 0) -> str:
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     ext = os.path.splitext(upload_file.filename)[1].lower()
-    filename = f"expense_{expense_id}{ext}"
+    filename = f"expense_{expense_id}_{position}{ext}"
     dest_path = os.path.join(settings.UPLOAD_DIR, filename)
     with open(dest_path, "wb") as f:
         shutil.copyfileobj(upload_file.file, f)

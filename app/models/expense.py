@@ -25,7 +25,7 @@ class Expense(Base):
     tax_deductible = Column(String, default="Nevím")  # Ano / Ne / Nevím
     fulfillment_code = Column(String)
     price_includes_vat = Column(Boolean, default=True)
-    attachment_path = Column(String)
+    attachment_path = Column(String)  # legacy – kept for migration
     notes = Column(Text)
     created_at = Column(DateTime, server_default=func.now())
 
@@ -35,6 +35,12 @@ class Expense(Base):
         back_populates="expense",
         cascade="all, delete-orphan",
         order_by="ExpenseItem.position",
+    )
+    attachments = relationship(
+        "ExpenseAttachment",
+        back_populates="expense",
+        cascade="all, delete-orphan",
+        order_by="ExpenseAttachment.position",
     )
 
     @property
@@ -93,3 +99,15 @@ class ExpenseItem(Base):
     @property
     def total(self) -> Decimal:
         return self.subtotal + self.vat_amount
+
+
+class ExpenseAttachment(Base):
+    __tablename__ = "expense_attachments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    expense_id = Column(Integer, ForeignKey("expenses.id"), nullable=False)
+    filename = Column(String, nullable=False)
+    filepath = Column(String, nullable=False)
+    position = Column(Integer, default=0)
+
+    expense = relationship("Expense", back_populates="attachments")

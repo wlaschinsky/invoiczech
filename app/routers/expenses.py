@@ -215,9 +215,18 @@ async def expense_detail(request: Request, expense_id: int, db: Session = Depend
     expense = db.query(Expense).filter(Expense.id == expense_id).first()
     if not expense:
         raise HTTPException(status_code=404, detail="Náklad nenalezen")
+    attachment_type = None
+    if expense.attachment_path:
+        ext = os.path.splitext(expense.attachment_path)[1].lower()
+        if ext in (".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"):
+            attachment_type = "image"
+        elif ext == ".pdf":
+            attachment_type = "pdf"
+        else:
+            attachment_type = "other"
     return templates.TemplateResponse(
         "expenses/detail.html",
-        {"request": request, "expense": expense},
+        {"request": request, "expense": expense, "attachment_type": attachment_type},
     )
 
 
@@ -320,13 +329,27 @@ async def delete_expense(request: Request, expense_id: int, db: Session = Depend
 
 
 @router.get("/{expense_id}/priloha")
-async def download_attachment(expense_id: int, db: Session = Depends(get_db)):
+async def view_attachment(expense_id: int, db: Session = Depends(get_db)):
     expense = db.query(Expense).filter(Expense.id == expense_id).first()
     if not expense or not expense.attachment_path:
         raise HTTPException(status_code=404, detail="Příloha nenalezena")
     if not os.path.exists(expense.attachment_path):
         raise HTTPException(status_code=404, detail="Soubor přílohy neexistuje")
     return FileResponse(expense.attachment_path)
+
+
+@router.get("/{expense_id}/priloha/stahnout")
+async def download_attachment(expense_id: int, db: Session = Depends(get_db)):
+    expense = db.query(Expense).filter(Expense.id == expense_id).first()
+    if not expense or not expense.attachment_path:
+        raise HTTPException(status_code=404, detail="Příloha nenalezena")
+    if not os.path.exists(expense.attachment_path):
+        raise HTTPException(status_code=404, detail="Soubor přílohy neexistuje")
+    filename = os.path.basename(expense.attachment_path)
+    return FileResponse(
+        expense.attachment_path,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 def _save_items(form, expense: Expense, price_includes_vat: bool, db: Session) -> None:

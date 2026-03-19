@@ -127,9 +127,24 @@
 {% if expense.attachment_path %}
 <div class="detail-card mt-4">
   <h3>Příloha</h3>
-  <a href="/naklady/{{ expense.id }}/priloha" class="btn btn-secondary" target="_blank">
-    Stáhnout přílohu
-  </a>
+  <div class="attachment-preview">
+    {% if attachment_type == 'image' %}
+    <a href="/naklady/{{ expense.id }}/priloha" target="_blank" class="attachment-image-link">
+      <img src="/naklady/{{ expense.id }}/priloha" alt="Příloha" class="attachment-image">
+    </a>
+    {% elif attachment_type == 'pdf' %}
+    <iframe src="/naklady/{{ expense.id }}/priloha" class="attachment-pdf"></iframe>
+    {% endif %}
+  </div>
+  <div class="attachment-actions">
+    <a href="/naklady/{{ expense.id }}/priloha/stahnout" class="btn btn-secondary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Stáhnout
+    </a>
+    {% if attachment_type == 'pdf' %}
+    <a href="/naklady/{{ expense.id }}/priloha" class="btn btn-ghost" target="_blank">Otevřít v novém okně</a>
+    {% endif %}
+  </div>
 </div>
 {% endif %}
 

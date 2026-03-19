@@ -1,21 +1,20 @@
 {% extends "base.html" %}
-{% block title %}DPH exporty{% endblock %}
+{% block title %}Exporty{% endblock %}
 
 {% block breadcrumb %}
 <nav class="breadcrumb">
   <span class="breadcrumb-home">InvoiCzech <span class="breadcrumb-sep">›</span></span>
-  <span class="breadcrumb-current">DPH exporty</span>
+  <span class="breadcrumb-current">Exporty</span>
 </nav>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <h1>DPH exporty</h1>
+  <h1>Exporty</h1>
 </div>
 
 <p class="text-muted mb-4">
-  Generování XML souborů pro portál <strong>Moje Daně</strong> (Finanční správa ČR).<br>
-  Výsledný soubor nahrajte do sekce <em>Podat → DPH → Nahrát soubor</em>.
+  Generování XML souborů pro portál <strong>Moje Daně</strong> (Finanční správa ČR).
 </p>
 
 <div class="export-grid">
@@ -122,11 +121,53 @@
     </form>
   </div>
 
-</div>
+  <!-- Daňové přiznání FO -->
+  <div class="export-card">
+    <div class="export-card-header">
+      <h2>Daňové přiznání FO (DPFDP7)</h2>
+      <span class="badge badge-neutral">XML</span>
+    </div>
+    <p class="text-muted">
+      Přiznání k dani z příjmů fyzických osob.
+      Obsahuje příjmy ze samostatné výdělečné činnosti (§7) s výdajovým paušálem.
+    </p>
+    <form method="post" action="/exporty/dpfdp7" class="export-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rok</label>
+          <input type="number" name="year" value="{{ today.year - 1 }}" min="2020" max="2099" class="form-control w-24">
+        </div>
+        <div class="form-group">
+          <label>Výdajový paušál %</label>
+          <select name="pausal" class="form-control">
+            <option value="40">40 %</option>
+            <option value="60" selected>60 %</option>
+            <option value="80">80 %</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Zaplacené zálohy na dani</label>
+          <input type="number" name="zalohy" value="0" min="0" class="form-control w-24">
+        </div>
+        <div class="form-group">
+          <label>Datum podání</label>
+          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:8px">
+        <label class="checkbox-label">
+          <input type="checkbox" name="sleva_poplatnik" value="1" checked>
+          Sleva na poplatníka (30 840 Kč)
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:12px">Stáhnout DPFDP7 XML</button>
+    </form>
+  </div>
 
+</div>
 <div class="info-box mt-4">
-  <strong>Poznámka:</strong> Vygenerovaný XML soubor obsahuje data z fakturbáze na základě pole DUZP.
-  Zkontrolujte prosím, že všechny faktury a náklady mají správně vyplněné DUZP před generováním exportu.
+  <strong>Poznámka:</strong> KH1 a DP3 používají pole DUZP, DPFDP7 používá datum úhrady.
+  Zkontrolujte prosím, že všechny faktury a náklady mají správně vyplněná data před generováním exportu.
   Hodnoty DPH jsou zaokrouhleny na celé Kč.
 </div>
 {% endblock %}

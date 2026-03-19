@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, Response
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..services.xml_generator import generate_kh1, generate_dp3
+from ..services.xml_generator import generate_kh1, generate_dp3, generate_dpfdp7
 from .utils import flash
 
 router = APIRouter(prefix="/exporty")
@@ -48,6 +48,38 @@ async def export_dp3(request: Request, db: Session = Depends(get_db)):
 
     mesic_str = f"Q{period}" if quarter else f"{period:02d}"
     filename = f"DP3_{year}_{mesic_str}.xml"
+    return Response(
+        content=xml_content.encode("utf-8"),
+        media_type="application/xml",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.post("/dpfdp7")
+async def export_dpfdp7(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    try:
+        year = int(form.get("year", date.today().year - 1))
+    except ValueError:
+        year = date.today().year - 1
+
+    try:
+        pausal = int(form.get("pausal", 60))
+    except ValueError:
+        pausal = 60
+
+    sleva = 30840 if form.get("sleva_poplatnik") else 0
+
+    try:
+        zalohy = int(form.get("zalohy", 0))
+    except ValueError:
+        zalohy = 0
+
+    sub_date = date.fromisoformat(form.get("submission_date", date.today().isoformat()))
+
+    xml_content = generate_dpfdp7(db, year, pausal, sleva, zalohy, sub_date)
+
+    filename = f"DPFDP7-{year}.xml"
     return Response(
         content=xml_content.encode("utf-8"),
         media_type="application/xml",

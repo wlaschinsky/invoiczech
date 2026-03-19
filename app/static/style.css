@@ -1529,33 +1529,50 @@ input[type=date].form-control.dp-native {
 /* ---- Hamburger (hidden on desktop) ---- */
 .hamburger {
   display: none;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 5px;
-  width: 36px;
-  height: 36px;
-  padding: 6px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   background: none;
-  border: none;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.hamburger:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.06);
 }
 .hamburger-line {
   display: block;
-  width: 100%;
-  height: 2px;
-  background: var(--color-text-primary);
-  border-radius: 2px;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  position: absolute;
+  left: 6px;
+  width: 14px;
+  height: 1.5px;
+  background: var(--color-text-secondary);
+  border-radius: 1px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.2s ease;
+}
+.hamburger-line:nth-child(1) { top: 8px; }
+.hamburger-line:nth-child(2) { top: 13px; }
+.hamburger-line:nth-child(3) { top: 18px; }
+.hamburger.active .hamburger-line {
+  background: var(--color-accent-primary);
 }
 .hamburger.active .hamburger-line:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+  transform: translateY(5px) rotate(45deg);
 }
 .hamburger.active .hamburger-line:nth-child(2) {
   opacity: 0;
+  transform: scaleX(0);
 }
 .hamburger.active .hamburger-line:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+  transform: translateY(-5px) rotate(-45deg);
 }
 
 /* ---- Sidebar overlay ---- */

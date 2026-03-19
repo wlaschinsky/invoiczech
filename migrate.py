@@ -11,7 +11,7 @@ from sqlalchemy import Integer, String, Numeric, Date, DateTime, Text, Boolean, 
 
 # Import modelů (side-effect: registrace do Base.metadata)
 from app.database import Base, engine
-from app.models import contact, invoice, expense, invoice_template  # noqa
+from app.models import contact, invoice, expense, invoice_template, profile  # noqa
 
 
 # Mapování SQLAlchemy typů na SQLite typy

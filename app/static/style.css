@@ -1231,6 +1231,11 @@ input[type=date].form-control.dp-native {
 /* ============================================================
    Detail view
    ============================================================ */
+.detail-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1813,7 +1818,7 @@ a.attachment-filename:hover {
   .sidebar.mobile-open { transform: translateX(0); }
   .main-content { margin-left: 0; }
   .main-content.sidebar-collapsed { margin-left: 0; }
-  .detail-grid, .export-grid { grid-template-columns: 1fr; }
+  .detail-grid, .detail-grid-inner, .export-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-row--3 { grid-template-columns: repeat(2, 1fr); }
   .form-row { flex-direction: column; }

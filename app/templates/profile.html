@@ -15,109 +15,233 @@
 
 <form method="post" action="/profil">
 
-  <div class="detail-grid">
-    <div class="detail-card">
-      <h3>Osobní údaje</h3>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="first_name">Jméno</label>
-          <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" class="form-control">
+  {# ── Sekce 1: Osobní a firemní údaje ── #}
+  <div class="detail-card">
+    <h3>Osobní a firemní údaje</h3>
+    <div class="detail-grid-inner">
+      <div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Jméno</label>
+            <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="last_name">Příjmení</label>
+            <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" class="form-control">
+          </div>
         </div>
         <div class="form-group">
-          <label for="last_name">Příjmení</label>
-          <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" class="form-control">
+          <label for="company_name">Název firmy / Jméno OSVČ</label>
+          <input type="text" id="company_name" name="company_name" value="{{ profile.company_name }}" class="form-control">
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ico">IČO</label>
+            <input type="text" id="ico" name="ico" value="{{ profile.ico }}" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="dic">DIČ</label>
+            <input type="text" id="dic" name="dic" value="{{ profile.dic }}" class="form-control">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" value="{{ profile.email }}" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="phone">Telefon</label>
+            <input type="text" id="phone" name="phone" value="{{ profile.phone }}" class="form-control">
+          </div>
+        </div>
+        <label class="checkbox-label" style="margin-top:8px">
+          <input type="checkbox" name="vat_payer" value="1" {% if profile.vat_payer %}checked{% endif %}>
+          Plátce DPH
+        </label>
       </div>
-      <div class="form-row">
+      <div>
         <div class="form-group">
-          <label for="email">E-mail</label>
-          <input type="email" id="email" name="email" value="{{ profile.email }}" class="form-control">
+          <label for="street">Ulice</label>
+          <input type="text" id="street" name="street" value="{{ profile.street }}" class="form-control">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="house_number">Č. popisné</label>
+            <input type="text" id="house_number" name="house_number" value="{{ profile.house_number }}" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="orientation_number">Č. orientační</label>
+            <input type="text" id="orientation_number" name="orientation_number" value="{{ profile.orientation_number }}" class="form-control">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">Město</label>
+            <input type="text" id="city" name="city" value="{{ profile.city }}" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="zip_code">PSČ</label>
+            <input type="text" id="zip_code" name="zip_code" value="{{ profile.zip_code }}" class="form-control">
+          </div>
         </div>
         <div class="form-group">
-          <label for="phone">Telefon</label>
-          <input type="text" id="phone" name="phone" value="{{ profile.phone }}" class="form-control">
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-card">
-      <h3>Adresa</h3>
-      <div class="form-group">
-        <label for="street">Ulice</label>
-        <input type="text" id="street" name="street" value="{{ profile.street }}" class="form-control">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="house_number">Č. popisné</label>
-          <input type="text" id="house_number" name="house_number" value="{{ profile.house_number }}" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="orientation_number">Č. orientační</label>
-          <input type="text" id="orientation_number" name="orientation_number" value="{{ profile.orientation_number }}" class="form-control">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="city">Město</label>
-          <input type="text" id="city" name="city" value="{{ profile.city }}" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="zip_code">PSČ</label>
-          <input type="text" id="zip_code" name="zip_code" value="{{ profile.zip_code }}" class="form-control">
+          <label for="country">Stát</label>
+          <input type="text" id="country" name="country" value="{{ profile.country }}" class="form-control">
         </div>
       </div>
     </div>
   </div>
 
-  <div class="detail-grid mt-4">
-    <div class="detail-card">
-      <h3>Podnikatelské údaje</h3>
+  {# ── Sekce 2: Bankovní spojení ── #}
+  <div class="detail-card mt-4">
+    <h3>Bankovní spojení</h3>
+    <div class="form-row">
       <div class="form-group">
-        <label for="company_name">Název firmy / Jméno OSVČ</label>
-        <input type="text" id="company_name" name="company_name" value="{{ profile.company_name }}" class="form-control">
+        <label for="bank_name">Název banky</label>
+        <input type="text" id="bank_name" name="bank_name" value="{{ profile.bank_name }}" class="form-control">
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="ico">IČO</label>
-          <input type="text" id="ico" name="ico" value="{{ profile.ico }}" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="dic">DIČ</label>
-          <input type="text" id="dic" name="dic" value="{{ profile.dic }}" class="form-control">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="bank_account">Číslo účtu</label>
-          <input type="text" id="bank_account" name="bank_account" value="{{ profile.bank_account }}" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="iban">IBAN</label>
-          <input type="text" id="iban" name="iban" value="{{ profile.iban }}" class="form-control">
-        </div>
+      <div class="form-group">
+        <label for="bank_account">Číslo účtu</label>
+        <input type="text" id="bank_account" name="bank_account" value="{{ profile.bank_account }}" placeholder="XXXXXXXXXX/XXXX" class="form-control">
       </div>
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="iban">IBAN</label>
+        <input type="text" id="iban" name="iban" value="{{ profile.iban }}" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="currency">Měna</label>
+        <input type="text" id="currency" name="currency" value="{{ profile.currency }}" class="form-control">
+      </div>
+    </div>
+  </div>
 
-    <div class="detail-card">
-      <h3>Finanční úřad</h3>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="fu_ufo">Číslo FÚ (c_ufo)</label>
-          <input type="text" id="fu_ufo" name="fu_ufo" value="{{ profile.fu_ufo }}" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="fu_pracufo">Pracoviště (c_pracufo)</label>
-          <input type="text" id="fu_pracufo" name="fu_pracufo" value="{{ profile.fu_pracufo }}" class="form-control">
-        </div>
+  {# ── Sekce 3: Finanční úřad ── #}
+  <div class="detail-card mt-4">
+    <h3>Finanční úřad</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fu_select">Územní pracoviště</label>
+        <select id="fu_select" class="form-control" onchange="onFuChange()">
+          <option value="">– Vyberte –</option>
+          <option value="451|2001">Praha 1</option>
+          <option value="451|2002">Praha 2</option>
+          <option value="451|2003">Praha 3</option>
+          <option value="451|2004">Praha 4</option>
+          <option value="451|2005">Praha 5</option>
+          <option value="451|2006">Praha 6</option>
+          <option value="451|2007">Praha 7</option>
+          <option value="451|2008">Praha 8</option>
+          <option value="451|2009">Město</option>
+          <option value="451|2010">Praha 10</option>
+          <option value="452|2101">Benešov</option>
+          <option value="452|2201">Beroun</option>
+          <option value="452|2501">Kladno</option>
+          <option value="452|2601">Kolín</option>
+          <option value="452|2801">Mladá Boleslav</option>
+          <option value="452|3101">Příbram</option>
+          <option value="453|2301">České Budějovice</option>
+          <option value="453|2401">Český Krumlov</option>
+          <option value="453|3201">Tábor</option>
+          <option value="454|2502">Plzeň</option>
+          <option value="455|2402">Karlovy Vary</option>
+          <option value="456|2902">Ústí nad Labem</option>
+          <option value="456|2302">Děčín</option>
+          <option value="456|2702">Liberec</option>
+          <option value="457|2702">Jablonec nad Nisou</option>
+          <option value="458|2802">Hradec Králové</option>
+          <option value="459|3002">Pardubice</option>
+          <option value="460|2503">Jihlava</option>
+          <option value="461|3103">Brno</option>
+          <option value="462|2903">Olomouc</option>
+          <option value="463|2803">Ostrava</option>
+          <option value="464|3203">Zlín</option>
+          <option value="custom">Jiný (ruční zadání)</option>
+        </select>
+        <input type="hidden" id="fu_ufo" name="fu_ufo" value="{{ profile.fu_ufo }}">
+        <input type="hidden" id="fu_pracufo" name="fu_pracufo" value="{{ profile.fu_pracufo }}">
+      </div>
+      <div class="form-group" id="fu_manual_ufo" style="display:none">
+        <label for="fu_ufo_manual">Číslo FÚ (c_ufo)</label>
+        <input type="number" id="fu_ufo_manual" class="form-control" value="{{ profile.fu_ufo }}">
+      </div>
+      <div class="form-group" id="fu_manual_pracufo" style="display:none">
+        <label for="fu_pracufo_manual">Pracoviště (c_pracufo)</label>
+        <input type="number" id="fu_pracufo_manual" class="form-control" value="{{ profile.fu_pracufo }}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="okec">Hlavní ekonomická činnost (OKEČ)</label>
+        <select id="okec" name="okec" class="form-control">
+          <option value="">– Vyberte –</option>
+          <option value="011000" {% if profile.okec == "011000" %}selected{% endif %}>011000 – Rostlinná výroba</option>
+          <option value="412000" {% if profile.okec == "412000" %}selected{% endif %}>412000 – Stavebnictví</option>
+          <option value="461000" {% if profile.okec == "461000" %}selected{% endif %}>461000 – Zprostředkování velkoobchodu</option>
+          <option value="471000" {% if profile.okec == "471000" %}selected{% endif %}>471000 – Maloobchod</option>
+          <option value="494000" {% if profile.okec == "494000" %}selected{% endif %}>494000 – Silniční nákladní doprava</option>
+          <option value="561000" {% if profile.okec == "561000" %}selected{% endif %}>561000 – Stravování a pohostinství</option>
+          <option value="620000" {% if profile.okec == "620000" %}selected{% endif %}>620000 – Činnosti v oblasti IT</option>
+          <option value="620100" {% if profile.okec == "620100" %}selected{% endif %}>620100 – Programování</option>
+          <option value="681000" {% if profile.okec == "681000" %}selected{% endif %}>681000 – Nemovitosti</option>
+          <option value="702000" {% if profile.okec == "702000" %}selected{% endif %}>702000 – Poradenství v řízení</option>
+          <option value="711000" {% if profile.okec == "711000" %}selected{% endif %}>711000 – Architektonické a inženýrské činnosti</option>
+          <option value="731000" {% if profile.okec == "731000" %}selected{% endif %}>731000 – Reklama</option>
+          <option value="741000" {% if profile.okec == "741000" %}selected{% endif %}>741000 – Designérské činnosti</option>
+          <option value="862000" {% if profile.okec == "862000" %}selected{% endif %}>862000 – Zdravotní péče</option>
+          <option value="855000" {% if profile.okec == "855000" %}selected{% endif %}>855000 – Vzdělávání</option>
+          <option value="960000" {% if profile.okec == "960000" %}selected{% endif %}>960000 – Ostatní osobní služby</option>
+        </select>
       </div>
       <div class="form-group">
-        <label for="okec">OKEČ</label>
-        <input type="text" id="okec" name="okec" value="{{ profile.okec }}" class="form-control">
+        <label for="ds_type">Typ datové schránky</label>
+        <select id="ds_type" name="ds_type" class="form-control">
+          <option value="F" {% if profile.ds_type == "F" %}selected{% endif %}>F – Fyzická osoba</option>
+          <option value="P" {% if profile.ds_type == "P" %}selected{% endif %}>P – Právnická osoba</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="expense_flat_rate">Typ výdajového paušálu</label>
+        <select id="expense_flat_rate" name="expense_flat_rate" class="form-control">
+          <option value="40" {% if profile.expense_flat_rate == 40 %}selected{% endif %}>40 %</option>
+          <option value="60" {% if profile.expense_flat_rate == 60 %}selected{% endif %}>60 %</option>
+          <option value="80" {% if profile.expense_flat_rate == 80 %}selected{% endif %}>80 %</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  {# ── Sekce 4: Výchozí nastavení faktur ── #}
+  <div class="detail-card mt-4">
+    <h3>Výchozí nastavení faktur</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="default_due_days">Splatnost (dní)</label>
+        <input type="number" id="default_due_days" name="default_due_days" value="{{ profile.default_due_days }}" min="1" class="form-control">
       </div>
       <div class="form-group">
-        <label for="default_invoice_text">Výchozí text faktury</label>
-        <textarea id="default_invoice_text" name="default_invoice_text" rows="3" class="form-control">{{ profile.default_invoice_text }}</textarea>
+        <label for="default_payment_method">Způsob úhrady</label>
+        <select id="default_payment_method" name="default_payment_method" class="form-control">
+          {% for m in ["Bankovní převod", "Hotově", "Dobírka", "Zápočet"] %}
+          <option value="{{ m }}" {% if profile.default_payment_method == m %}selected{% endif %}>{{ m }}</option>
+          {% endfor %}
+        </select>
       </div>
+      <div class="form-group">
+        <label for="default_vat_rate">DPH sazba (%)</label>
+        <select id="default_vat_rate" name="default_vat_rate" class="form-control">
+          {% for r in [21, 12, 0] %}
+          <option value="{{ r }}" {% if profile.default_vat_rate == r %}selected{% endif %}>{{ r }} %</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="default_invoice_text">Výchozí text faktury</label>
+      <textarea id="default_invoice_text" name="default_invoice_text" rows="3" class="form-control">{{ profile.default_invoice_text }}</textarea>
     </div>
   </div>
 
@@ -126,4 +250,58 @@
   </div>
 
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function onFuChange() {
+  const sel = document.getElementById('fu_select');
+  const val = sel.value;
+  const manUfo = document.getElementById('fu_manual_ufo');
+  const manPrac = document.getElementById('fu_manual_pracufo');
+  const hidUfo = document.getElementById('fu_ufo');
+  const hidPrac = document.getElementById('fu_pracufo');
+
+  if (val === 'custom') {
+    manUfo.style.display = '';
+    manPrac.style.display = '';
+    hidUfo.value = document.getElementById('fu_ufo_manual').value;
+    hidPrac.value = document.getElementById('fu_pracufo_manual').value;
+  } else if (val) {
+    manUfo.style.display = 'none';
+    manPrac.style.display = 'none';
+    const parts = val.split('|');
+    hidUfo.value = parts[0];
+    hidPrac.value = parts[1];
+  } else {
+    manUfo.style.display = 'none';
+    manPrac.style.display = 'none';
+    hidUfo.value = '';
+    hidPrac.value = '';
+  }
+}
+
+// Sync manual inputs → hidden fields
+document.getElementById('fu_ufo_manual').addEventListener('input', function() {
+  document.getElementById('fu_ufo').value = this.value;
+});
+document.getElementById('fu_pracufo_manual').addEventListener('input', function() {
+  document.getElementById('fu_pracufo').value = this.value;
+});
+
+// Pre-select on page load
+(function() {
+  const ufo = '{{ profile.fu_ufo }}';
+  const prac = '{{ profile.fu_pracufo }}';
+  if (!ufo && !prac) return;
+  const sel = document.getElementById('fu_select');
+  const combo = ufo + '|' + prac;
+  for (const opt of sel.options) {
+    if (opt.value === combo) { sel.value = combo; return; }
+  }
+  // Not in the list → show manual fields
+  sel.value = 'custom';
+  onFuChange();
+})();
+</script>
 {% endblock %}

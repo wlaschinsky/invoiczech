@@ -66,7 +66,8 @@
       "Bash(venv/bin/python -c \"from app.routers.dashboard import router; print\\(''OK''\\)\")",
       "Bash(venv/bin/python -c \"from app.main import app; print\\(''Routes:'', [r.path for r in app.routes if hasattr\\(r, ''path''\\) and ''prehled'' in r.path]\\)\")",
       "Bash(venv/bin/python -c \"from app.routers.overview import router; print\\(''OK''\\)\")",
-      "Bash(venv/bin/python -c \":*)"
+      "Bash(venv/bin/python -c \":*)",
+      "Bash(venv/bin/python -c \"from app.main import app; print\\(''App OK''\\)\")"
     ]
   }
 }

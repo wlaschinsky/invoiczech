@@ -42,31 +42,9 @@ cp .env.example .env
 | `SECRET_KEY` | Náhodný řetězec pro šifrování sessions |
 | `PASSWORD_HASH` | Bcrypt hash hesla (viz níže) |
 
-### Vlastník aplikace
+### Profil podnikatele
 
-Jméno a email vlastníka se zobrazují na login stránce a v sidebaru. Nastavují se v `.env`:
-
-```
-OWNER_NAME=Jan Novák
-OWNER_EMAIL=jan@example.cz
-```
-
-### Údaje dodavatele
-
-Výchozí hodnoty dodavatele (pro PDF faktury, exporty) lze přepsat v `.env`:
-
-```
-SUPPLIER_NAME=Jan Novák
-SUPPLIER_ICO=12345678
-SUPPLIER_DIC=CZ1234567890
-SUPPLIER_STREET=Ulice 123
-SUPPLIER_CITY=Praha
-SUPPLIER_ZIP=110 00
-SUPPLIER_ACCOUNT=1234567890/0100
-SUPPLIER_IBAN=CZ1234567890123456789012
-SUPPLIER_EMAIL=jan@example.cz
-SUPPLIER_PHONE=123456789
-```
+Údaje podnikatele (jméno, adresa, IČO, DIČ, bankovní účet, finanční úřad) se nastavují přímo v aplikaci na stránce **Profil** (`/profil`). Při prvním spuštění se automaticky naplní z `.env` proměnných (pokud existují).
 
 ### Nastavení hesla
 

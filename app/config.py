@@ -12,27 +12,24 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
 
     # Vlastník aplikace (login stránka, sidebar)
-    OWNER_NAME: str = "Vlastník Aplikace"
-    OWNER_EMAIL: str = "owner@example.com"
+    OWNER_NAME: str = ""
+    OWNER_EMAIL: str = ""
 
-    # Údaje dodavatele
-    SUPPLIER_NAME: str = "Vlastník Aplikace"
-    SUPPLIER_STREET: str = "Ulice XX"
-    SUPPLIER_CITY: str = "Město"
-    SUPPLIER_ZIP: str = "XXX XX"
-    SUPPLIER_ICO: str = "XXXXXXXX"
-    SUPPLIER_DIC: str = "CZXXXXXXXXXX"
-    SUPPLIER_ACCOUNT: str = "XXXXXXXXXX/XXXX"
+    # Údaje dodavatele (nastavit v .env)
+    SUPPLIER_NAME: str = ""
+    SUPPLIER_STREET: str = ""
+    SUPPLIER_CITY: str = ""
+    SUPPLIER_ZIP: str = ""
+    SUPPLIER_ICO: str = ""
+    SUPPLIER_DIC: str = ""
+    SUPPLIER_ACCOUNT: str = ""
     SUPPLIER_IBAN: str = ""
-    SUPPLIER_EMAIL: str = "owner@example.com"
-    SUPPLIER_PHONE: str = "XXXXXXXXXX"
-    SUPPLIER_FU_UFO: str = "451"
-    SUPPLIER_FU_PRACUFO: str = "2009"
-    SUPPLIER_OKEC: str = "620000"
-    DEFAULT_INVOICE_TEXT: str = (
-        "Fakturuji Vám za smluvně prací, na základě "
-        "dodatku k rámcové smlouvě o dílo ze dne 1.5.2025."
-    )
+    SUPPLIER_EMAIL: str = ""
+    SUPPLIER_PHONE: str = ""
+    SUPPLIER_FU_UFO: str = ""
+    SUPPLIER_FU_PRACUFO: str = ""
+    SUPPLIER_OKEC: str = ""
+    DEFAULT_INVOICE_TEXT: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
@@ -44,12 +41,18 @@ def get_settings() -> Settings:
 
 def get_version() -> str:
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # 1) Soubor VERSION (zapisuje deploy pipeline)
+    version_file = os.path.join(project_root, "VERSION")
+    if os.path.isfile(version_file):
+        v = open(version_file).read().strip()
+        if v:
+            return v
+    # 2) Fallback na git (lokální vývoj)
     try:
         return subprocess.check_output(
             ["git", "describe", "--tags", "--abbrev=0"],
             cwd=project_root,
             stderr=subprocess.PIPE,
-            env={**os.environ, "HOME": os.path.expanduser("~")},
         ).decode().strip()
     except Exception:
         return "dev"

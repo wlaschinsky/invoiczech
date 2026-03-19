@@ -1658,13 +1658,14 @@ input[type=date].form-control.dp-native {
   /* Detail table (key-value pairs): tighter */
   .detail-table th { width: 40%; font-size: 0.8rem; }
   .detail-table td { font-size: 0.8rem; }
-  /* Filter form: full width inputs */
-  .filter-form .form-control { max-width: none; }
+  /* Filter form: full width, stacked */
+  .filter-form { gap: 6px; align-items: stretch; }
+  .filter-form .form-control { max-width: none; width: 100%; }
   .form-control-date { max-width: none !important; }
   .filter-form .dp-wrap { width: 100%; }
-  /* Bulk bar stacks */
-  .bulk-bar-inner { flex-direction: column; gap: 8px; }
-  .bulk-actions { flex-wrap: wrap; }
+  .filter-form .btn { width: 100%; justify-content: center; }
+  /* Bulk bar: hidden on mobile (use desktop for bulk ops) */
+  .bulk-bar { display: none !important; }
   /* Touch-friendly buttons: min 44px tap target */
   .btn { min-height: 44px; }
   .btn-sm { min-height: 36px; }

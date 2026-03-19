@@ -12,6 +12,16 @@ from ..models.expense import Expense
 
 router = APIRouter()
 
+_MONTHS_CS = [
+    "", "leden", "únor", "březen", "duben",
+    "květen", "červen", "červenec", "srpen",
+    "září", "říjen", "listopad", "prosinec",
+]
+
+
+def _month_label(m: int, y: int) -> str:
+    return f"{_MONTHS_CS[m]} {y}"
+
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request, db: Session = Depends(get_db)):
@@ -19,64 +29,75 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
     month_start = today.replace(day=1)
     year_start = today.replace(month=1, day=1)
 
-    # --- Faktury ---
+    # Previous month range
+    prev_month_end = month_start - timedelta(days=1)
+    prev_month_start = prev_month_end.replace(day=1)
+
+    # --- Faktury (filter by DUZP) ---
     all_invoices = db.query(Invoice).filter(Invoice.status != "Stornována").all()
 
-    def inv_total(inv: Invoice) -> Decimal:
-        return inv.total
-
-    def inv_base(inv: Invoice) -> Decimal:
-        return inv.subtotal
-
-    invoices_month = [
+    invoices_month = [i for i in all_invoices if i.duzp and i.duzp >= month_start]
+    invoices_year = [i for i in all_invoices if i.duzp and i.duzp >= year_start]
+    invoices_prev_month = [
         i for i in all_invoices
-        if i.issue_date >= month_start
-    ]
-    invoices_year = [
-        i for i in all_invoices
-        if i.issue_date >= year_start
+        if i.duzp and prev_month_start <= i.duzp <= prev_month_end
     ]
 
-    income_month = sum(inv_base(i) for i in invoices_month)
-    income_year = sum(inv_base(i) for i in invoices_year)
+    income_month_total = sum(i.total for i in invoices_month)
+    income_month_base = sum(i.subtotal for i in invoices_month)
+    income_year_total = sum(i.total for i in invoices_year)
+    income_year_base = sum(i.subtotal for i in invoices_year)
 
+    # Daň na výstupu předchozí měsíc (VAT from invoices)
+    vat_output_prev = sum(i.vat_total for i in invoices_prev_month)
+
+    # Neuhrazené faktury
     unpaid = [i for i in all_invoices if i.status == "Vystavena"]
-    unpaid_total = sum(inv_total(i) for i in unpaid)
+    unpaid_total = sum(i.total for i in unpaid)
 
-    overdue = [i for i in unpaid if i.due_date < today]
-
-    # --- Náklady ---
+    # --- Náklady (daňově uznatelné: Ano + Nevím, filter by issue_date) ---
     all_expenses = db.query(Expense).all()
-    expenses_month = [e for e in all_expenses if e.issue_date >= month_start]
-    expenses_year = [e for e in all_expenses if e.issue_date >= year_start]
+    deductible = [e for e in all_expenses if e.tax_deductible in ("Ano", "Nevím")]
 
-    costs_month = sum(e.total for e in expenses_month)
-    costs_year = sum(e.total for e in expenses_year)
+    exp_month = [e for e in deductible if e.issue_date >= month_start]
+    exp_prev_month = [
+        e for e in deductible
+        if prev_month_start <= e.issue_date <= prev_month_end
+    ]
+    exp_year = [e for e in deductible if e.issue_date >= year_start]
 
-    # --- Odhadovaná DPH za aktuální měsíc ---
-    inv_vat_month = sum(
-        sum(item.vat_amount for item in i.items if item.vat_rate == 21)
-        for i in invoices_month
-    )
-    exp_vat_month = sum(
-        sum(item.vat_amount for item in e.items if item.vat_rate == 21)
-        for e in expenses_month
-        if e.tax_deductible in ("Ano", "Nevím")
-    )
-    estimated_vat = max(Decimal("0"), inv_vat_month - exp_vat_month)
+    costs_month_total = sum(e.total for e in exp_month)
+    costs_month_vat = sum(e.vat_total for e in exp_month)
+    costs_prev_total = sum(e.total for e in exp_prev_month)
+    costs_prev_vat = sum(e.vat_total for e in exp_prev_month)
+    costs_year_total = sum(e.total for e in exp_year)
+    costs_year_vat = sum(e.vat_total for e in exp_year)
 
     return templates.TemplateResponse(
         "dashboard.html",
         {
             "request": request,
-            "income_month": income_month,
-            "income_year": income_year,
-            "costs_month": costs_month,
-            "costs_year": costs_year,
+            # Labels
+            "current_month_label": _month_label(today.month, today.year),
+            "prev_month_label": _month_label(prev_month_start.month, prev_month_start.year),
+            "current_year": today.year,
+            # Příjmy
+            "income_month_total": income_month_total,
+            "income_month_base": income_month_base,
+            "income_year_total": income_year_total,
+            "income_year_base": income_year_base,
+            # Náklady
+            "costs_month_total": costs_month_total,
+            "costs_month_vat": costs_month_vat,
+            "costs_prev_total": costs_prev_total,
+            "costs_prev_vat": costs_prev_vat,
+            "costs_year_total": costs_year_total,
+            "costs_year_vat": costs_year_vat,
+            # DPH
+            "vat_output_prev": vat_output_prev,
+            # Neuhrazené
             "unpaid_count": len(unpaid),
             "unpaid_total": unpaid_total,
-            "overdue": overdue,
-            "estimated_vat": estimated_vat,
             "today": today,
         },
     )

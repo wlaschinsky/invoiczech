@@ -43,7 +43,6 @@ class Profile(Base):
     default_payment_method = Column(String, default="Bankovní převod")
     default_invoice_text = Column(Text, default="")
     default_vat_rate = Column(Integer, default=21)
-    expense_flat_rate = Column(Integer, default=60)
 
     @property
     def full_name(self) -> str:

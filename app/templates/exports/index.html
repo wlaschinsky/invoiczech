@@ -121,49 +121,10 @@
     </form>
   </div>
 
-  <!-- Daňové přiznání FO -->
-  <div class="export-card">
-    <div class="export-card-header">
-      <h2>Daňové přiznání FO (DPFDP7)</h2>
-      <span class="badge badge-neutral">XML</span>
-    </div>
-    <p class="text-muted">
-      Přiznání k dani z příjmů fyzických osob.
-      Obsahuje příjmy ze samostatné výdělečné činnosti (§7) s výdajovým paušálem.
-    </p>
-    <form method="post" action="/exporty/dpfdp7" class="export-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Rok</label>
-          <input type="number" name="year" value="{{ today.year - 1 }}" min="2020" max="2099" class="form-control w-24">
-        </div>
-        <div class="form-group">
-          <label>Výdajový paušál</label>
-          <input type="text" value="{{ profile.expense_flat_rate or 60 }} %" class="form-control" disabled>
-          <small class="text-muted">Nastavení v <a href="/profil">profilu</a></small>
-        </div>
-        <div class="form-group">
-          <label>Zaplacené zálohy na dani</label>
-          <input type="number" name="zalohy" value="0" min="0" class="form-control w-24">
-        </div>
-        <div class="form-group">
-          <label>Datum podání</label>
-          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
-        </div>
-      </div>
-      <div class="form-row" style="margin-top:8px">
-        <label class="checkbox-label">
-          <input type="checkbox" name="sleva_poplatnik" value="1" checked>
-          Sleva na poplatníka (30 840 Kč)
-        </label>
-      </div>
-      <button type="submit" class="btn btn-primary">Stáhnout DPFDP7 XML</button>
-    </form>
-  </div>
 
 </div>
 <div class="info-box mt-4">
-  <strong>Poznámka:</strong> KH1 a DP3 používají pole DUZP, DPFDP7 používá datum úhrady.
+  <strong>Poznámka:</strong> KH1 a DP3 používají pole DUZP (datum uskutečnění zdanitelného plnění).
   Zkontrolujte prosím, že všechny faktury a náklady mají správně vyplněná data před generováním exportu.
   Hodnoty DPH jsou zaokrouhleny na celé Kč.
 </div>

@@ -55,7 +55,8 @@
       "Bash(python3 migrate.py)",
       "Bash(ls .venv/bin/python*)",
       "Bash(ls venv/bin/python*)",
-      "Bash(venv/bin/python migrate.py)"
+      "Bash(venv/bin/python migrate.py)",
+      "Bash(in new window\" link. Mobile: smaller preview height, stacked buttons.:*)"
     ]
   }
 }

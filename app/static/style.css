@@ -510,25 +510,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: auto;
 }
 
-/* ---- Sidebar footer (version) ---- */
-.sidebar-footer {
-  margin-top: auto;
-  padding: 16px;
-  font-size: 12px;
-  color: #64748b;
-  border-top: 1px solid var(--color-border);
-}
-.sidebar-footer .brand-invoi { color: #94a3b8; }
-.sidebar-footer .brand-dot { color: #00d68f; font-size: 13px; }
-.sidebar-footer .brand-czech { color: #6366f1; }
-.sidebar-version {
-  display: block;
-  margin-top: 4px;
-  font-size: 11px;
-  opacity: 0.5;
-  font-family: ui-monospace, "SF Mono", monospace;
-}
-.sidebar.collapsed .sidebar-footer { display: none; }
 
 /* ============================================================
    Page header
@@ -1663,8 +1644,7 @@ input[type=date].form-control.dp-native {
   .sidebar.collapsed .nav-label,
   .sidebar.collapsed .user-info,
   .sidebar.collapsed .user-chevron,
-  .sidebar.collapsed .separator-line,
-  .sidebar.collapsed .sidebar-footer { display: revert; }
+  .sidebar.collapsed .separator-line { display: revert; }
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
   /* Footer padding for mobile */
   .app-footer { padding: 14px 16px; font-size: 13px; }

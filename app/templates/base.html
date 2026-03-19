@@ -923,6 +923,43 @@
       document.addEventListener('click', function() { closeAll(); });
     })();
   </script>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-backdrop"></div>
+    <div class="lightbox-content" id="lightbox-content"></div>
+    <button type="button" class="lightbox-close" id="lightbox-close">&times;</button>
+  </div>
+  <script>
+  function openLightbox(url, type) {
+    var lb = document.getElementById('lightbox');
+    var content = document.getElementById('lightbox-content');
+    if (type === 'image') {
+      content.innerHTML = '<img src="' + url + '" class="lightbox-img">';
+    } else if (type === 'pdf') {
+      content.innerHTML = '<iframe src="' + url + '" class="lightbox-iframe"></iframe>';
+    } else {
+      window.open(url, '_blank');
+      return;
+    }
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  (function() {
+    var lb = document.getElementById('lightbox');
+    if (!lb) return;
+    function closeLb() {
+      lb.classList.remove('open');
+      document.getElementById('lightbox-content').innerHTML = '';
+      document.body.style.overflow = '';
+    }
+    document.getElementById('lightbox-close').addEventListener('click', closeLb);
+    lb.querySelector('.lightbox-backdrop').addEventListener('click', closeLb);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && lb.classList.contains('open')) closeLb();
+    });
+  })();
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

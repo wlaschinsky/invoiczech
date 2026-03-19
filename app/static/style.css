@@ -1336,6 +1336,59 @@ input[type=date].form-control.dp-native {
   color: #ef4444;
   font-size: 0.85rem;
 }
+/* ---- Lightbox ---- */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+}
+.lightbox-content {
+  position: relative;
+  z-index: 1;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+.lightbox-iframe {
+  width: 80vw;
+  height: 85vh;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 2;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.lightbox-close:hover { opacity: 1; }
+
 .attachment-preview {
   margin-bottom: 12px;
 }
@@ -1687,11 +1740,12 @@ input[type=date].form-control.dp-native {
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
   /* Footer padding for mobile */
   .app-footer { padding: 14px 16px; font-size: 13px; }
-  /* Attachment preview */
-  .attachment-pdf { height: 350px; }
-  .attachment-image { max-height: 300px; }
+  /* Attachment */
   .attachment-actions { flex-direction: column; }
   .attachment-actions .btn { width: 100%; justify-content: center; }
+  /* Lightbox mobile */
+  .lightbox-iframe { width: 95vw; height: 80vh; }
+  .lightbox-close { top: 8px; right: 12px; font-size: 1.6rem; }
   /* Action buttons stack vertically */
   .actions { white-space: nowrap; }
   /* Detail cards: reduce padding */

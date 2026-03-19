@@ -103,9 +103,21 @@ async def yearly_overview(
 ):
     year = rok or date.today().year
     data = _compute(db, year)
+
+    # Roky s daty (DUZP faktur + issue_date nákladů)
+    inv_years = {
+        i.duzp.year for i in db.query(Invoice).all()
+        if i.duzp
+    }
+    exp_years = {
+        e.issue_date.year for e in db.query(Expense).all()
+        if e.issue_date
+    }
+    available_years = sorted(inv_years | exp_years | {year}, reverse=True)
+
     return templates.TemplateResponse(
         "overview/year.html",
-        {"request": request, **data},
+        {"request": request, "available_years": available_years, **data},
     )
 
 

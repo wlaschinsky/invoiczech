@@ -23,13 +23,13 @@
   </div>
 </div>
 
-<div class="filter-bar mb-4">
-  <form method="get" action="/prehled/rok" class="form-row" style="align-items:flex-end;gap:12px;">
-    <div class="form-group" style="margin-bottom:0">
-      <label for="rok">Rok</label>
-      <input type="number" id="rok" name="rok" value="{{ year }}" min="2020" max="2099" class="form-control w-24">
-    </div>
-    <button type="submit" class="btn btn-secondary">Zobrazit</button>
+<div class="filter-bar">
+  <form method="get" action="/prehled/rok" class="filter-form">
+    <select name="rok" class="form-control form-control-sm" onchange="this.form.submit()">
+      {% for y in available_years %}
+      <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
   </form>
 </div>
 

@@ -470,10 +470,10 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 18px 32px;
   border-top: 1px solid rgba(99, 102, 241, 0.1);
   background: var(--color-bg-primary);
-  font-size: 12px;
+  font-size: 14px;
   color: #94a3b8;
   line-height: 1;
 }
@@ -485,23 +485,50 @@ h1, h2, h3, h4, h5, h6 {
 .footer-left {
   display: flex;
   align-items: center;
+  gap: 6px;
+  font-weight: 500;
 }
 .footer-version {
-  opacity: 0.6;
-  margin-left: 4px;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
 }
 .footer-link {
   color: #94a3b8;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
 }
 .footer-link:hover {
   color: #6366f1;
+  opacity: 1;
 }
 .app-footer--login {
   width: 100%;
   margin-top: auto;
 }
+
+/* ---- Sidebar footer (version) ---- */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  font-size: 12px;
+  color: #64748b;
+  border-top: 1px solid var(--color-border);
+}
+.sidebar-footer .brand-invoi { color: #94a3b8; }
+.sidebar-footer .brand-dot { color: #00d68f; font-size: 13px; }
+.sidebar-footer .brand-czech { color: #6366f1; }
+.sidebar-version {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.5;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.sidebar.collapsed .sidebar-footer { display: none; }
 
 /* ============================================================
    Page header
@@ -1636,8 +1663,11 @@ input[type=date].form-control.dp-native {
   .sidebar.collapsed .nav-label,
   .sidebar.collapsed .user-info,
   .sidebar.collapsed .user-chevron,
-  .sidebar.collapsed .separator-line { display: revert; }
+  .sidebar.collapsed .separator-line,
+  .sidebar.collapsed .sidebar-footer { display: revert; }
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
+  /* Footer padding for mobile */
+  .app-footer { padding: 14px 16px; font-size: 13px; }
   /* Action buttons stack vertically */
   .actions { white-space: nowrap; }
   /* Detail cards: reduce padding */

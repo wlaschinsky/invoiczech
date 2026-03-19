@@ -65,10 +65,6 @@ async def save_profile(request: Request, db: Session = Depends(get_db)):
     profile.fu_pracufo = form.get("fu_pracufo", "").strip()
     profile.okec = form.get("okec", "").strip()
     profile.ds_type = form.get("ds_type", "F").strip()
-    try:
-        profile.expense_flat_rate = int(form.get("expense_flat_rate", 60))
-    except ValueError:
-        profile.expense_flat_rate = 60
 
     # Sekce 4 — Výchozí nastavení faktur
     try:

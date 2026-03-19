@@ -43,11 +43,13 @@ def get_settings() -> Settings:
 
 
 def get_version() -> str:
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     try:
         return subprocess.check_output(
             ["git", "describe", "--tags", "--abbrev=0"],
-            cwd=os.path.dirname(os.path.dirname(__file__)),
-            stderr=subprocess.DEVNULL,
+            cwd=project_root,
+            stderr=subprocess.PIPE,
+            env={**os.environ, "HOME": os.path.expanduser("~")},
         ).decode().strip()
     except Exception:
         return "dev"

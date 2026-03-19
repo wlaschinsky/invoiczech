@@ -1528,6 +1528,8 @@ a.attachment-filename:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
 }
+.stat-card--income  { border-left-color: var(--color-accent-green); }
+.stat-card--expense { border-left-color: #f43f5e; }
 .stat-card--warning { border-left-color: #fb923c; }
 .stat-card--danger  { border-left-color: #ef4444; }
 .stat-card--info    { border-left-color: var(--color-accent-primary); }

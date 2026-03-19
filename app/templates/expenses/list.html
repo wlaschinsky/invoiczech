@@ -55,11 +55,11 @@
       <th>Název</th>
       <th class="mobile-hide">Dodavatel</th>
       <th class="mobile-hide">Typ</th>
-      <th>Datum</th>
+      <th class="mobile-hide">Datum</th>
       <th class="mobile-hide">Daň. uznatelný</th>
       <th class="text-right mobile-hide">Bez DPH</th>
-      <th class="text-right">Celkem s DPH</th>
-      <th></th>
+      <th class="text-right">Celkem</th>
+      <th class="mobile-hide"></th>
     </tr>
   </thead>
   <tbody>
@@ -70,7 +70,7 @@
       <td>{{ exp.title or '—' }}</td>
       <td class="mobile-hide">{{ exp.contact_name or '—' }}</td>
       <td class="mobile-hide"><span class="badge badge-neutral">{{ exp.document_type }}</span></td>
-      <td>{{ exp.issue_date | date_cs }}</td>
+      <td class="mobile-hide">{{ exp.issue_date | date_cs }}</td>
       <td class="mobile-hide">
         {% if exp.tax_deductible == 'Ano' %}
         <span class="badge badge-uhrazena">Ano</span>
@@ -82,8 +82,8 @@
       </td>
       <td class="text-right mobile-hide">{{ exp.subtotal | czk }}</td>
       <td class="text-right font-medium">{{ exp.total | czk }}</td>
-      <td class="actions">
-        <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost mobile-hide">Detail</a>
+      <td class="actions mobile-hide">
+        <a href="/naklady/{{ exp.id }}" class="btn btn-sm btn-ghost">Detail</a>
         <form method="post" action="/naklady/{{ exp.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat náklad {{ exp.number }}?')">
           <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Smazat">
@@ -97,10 +97,11 @@
   <tfoot>
     <tr>
       <td class="mobile-hide"></td>
-      <td colspan="6" class="text-right text-muted"><span class="mobile-hide">Celkem ({{ expenses | length }}):</span></td>
+      <td colspan="2" class="text-right text-muted">Celkem:</td>
+      <td class="mobile-hide" colspan="4"></td>
       <td class="text-right mobile-hide">{{ expenses | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ expenses | sum(attribute='total') | czk }}</td>
-      <td></td>
+      <td class="mobile-hide"></td>
     </tr>
   </tfoot>
 </table>

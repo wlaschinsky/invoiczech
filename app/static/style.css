@@ -1595,6 +1595,25 @@ input[type=date].form-control.dp-native {
   .breadcrumb-home { position: static; }
   /* Hide less important table columns on mobile */
   .mobile-hide { display: none !important; }
+  /* Content padding */
+  .content-inner { padding: 16px; }
+  /* Page header stacks on mobile */
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .page-header h1 { font-size: 1.25rem; }
+  .header-actions { width: 100%; }
+  .header-actions .btn { flex: 1; justify-content: center; }
+  /* Totals box full width */
+  .totals-box { width: 100%; }
+  /* Detail page actions */
+  .detail-actions-bottom { flex-direction: column; gap: 8px; }
+  .detail-actions-bottom .btn { width: 100%; justify-content: center; }
+  .action-buttons { flex-direction: column; gap: 8px; }
+  .action-buttons .inline-form { display: flex; flex-direction: column; gap: 8px; }
+  /* Form groups min-width reset */
+  .form-group-lg { min-width: 0; }
+  /* Dashboard actions */
+  .dashboard-actions { flex-direction: column; }
+  .dashboard-actions .btn { width: 100%; justify-content: center; }
   /* Ensure collapsed sidebar labels are visible in mobile drawer */
   .sidebar.collapsed .nav-label,
   .sidebar.collapsed .user-info,

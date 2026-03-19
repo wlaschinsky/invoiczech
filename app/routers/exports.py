@@ -63,10 +63,10 @@ async def export_dpfdp7(request: Request, db: Session = Depends(get_db)):
     except ValueError:
         year = date.today().year - 1
 
-    try:
-        pausal = int(form.get("pausal", 60))
-    except ValueError:
-        pausal = 60
+    # Paušál se načítá z profilu
+    from ..models.profile import Profile
+    profile = db.query(Profile).first()
+    pausal = profile.expense_flat_rate if profile and profile.expense_flat_rate else 60
 
     sleva = 30840 if form.get("sleva_poplatnik") else 0
 

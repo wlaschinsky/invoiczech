@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, Boolean
 
 from ..database import Base
 
@@ -8,35 +8,42 @@ class Profile(Base):
 
     id = Column(Integer, primary_key=True, default=1)
 
-    # Osobní údaje
+    # Osobní a firemní údaje
     first_name = Column(String, default="")
     last_name = Column(String, default="")
     email = Column(String, default="")
     phone = Column(String, default="")
-
-    # Adresa
-    street = Column(String, default="")
-    house_number = Column(String, default="")       # číslo popisné
-    orientation_number = Column(String, default="")  # číslo orientační
-    city = Column(String, default="")
-    zip_code = Column(String, default="")
-
-    # Podnikatelské údaje
     company_name = Column(String, default="")
     ico = Column(String, default="")
     dic = Column(String, default="")
+    vat_payer = Column(Boolean, default=True)
 
-    # Bankovní údaje
+    # Adresa
+    street = Column(String, default="")
+    house_number = Column(String, default="")
+    orientation_number = Column(String, default="")
+    city = Column(String, default="")
+    zip_code = Column(String, default="")
+    country = Column(String, default="Česká republika")
+
+    # Bankovní spojení
+    bank_name = Column(String, default="")
     bank_account = Column(String, default="")
     iban = Column(String, default="")
+    currency = Column(String, default="CZK")
 
     # Finanční úřad
     fu_ufo = Column(String, default="")
     fu_pracufo = Column(String, default="")
     okec = Column(String, default="")
+    ds_type = Column(String, default="F")
 
-    # Výchozí text faktury
+    # Výchozí nastavení faktur
+    default_due_days = Column(Integer, default=10)
+    default_payment_method = Column(String, default="Bankovní převod")
     default_invoice_text = Column(Text, default="")
+    default_vat_rate = Column(Integer, default=21)
+    expense_flat_rate = Column(Integer, default=60)
 
     @property
     def full_name(self) -> str:

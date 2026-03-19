@@ -239,9 +239,11 @@
     </div>
     {% endif %}
     <div class="form-group">
-      <label for="attachment">{% if expense and expense.attachment_path %}Nahrát novou přílohu{% else %}Nahrát soubor (foto, PDF){% endif %}</label>
+      <label for="attachment">{% if expense and expense.attachment_path %}Nahrát novou přílohu{% else %}Nahrát přílohu{% endif %}</label>
       <input type="file" id="attachment" name="attachment" class="form-control"
-             accept=".pdf,.jpg,.jpeg,.png,.gif,.heic">
+             accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic">
+      <small class="text-muted">PDF, JPG, PNG, GIF, WebP, HEIC — max 10 MB</small>
+      <div id="attachment-error" class="text-danger" style="display:none; margin-top:4px; font-size:0.85rem;"></div>
     </div>
     <div class="form-group">
       <label for="notes">Poznámky</label>
@@ -344,5 +346,34 @@ function removeRow(btn) {
 
 document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
 document.addEventListener('DOMContentLoaded', recalcTotals);
+
+// Attachment validation
+(function() {
+  var input = document.getElementById('attachment');
+  var errEl = document.getElementById('attachment-error');
+  if (!input || !errEl) return;
+  var maxSize = 10 * 1024 * 1024;
+  var allowed = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.heic'];
+
+  input.addEventListener('change', function() {
+    errEl.style.display = 'none';
+    errEl.textContent = '';
+    if (!input.files.length) return;
+    var file = input.files[0];
+    var ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (allowed.indexOf(ext) === -1) {
+      errEl.textContent = 'Nepodporovaný typ souboru (' + ext + '). Povolené: ' + allowed.join(', ');
+      errEl.style.display = 'block';
+      input.value = '';
+      return;
+    }
+    if (file.size > maxSize) {
+      errEl.textContent = 'Soubor je příliš velký (' + Math.round(file.size / 1024 / 1024) + ' MB). Maximum je 10 MB.';
+      errEl.style.display = 'block';
+      input.value = '';
+      return;
+    }
+  });
+})();
 </script>
 {% endblock %}

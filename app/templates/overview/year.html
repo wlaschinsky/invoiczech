@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Přehled {{ year }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <span class="breadcrumb-home">InvoiCzech <span class="breadcrumb-sep">›</span></span>
+  <span class="breadcrumb-current">Přehled {{ year }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Roční přehled {{ year }}</h1>
+  <div class="header-actions">
+    <a href="/prehled/rok/pdf?rok={{ year }}" class="btn btn-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      PDF
+    </a>
+    <a href="/prehled/rok/csv?rok={{ year }}" class="btn btn-secondary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CSV
+    </a>
+  </div>
+</div>
+
+<div class="filter-bar mb-4">
+  <form method="get" action="/prehled/rok" class="form-row" style="align-items:flex-end;gap:12px;">
+    <div class="form-group" style="margin-bottom:0">
+      <label for="rok">Rok</label>
+      <input type="number" id="rok" name="rok" value="{{ year }}" min="2020" max="2099" class="form-control w-24">
+    </div>
+    <button type="submit" class="btn btn-secondary">Zobrazit</button>
+  </form>
+</div>
+
+{# ── Souhrnné karty ── #}
+<div class="stats-row stats-row--3 mb-4">
+  <div class="stat-card stat-card--income">
+    <div class="stat-label">Příjmy {{ year }}</div>
+    <div class="stat-value stat-value--income">{{ income_total | czk }}</div>
+    <div class="stat-sub">bez DPH: {{ income_base | czk }}</div>
+  </div>
+  <div class="stat-card stat-card--expense">
+    <div class="stat-label">Náklady {{ year }}</div>
+    <div class="stat-value">{{ costs_total | czk }}</div>
+    <div class="stat-sub">bez DPH: {{ costs_base | czk }}</div>
+  </div>
+  <div class="stat-card stat-card--info">
+    <div class="stat-label">Vlastní daňová povinnost</div>
+    <div class="stat-value">{{ vat_liability | czk }}</div>
+    <div class="stat-sub">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
+  </div>
+</div>
+
+{# ── Měsíční tabulka ── #}
+<div class="detail-card">
+  <h3>Měsíční rozpis</h3>
+  <div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Měsíc</th>
+        <th class="text-right">Příjmy bez DPH</th>
+        <th class="text-right">Příjmy s DPH</th>
+        <th class="text-right">DPH výstup</th>
+        <th class="text-right">Náklady bez DPH</th>
+        <th class="text-right">Náklady s DPH</th>
+        <th class="text-right">DPH vstup</th>
+        <th class="text-right">Daň. povinnost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in months %}
+      <tr>
+        <td>{{ m.name | capitalize }}</td>
+        <td class="text-right">{{ m.income_base | czk }}</td>
+        <td class="text-right">{{ m.income_total | czk }}</td>
+        <td class="text-right">{{ m.vat_output | czk }}</td>
+        <td class="text-right">{{ m.costs_base | czk }}</td>
+        <td class="text-right">{{ m.costs_total | czk }}</td>
+        <td class="text-right">{{ m.vat_input | czk }}</td>
+        <td class="text-right font-medium">{{ m.vat_liability | czk }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="row-total">
+        <td><strong>Celkem</strong></td>
+        <td class="text-right"><strong>{{ income_base | czk }}</strong></td>
+        <td class="text-right"><strong>{{ income_total | czk }}</strong></td>
+        <td class="text-right"><strong>{{ vat_output | czk }}</strong></td>
+        <td class="text-right"><strong>{{ costs_base | czk }}</strong></td>
+        <td class="text-right"><strong>{{ costs_total | czk }}</strong></td>
+        <td class="text-right"><strong>{{ vat_input | czk }}</strong></td>
+        <td class="text-right"><strong>{{ vat_liability | czk }}</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+</div>
+{% endblock %}

@@ -734,6 +734,7 @@ h1, h2, h3, h4, h5, h6 {
 .link-strong:hover { color: var(--color-accent-primary); }
 
 .row-danger td { background: rgba(239, 68, 68, 0.06) !important; }
+.row-total td { border-top: 2px solid var(--color-border); background: var(--color-bg-secondary); }
 td.actions {
   display: flex;
   gap: 6px;

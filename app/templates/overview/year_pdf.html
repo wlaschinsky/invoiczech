@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 8.5pt;
+      color: #1a1a2e;
+      line-height: 1.4;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16pt;
+      border-bottom: 2pt solid #1e40af;
+      padding-bottom: 8pt;
+    }
+    .header h1 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .header .meta {
+      font-size: 8pt;
+      color: #666;
+      text-align: right;
+    }
+
+    /* Summary cards */
+    .summary {
+      display: flex;
+      gap: 12pt;
+      margin-bottom: 16pt;
+    }
+    .summary-card {
+      flex: 1;
+      border: 1pt solid #ddd;
+      border-radius: 4pt;
+      padding: 10pt;
+      border-top: 2.5pt solid #1e40af;
+    }
+    .summary-card--green { border-top-color: #16a34a; }
+    .summary-card--rose  { border-top-color: #f43f5e; }
+    .summary-card .label {
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5pt;
+      color: #666;
+      margin-bottom: 4pt;
+    }
+    .summary-card .value {
+      font-size: 12pt;
+      font-weight: 700;
+    }
+    .summary-card .sub {
+      font-size: 7.5pt;
+      color: #666;
+      margin-top: 2pt;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8pt;
+    }
+    th, td {
+      padding: 5pt 6pt;
+      border-bottom: 0.5pt solid #ddd;
+    }
+    th {
+      background: #f5f5f9;
+      font-weight: 600;
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3pt;
+      color: #555;
+    }
+    .text-right { text-align: right; }
+    tfoot td {
+      border-top: 1.5pt solid #1e40af;
+      font-weight: 700;
+      padding-top: 6pt;
+    }
+    .footer {
+      margin-top: 16pt;
+      font-size: 7pt;
+      color: #999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Roční přehled {{ year }}</h1>
+  <div class="meta">{{ settings.OWNER_NAME }}<br>IČO: {{ settings.SUPPLIER_ICO }}</div>
+</div>
+
+<div class="summary">
+  <div class="summary-card summary-card--green">
+    <div class="label">Příjmy {{ year }}</div>
+    <div class="value">{{ income_total | czk }}</div>
+    <div class="sub">bez DPH: {{ income_base | czk }}</div>
+  </div>
+  <div class="summary-card summary-card--rose">
+    <div class="label">Náklady {{ year }}</div>
+    <div class="value">{{ costs_total | czk }}</div>
+    <div class="sub">bez DPH: {{ costs_base | czk }}</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Vlastní daňová povinnost</div>
+    <div class="value">{{ vat_liability | czk }}</div>
+    <div class="sub">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Měsíc</th>
+      <th class="text-right">Příjmy bez DPH</th>
+      <th class="text-right">Příjmy s DPH</th>
+      <th class="text-right">DPH výstup</th>
+      <th class="text-right">Náklady bez DPH</th>
+      <th class="text-right">Náklady s DPH</th>
+      <th class="text-right">DPH vstup</th>
+      <th class="text-right">Daň. povinnost</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in months %}
+    <tr>
+      <td>{{ m.name | capitalize }}</td>
+      <td class="text-right">{{ m.income_base | czk }}</td>
+      <td class="text-right">{{ m.income_total | czk }}</td>
+      <td class="text-right">{{ m.vat_output | czk }}</td>
+      <td class="text-right">{{ m.costs_base | czk }}</td>
+      <td class="text-right">{{ m.costs_total | czk }}</td>
+      <td class="text-right">{{ m.vat_input | czk }}</td>
+      <td class="text-right">{{ m.vat_liability | czk }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>Celkem</td>
+      <td class="text-right">{{ income_base | czk }}</td>
+      <td class="text-right">{{ income_total | czk }}</td>
+      <td class="text-right">{{ vat_output | czk }}</td>
+      <td class="text-right">{{ costs_base | czk }}</td>
+      <td class="text-right">{{ costs_total | czk }}</td>
+      <td class="text-right">{{ vat_input | czk }}</td>
+      <td class="text-right">{{ vat_liability | czk }}</td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="footer">InvoiCzech — vygenerováno automaticky</div>
+
+</body>
+</html>

@@ -63,7 +63,8 @@
       "Bash(venv/bin/python -c \"from app.database import create_tables; create_tables\\(\\); print\\(''Tables OK''\\)\")",
       "Bash(venv/bin/python -m pytest tests/ -x -q)",
       "Bash(venv/bin/python -c \"from app.routers.expenses import router; print\\(''Router OK''\\)\")",
-      "Bash(venv/bin/python -c \"from app.routers.dashboard import router; print\\(''OK''\\)\")"
+      "Bash(venv/bin/python -c \"from app.routers.dashboard import router; print\\(''OK''\\)\")",
+      "Bash(venv/bin/python -c \"from app.main import app; print\\(''Routes:'', [r.path for r in app.routes if hasattr\\(r, ''path''\\) and ''prehled'' in r.path]\\)\")"
     ]
   }
 }

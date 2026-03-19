@@ -15,12 +15,12 @@
 
 {# ── Řádek 1: Příjmy ── #}
 <div class="stats-row stats-row--2">
-  <div class="stat-card">
+  <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_month_label }}</div>
     <div class="stat-value stat-value--income">{{ income_month_total | czk }}</div>
     <div class="stat-sub">bez DPH: {{ income_month_base | czk }}</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_year }}</div>
     <div class="stat-value stat-value--income">{{ income_year_total | czk }}</div>
     <div class="stat-sub">bez DPH: {{ income_year_base | czk }}</div>
@@ -29,17 +29,17 @@
 
 {# ── Řádek 2: Náklady ── #}
 <div class="stats-row stats-row--3">
-  <div class="stat-card">
+  <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_month_label }}</div>
     <div class="stat-value">{{ costs_month_total | czk }}</div>
     <div class="stat-sub">z toho DPH: {{ costs_month_vat | czk }}</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ prev_month_label }}</div>
     <div class="stat-value">{{ costs_prev_total | czk }}</div>
     <div class="stat-sub">z toho DPH: {{ costs_prev_vat | czk }}</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_year }}</div>
     <div class="stat-value">{{ costs_year_total | czk }}</div>
     <div class="stat-sub">z toho DPH: {{ costs_year_vat | czk }}</div>

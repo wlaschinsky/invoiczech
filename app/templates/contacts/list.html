@@ -27,15 +27,16 @@
 {% endif %}
 
 {% if contacts %}
+<div class="table-wrap">
 <table class="table table-hover" data-testid="contact-list">
   <thead>
     <tr>
       <th>Název</th>
       <th>IČO</th>
-      <th>DIČ</th>
-      <th>Adresa</th>
-      <th>Faktury</th>
-      <th>Náklady</th>
+      <th class="mobile-hide">DIČ</th>
+      <th class="mobile-hide">Adresa</th>
+      <th class="mobile-hide">Faktury</th>
+      <th class="mobile-hide">Náklady</th>
       <th></th>
     </tr>
   </thead>
@@ -44,10 +45,10 @@
     <tr>
       <td><a href="/adresar/{{ c.id }}" class="link-strong">{{ c.name }}</a></td>
       <td>{{ c.ico or '—' }}</td>
-      <td>{{ c.dic or '—' }}</td>
-      <td class="text-muted">{{ c.full_address or '—' }}</td>
-      <td><span class="badge badge-neutral">{{ inv_counts.get(c.id, 0) }}</span></td>
-      <td><span class="badge badge-neutral">{{ exp_counts.get(c.id, 0) }}</span></td>
+      <td class="mobile-hide">{{ c.dic or '—' }}</td>
+      <td class="mobile-hide text-muted">{{ c.full_address or '—' }}</td>
+      <td class="mobile-hide"><span class="badge badge-neutral">{{ inv_counts.get(c.id, 0) }}</span></td>
+      <td class="mobile-hide"><span class="badge badge-neutral">{{ exp_counts.get(c.id, 0) }}</span></td>
       <td class="actions">
         <a href="/adresar/{{ c.id }}/upravit" class="btn btn-sm btn-ghost">Upravit</a>
       </td>
@@ -55,6 +56,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
   {% if total_count %}
   <div class="empty-state">

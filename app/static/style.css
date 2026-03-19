@@ -677,6 +677,15 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius);
   overflow: hidden;
 }
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.table-wrap > .table {
+  margin-bottom: 0;
+}
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -1584,10 +1593,14 @@ input[type=date].form-control.dp-native {
   .form-row { flex-direction: column; }
   .filter-form { flex-direction: column; }
   .breadcrumb-home { position: static; }
+  /* Hide less important table columns on mobile */
+  .mobile-hide { display: none !important; }
   /* Ensure collapsed sidebar labels are visible in mobile drawer */
   .sidebar.collapsed .nav-label,
   .sidebar.collapsed .user-info,
   .sidebar.collapsed .user-chevron,
   .sidebar.collapsed .separator-line { display: revert; }
   .sidebar.collapsed .nav-link { justify-content: flex-start; }
+  /* Action buttons stack vertically */
+  .actions { white-space: nowrap; }
 }

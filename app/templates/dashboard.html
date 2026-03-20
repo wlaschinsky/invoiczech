@@ -14,8 +14,10 @@
 </div>
 <div class="dashboard-actions">
   <a href="/faktury/nova" class="btn btn-primary">Nová faktura</a>
+  {% if profile.vat_payer %}
   <a href="/naklady/novy" class="btn btn-secondary">Nový náklad</a>
   <a href="/exporty" class="btn btn-secondary">Exporty</a>
+  {% endif %}
 </div>
 
 {# ── Řádek 1: Příjmy ── #}

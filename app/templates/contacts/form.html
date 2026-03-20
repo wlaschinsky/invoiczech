@@ -39,7 +39,7 @@
         <div class="input-group">
           <input type="text" id="ares_ico"
                  value="{{ contact.ico if contact else '' }}"
-                 placeholder="12345678" class="form-control">
+                 placeholder="12345678" class="form-control" data-testid="contact-ares-ico-field">
           <button type="button" class="btn btn-secondary" onclick="loadFromAres()" data-testid="contact-ares-load">Načíst z ARES</button>
         </div>
       </div>
@@ -62,7 +62,7 @@
         <label for="dic">DIČ</label>
         <input type="text" id="dic" name="dic"
                value="{{ contact.dic if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-dic-field">
       </div>
     </div>
 
@@ -71,25 +71,25 @@
         <label for="street">Ulice a číslo</label>
         <input type="text" id="street" name="street"
                value="{{ contact.street if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-street-field">
       </div>
       <div class="form-group">
         <label for="zip_code">PSČ</label>
         <input type="text" id="zip_code" name="zip_code"
                value="{{ contact.zip_code if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-zip-code-field">
       </div>
       <div class="form-group form-group-lg">
         <label for="city">Město</label>
         <input type="text" id="city" name="city"
                value="{{ contact.city if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-city-field">
       </div>
       <div class="form-group">
         <label for="country">Stát</label>
         <input type="text" id="country" name="country"
                value="{{ contact.country if contact else 'Česká republika' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-country-field">
       </div>
     </div>
 
@@ -98,21 +98,21 @@
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email"
                value="{{ contact.email if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-email-field">
       </div>
       <div class="form-group">
         <label for="phone">Telefon</label>
         <input type="tel" id="phone" name="phone"
                value="{{ contact.phone if contact else '' }}"
-               class="form-control">
+               class="form-control" data-testid="contact-phone-field">
       </div>
       <div class="form-group">
         <label for="contact_type">Typ kontaktu</label>
-        <select id="contact_type" name="contact_type" class="form-control">
+        <select id="contact_type" name="contact_type" class="form-control" data-testid="contact-type-select">
           {% set ct = contact.contact_type if contact else 'Obojí' %}
-          <option {% if ct == 'Odběratel' %}selected{% endif %}>Odběratel</option>
-          <option {% if ct == 'Dodavatel' %}selected{% endif %}>Dodavatel</option>
-          <option {% if ct == 'Obojí' %}selected{% endif %}>Obojí</option>
+          <option data-value="Odběratel" {% if ct == 'Odběratel' %}selected{% endif %}>Odběratel</option>
+          <option data-value="Dodavatel" {% if ct == 'Dodavatel' %}selected{% endif %}>Dodavatel</option>
+          <option data-value="Obojí" {% if ct == 'Obojí' %}selected{% endif %}>Obojí</option>
         </select>
       </div>
     </div>
@@ -123,9 +123,9 @@
       {% if contact %}Uložit změny{% else %}Přidat kontakt{% endif %}
     </button>
     {% if contact %}
-    <a href="/adresar/{{ contact.id }}" class="btn btn-ghost">Zrušit</a>
+    <a href="/adresar/{{ contact.id }}" class="btn btn-ghost" data-testid="contact-cancel-btn">Zrušit</a>
     {% else %}
-    <a href="/adresar" class="btn btn-ghost">Zrušit</a>
+    <a href="/adresar" class="btn btn-ghost" data-testid="contact-cancel-btn">Zrušit</a>
     {% endif %}
   </div>
 </form>

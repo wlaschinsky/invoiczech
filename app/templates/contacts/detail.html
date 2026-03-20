@@ -13,12 +13,12 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <h1>{{ contact.name }}</h1>
-    <span class="badge badge-neutral badge-lg">{{ contact.contact_type }}</span>
+    <h1 data-testid="contact-name-value">{{ contact.name }}</h1>
+    <span class="badge badge-neutral badge-lg" data-testid="contact-type-value">{{ contact.contact_type }}</span>
   </div>
   <div class="header-actions">
-    <a href="/adresar/{{ contact.id }}/upravit" class="btn btn-secondary">Upravit</a>
-    <a href="/adresar" class="btn btn-ghost">Zpět</a>
+    <a href="/adresar/{{ contact.id }}/upravit" class="btn btn-secondary" data-testid="contact-edit-btn">Upravit</a>
+    <a href="/adresar" class="btn btn-ghost" data-testid="contact-back-btn">Zpět</a>
   </div>
 </div>
 
@@ -26,11 +26,11 @@
   <div class="detail-card">
     <h3>Kontaktní údaje</h3>
     <table class="detail-table">
-      {% if contact.ico %}<tr><th>IČO</th><td>{{ contact.ico }}</td></tr>{% endif %}
-      {% if contact.dic %}<tr><th>DIČ</th><td>{{ contact.dic }}</td></tr>{% endif %}
-      {% if contact.full_address %}<tr><th>Adresa</th><td>{{ contact.full_address }}</td></tr>{% endif %}
-      {% if contact.email %}<tr><th>E-mail</th><td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td></tr>{% endif %}
-      {% if contact.phone %}<tr><th>Telefon</th><td>{{ contact.phone }}</td></tr>{% endif %}
+      {% if contact.ico %}<tr><th>IČO</th><td data-testid="contact-ico-value">{{ contact.ico }}</td></tr>{% endif %}
+      {% if contact.dic %}<tr><th>DIČ</th><td data-testid="contact-dic-value">{{ contact.dic }}</td></tr>{% endif %}
+      {% if contact.full_address %}<tr><th>Adresa</th><td data-testid="contact-address-value">{{ contact.full_address }}</td></tr>{% endif %}
+      {% if contact.email %}<tr><th>E-mail</th><td data-testid="contact-email-value"><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td></tr>{% endif %}
+      {% if contact.phone %}<tr><th>Telefon</th><td data-testid="contact-phone-value">{{ contact.phone }}</td></tr>{% endif %}
     </table>
   </div>
 
@@ -39,7 +39,7 @@
     <div class="activity-stats">
       <div style="text-align:center">
         <span class="stat-label">Faktur celkem:</span>
-        <strong>{{ inv_count }}</strong>
+        <strong data-testid="contact-invoice-count-value">{{ inv_count }}</strong>
         {% if inv_count %}
         <div class="mt-1">
           <a href="/faktury?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit faktury</a>
@@ -48,7 +48,7 @@
       </div>
       <div style="text-align:center">
         <span class="stat-label">Nákladů celkem:</span>
-        <strong>{{ exp_count }}</strong>
+        <strong data-testid="contact-expense-count-value">{{ exp_count }}</strong>
         {% if exp_count %}
         <div class="mt-1">
           <a href="/naklady?q={{ contact.name }}" class="btn btn-sm btn-ghost">Zobrazit náklady</a>
@@ -60,10 +60,10 @@
 </div>
 
 <div class="detail-actions-bottom mt-4">
-  <a href="/adresar" class="btn btn-ghost">Zpět</a>
+  <a href="/adresar" class="btn btn-ghost" data-testid="contact-back-bottom-btn">Zpět</a>
   <form method="post" action="/adresar/{{ contact.id }}/smazat"
         onsubmit="return confirm('Opravdu smazat kontakt {{ contact.name }}? Tato akce je nevratná.')">
-    <button type="submit" class="btn btn-danger">Smazat kontakt</button>
+    <button type="submit" class="btn btn-danger" data-testid="contact-delete-btn">Smazat kontakt</button>
   </form>
 </div>
 {% endblock %}

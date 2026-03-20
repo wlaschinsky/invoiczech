@@ -11,16 +11,16 @@
 {% block content %}
 <div class="page-header">
   <h1>Adresář</h1>
-  {% if total_count %}<a href="/adresar/novy" class="btn btn-primary">+ Nový kontakt</a>{% endif %}
+  {% if total_count %}<a href="/adresar/novy" class="btn btn-primary" data-testid="contact-create-btn">+ Nový kontakt</a>{% endif %}
 </div>
 
 {% if total_count %}
 <div class="filter-bar">
-  <form method="get" action="/adresar" class="filter-form">
-    <input type="text" name="q" value="{{ q }}" placeholder="Hledat podle názvu nebo IČO…" class="form-control form-control-sm">
-    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+  <form method="get" action="/adresar" class="filter-form" data-testid="contact-filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat podle názvu nebo IČO…" class="form-control form-control-sm" data-testid="contact-filter-field">
+    <button type="submit" class="btn btn-secondary btn-sm" data-testid="contact-filter-btn">Filtrovat</button>
     {% if q %}
-    <a href="/adresar" class="btn btn-danger btn-sm">Zrušit filtr</a>
+    <a href="/adresar" class="btn btn-danger btn-sm" data-testid="contact-filter-clear-btn">Zrušit filtr</a>
     {% endif %}
   </form>
 </div>
@@ -42,7 +42,7 @@
   </thead>
   <tbody>
     {% for c in contacts %}
-    <tr>
+    <tr data-testid="contact-row-{{ c.id }}">
       <td><a href="/adresar/{{ c.id }}" class="link-strong">{{ c.name }}</a></td>
       <td>{{ c.ico or '—' }}</td>
       <td class="mobile-hide">{{ c.dic or '—' }}</td>
@@ -50,7 +50,7 @@
       <td class="mobile-hide"><span class="badge badge-neutral">{{ inv_counts.get(c.id, 0) }}</span></td>
       <td class="mobile-hide"><span class="badge badge-neutral">{{ exp_counts.get(c.id, 0) }}</span></td>
       <td class="actions">
-        <a href="/adresar/{{ c.id }}/upravit" class="btn btn-sm btn-ghost mobile-hide">Upravit</a>
+        <a href="/adresar/{{ c.id }}/upravit" class="btn btn-sm btn-ghost mobile-hide" data-testid="contact-edit-btn-{{ c.id }}">Upravit</a>
       </td>
     </tr>
     {% endfor %}

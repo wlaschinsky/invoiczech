@@ -11,24 +11,24 @@
 {% block content %}
 <div class="page-header">
   <h1>Přijaté doklady (Náklady)</h1>
-  {% if total_count %}<a href="/naklady/novy" class="btn btn-primary">+ Nový náklad</a>{% endif %}
+  {% if total_count %}<a href="/naklady/novy" class="btn btn-primary" data-testid="expense-create-btn">+ Nový náklad</a>{% endif %}
 </div>
 
 {% if total_count %}
 <div class="filter-bar">
-  <form method="get" action="/naklady" class="filter-form">
-    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm">
-    <select name="typ" class="form-control form-control-sm">
-      <option value="" {% if not typ_filter %}selected{% endif %}>Všechny typy</option>
-      <option value="Faktura" {% if typ_filter == 'Faktura' %}selected{% endif %}>Faktura</option>
-      <option value="Účtenka" {% if typ_filter == 'Účtenka' %}selected{% endif %}>Účtenka</option>
-      <option value="Jiný" {% if typ_filter == 'Jiný' %}selected{% endif %}>Jiný</option>
+  <form method="get" action="/naklady" class="filter-form" data-testid="expense-filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm" data-testid="expense-filter-field">
+    <select name="typ" class="form-control form-control-sm" data-testid="expense-filter-type-select">
+      <option value="" data-value="" {% if not typ_filter %}selected{% endif %}>Všechny typy</option>
+      <option value="Faktura" data-value="Faktura" {% if typ_filter == 'Faktura' %}selected{% endif %}>Faktura</option>
+      <option value="Účtenka" data-value="Účtenka" {% if typ_filter == 'Účtenka' %}selected{% endif %}>Účtenka</option>
+      <option value="Jiný" data-value="Jiný" {% if typ_filter == 'Jiný' %}selected{% endif %}>Jiný</option>
     </select>
-    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm form-control-date" title="Datum od">
-    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm form-control-date" title="Datum do">
-    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm form-control-date" title="Datum od" data-testid="expense-filter-from-date-field">
+    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm form-control-date" title="Datum do" data-testid="expense-filter-to-date-field">
+    <button type="submit" class="btn btn-secondary btn-sm" data-testid="expense-filter-btn">Filtrovat</button>
     {% if q or typ_filter or od or do %}
-    <a href="/naklady" class="btn btn-danger btn-sm">Zrušit filtr</a>
+    <a href="/naklady" class="btn btn-danger btn-sm" data-testid="expense-filter-clear-btn">Zrušit filtr</a>
     {% endif %}
   </form>
 </div>
@@ -40,8 +40,8 @@
   <div class="bulk-bar-inner">
     <span class="bulk-count"><strong id="bulk-count">0</strong> vybráno z {{ expenses | length }}</span>
     <div class="bulk-actions">
-      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/naklady/hromadne/csv">Exportovat CSV</button>
-      <button type="button" class="btn btn-sm btn-danger" data-bulk-action="/naklady/hromadne/smazat" data-bulk-confirm="Smazat vybrané náklady? Tato akce je nevratná.">Smazat</button>
+      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/naklady/hromadne/csv" data-testid="expense-bulk-csv-btn">Exportovat CSV</button>
+      <button type="button" class="btn btn-sm btn-danger" data-bulk-action="/naklady/hromadne/smazat" data-bulk-confirm="Smazat vybrané náklady? Tato akce je nevratná." data-testid="expense-bulk-delete-btn">Smazat</button>
     </div>
   </div>
 </div>
@@ -50,7 +50,7 @@
 <table class="table table-hover" id="bulk-table" data-testid="expense-list">
   <thead>
     <tr>
-      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
+      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše" data-testid="expense-select-all-field"></th>
       <th>Číslo</th>
       <th>Název</th>
       <th class="mobile-hide">Dodavatel</th>

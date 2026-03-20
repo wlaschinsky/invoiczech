@@ -11,12 +11,12 @@
 {% block content %}
 <div class="page-header">
   <h1>Šablony faktur</h1>
-  {% if templates %}<a href="/sablony/nova" class="btn btn-primary">+ Nová šablona</a>{% endif %}
+  {% if templates %}<a href="/sablony/nova" class="btn btn-primary" data-testid="template-create-btn">+ Nová šablona</a>{% endif %}
 </div>
 
 {% if templates %}
 <div class="table-wrap">
-<table class="table table-hover">
+<table class="table table-hover" data-testid="template-list">
   <thead>
     <tr>
       <th>Název</th>
@@ -27,15 +27,15 @@
   </thead>
   <tbody>
     {% for t in templates %}
-    <tr>
+    <tr data-testid="template-row-{{ t.id }}">
       <td><a href="/sablony/{{ t.id }}" class="link-strong">{{ t.name }}</a></td>
       <td>{{ t.contact.name if t.contact else '—' }}</td>
       <td class="text-right">{{ t.total | czk }}</td>
       <td class="actions">
-        <a href="/sablony/{{ t.id }}/upravit" class="btn btn-sm btn-ghost">Upravit</a>
+        <a href="/sablony/{{ t.id }}/upravit" class="btn btn-sm btn-ghost" data-testid="template-edit-btn-{{ t.id }}">Upravit</a>
         <form method="post" action="/sablony/{{ t.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat šablonu {{ t.name }}?')">
-          <button type="submit" class="btn btn-sm btn-danger">Smazat</button>
+          <button type="submit" class="btn btn-sm btn-danger" data-testid="template-delete-btn-{{ t.id }}">Smazat</button>
         </form>
       </td>
     </tr>

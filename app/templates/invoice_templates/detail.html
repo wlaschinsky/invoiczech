@@ -12,10 +12,10 @@
 
 {% block content %}
 <div class="page-header">
-  <h1>{{ tpl.name }}</h1>
+  <h1 data-testid="template-name-value">{{ tpl.name }}</h1>
   <div class="header-actions">
-    <a href="/sablony/{{ tpl.id }}/upravit" class="btn btn-secondary">Upravit</a>
-    <a href="/sablony" class="btn btn-ghost">Zpět</a>
+    <a href="/sablony/{{ tpl.id }}/upravit" class="btn btn-secondary" data-testid="template-edit-btn">Upravit</a>
+    <a href="/sablony" class="btn btn-ghost" data-testid="template-back-btn">Zpět</a>
   </div>
 </div>
 
@@ -50,8 +50,8 @@
   <div class="detail-card">
     <h3>Platební podmínky</h3>
     <table class="detail-table">
-      <tr><th>Způsob úhrady</th><td>{{ tpl.payment_method or 'Bankovní převod' }}</td></tr>
-      <tr><th>Splatnost</th><td>{{ tpl.due_days or 10 }} dní</td></tr>
+      <tr><th>Způsob úhrady</th><td data-testid="template-payment-method-value">{{ tpl.payment_method or 'Bankovní převod' }}</td></tr>
+      <tr><th>Splatnost</th><td data-testid="template-due-days-value">{{ tpl.due_days or 10 }} dní</td></tr>
     </table>
   </div>
 </div>
@@ -61,7 +61,7 @@
   <h3>Položky</h3>
   {% if tpl.items %}
   <div class="table-wrap">
-  <table class="table">
+  <table class="table" data-testid="template-items-list">
     <thead>
       <tr>
         <th>Popis</th>
@@ -78,7 +78,7 @@
     </thead>
     <tbody>
       {% for item in tpl.items %}
-      <tr>
+      <tr data-testid="template-item-row-{{ loop.index }}">
         <td>{{ item.description }}</td>
         <td class="text-right">{{ item.quantity | num(2) }}</td>
         <td class="text-right">{{ item.unit_price | czk }}</td>
@@ -98,7 +98,7 @@
   <div class="vat-summary">
     <div class="grand-total">
       <span>Celkem:</span>
-      <span class="grand-total-value">{{ tpl.total | czk }}</span>
+      <span class="grand-total-value" data-testid="template-total-value">{{ tpl.total | czk }}</span>
     </div>
   </div>
   {% else %}
@@ -107,10 +107,10 @@
 </div>
 
 <div class="detail-actions-bottom mt-4">
-  <a href="/sablony" class="btn btn-ghost">Zpět</a>
+  <a href="/sablony" class="btn btn-ghost" data-testid="template-back-bottom-btn">Zpět</a>
   <form method="post" action="/sablony/{{ tpl.id }}/smazat"
         onsubmit="return confirm('Opravdu smazat šablonu {{ tpl.name }}? Tato akce je nevratná.')">
-    <button type="submit" class="btn btn-danger">Smazat šablonu</button>
+    <button type="submit" class="btn btn-danger" data-testid="template-delete-btn">Smazat šablonu</button>
   </form>
 </div>
 {% endblock %}

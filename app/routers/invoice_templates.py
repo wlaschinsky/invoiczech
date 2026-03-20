@@ -33,6 +33,17 @@ async def new_template_form(request: Request, db: Session = Depends(get_db)):
     )
 
 
+@router.get("/{tpl_id}", response_class=HTMLResponse)
+async def template_detail(request: Request, tpl_id: int, db: Session = Depends(get_db)):
+    tpl = db.query(InvoiceTemplate).filter(InvoiceTemplate.id == tpl_id).first()
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Šablona nenalezena")
+    return templates.TemplateResponse(
+        "invoice_templates/detail.html",
+        {"request": request, "tpl": tpl},
+    )
+
+
 @router.post("/nova")
 async def create_template(request: Request, db: Session = Depends(get_db)):
     form = await request.form()

@@ -51,3 +51,11 @@ class InvoiceTemplateItem(Base):
     position = Column(Integer, default=0)
 
     template = relationship("InvoiceTemplate", back_populates="items")
+
+    @property
+    def subtotal(self) -> Decimal:
+        return Decimal(str(self.quantity)) * Decimal(str(self.unit_price))
+
+    @property
+    def total(self) -> Decimal:
+        return self.subtotal * (1 + Decimal(str(self.vat_rate)) / 100)

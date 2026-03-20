@@ -57,8 +57,10 @@
       <th>Odběratel</th>
       <th class="mobile-hide">Vystavení</th>
       <th class="mobile-hide">Splatnost</th>
+      {% if profile.vat_payer %}
       <th class="text-right mobile-hide">Bez DPH</th>
-      <th class="text-right">Celkem</th>
+      {% endif %}
+      <th class="text-right">{% if profile.vat_payer %}Celkem{% else %}Částka{% endif %}</th>
       <th>Stav</th>
       <th class="mobile-hide"></th>
     </tr>
@@ -73,8 +75,12 @@
       <td class="mobile-hide {% if inv.status == 'Vystavena' and inv.due_date < today %}text-danger{% endif %}">
         {{ inv.due_date | date_cs }}
       </td>
+      {% if profile.vat_payer %}
       <td class="text-right mobile-hide">{{ inv.subtotal | czk }}</td>
       <td class="text-right font-medium">{{ inv.total | czk }}</td>
+      {% else %}
+      <td class="text-right font-medium">{{ inv.subtotal | czk }}</td>
+      {% endif %}
       <td>
         <span class="badge badge-{{ inv.status | lower | replace('á', 'a') | replace('í', 'i') | replace('ó', 'o') }}">
           {{ inv.status }}
@@ -98,8 +104,12 @@
       <td class="mobile-hide"></td>
       <td colspan="2" class="text-right text-muted">Celkem:</td>
       <td class="mobile-hide" colspan="2"></td>
+      {% if profile.vat_payer %}
       <td class="text-right mobile-hide">{{ invoices | sum(attribute='subtotal') | czk }}</td>
       <td class="text-right font-medium">{{ invoices | sum(attribute='total') | czk }}</td>
+      {% else %}
+      <td class="text-right font-medium">{{ invoices | sum(attribute='subtotal') | czk }}</td>
+      {% endif %}
       <td></td>
       <td class="mobile-hide"></td>
     </tr>

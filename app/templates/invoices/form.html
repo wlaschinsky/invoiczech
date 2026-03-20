@@ -166,6 +166,7 @@
   <!-- Položky -->
   <div class="form-section">
     <h2 class="form-section-title">Položky faktury</h2>
+    {% if profile.vat_payer %}
     <div class="form-row">
       <div class="form-group">
         <label for="price_mode">Výpočet DPH</label>
@@ -175,6 +176,7 @@
         </select>
       </div>
     </div>
+    {% endif %}
     <div class="table-wrap">
     <table class="table items-table" id="items-table">
       <thead>
@@ -182,8 +184,10 @@
           <th>Popis *</th>
           <th>Množství</th>
           <th>Cena / MJ (Kč)</th>
+          {% if profile.vat_payer %}
           <th>DPH %</th>
           <th class="text-right">Bez DPH</th>
+          {% endif %}
           <th class="text-right">Celkem</th>
           <th></th>
         </tr>
@@ -195,6 +199,7 @@
             <td data-label="Popis"><input type="text" name="description" value="{{ item.description }}" class="form-control" required></td>
             <td data-label="Množství"><input type="number" name="quantity" value="{{ item.quantity | num(3) }}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
             <td data-label="Cena / MJ"><input type="number" name="unit_price" value="{{ item.unit_price | num(2) }}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
+            {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
                 <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
@@ -204,6 +209,10 @@
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">{{ item.subtotal | czk }}</td>
             <td data-label="Celkem" class="text-right row-total">{{ item.total | czk }}</td>
+            {% else %}
+            <input type="hidden" name="vat_rate" value="0">
+            <td data-label="Celkem" class="text-right row-total">{{ item.subtotal | czk }}</td>
+            {% endif %}
             <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
           </tr>
           {% endfor %}
@@ -212,6 +221,7 @@
             <td data-label="Popis"><input type="text" name="description" class="form-control" placeholder="Popis služby/zboží" required></td>
             <td data-label="Množství"><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
             <td data-label="Cena / MJ"><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
+            {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
                 <option value="21" selected>21 %</option>
@@ -221,6 +231,10 @@
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
             <td data-label="Celkem" class="text-right row-total">—</td>
+            {% else %}
+            <input type="hidden" name="vat_rate" value="0">
+            <td data-label="Celkem" class="text-right row-total">—</td>
+            {% endif %}
             <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
           </tr>
         {% endif %}
@@ -232,6 +246,7 @@
     </div>
 
     <div class="totals-box" id="totals-box">
+      {% if profile.vat_payer %}
       <div class="totals-row">
         <span>Celkem bez DPH:</span>
         <span id="total-subtotal">0,00 Kč</span>
@@ -240,6 +255,7 @@
         <span>DPH (21 %):</span>
         <span id="total-vat">0,00 Kč</span>
       </div>
+      {% endif %}
       <div class="totals-row totals-row-total">
         <span>Celkem k úhradě:</span>
         <span id="total-grand">0,00 Kč</span>
@@ -278,6 +294,8 @@
 
 {% block scripts %}
 <script>
+var IS_VAT_PAYER = {{ 'true' if profile.vat_payer else 'false' }};
+
 function fmtCzk(val) {
   if (isNaN(val)) return '—';
   return val.toLocaleString('cs-CZ', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' Kč';
@@ -304,10 +322,12 @@ function recalcRow(el) {
   const row = el.closest('tr');
   const qty = parseFloat(row.querySelector('[name=quantity]').value) || 0;
   const price = parseFloat(row.querySelector('[name=unit_price]').value) || 0;
-  const vatRate = parseFloat(row.querySelector('[name=vat_rate]').value) || 0;
+  const vatSel = row.querySelector('select[name=vat_rate]');
+  const vatRate = vatSel ? (parseFloat(vatSel.value) || 0) : 0;
   const r = calcRow(qty, price, vatRate);
-  row.querySelector('.row-subtotal').textContent = fmtCzk(r.subtotal);
-  row.querySelector('.row-total').textContent = fmtCzk(r.total);
+  var sub = row.querySelector('.row-subtotal');
+  if (sub) sub.textContent = fmtCzk(r.subtotal);
+  row.querySelector('.row-total').textContent = IS_VAT_PAYER ? fmtCzk(r.total) : fmtCzk(r.subtotal);
   recalcTotals();
 }
 
@@ -323,34 +343,48 @@ function recalcTotals() {
   document.querySelectorAll('#items-tbody tr').forEach(row => {
     const qty = parseFloat(row.querySelector('[name=quantity]')?.value) || 0;
     const price = parseFloat(row.querySelector('[name=unit_price]')?.value) || 0;
-    const vatRate = parseFloat(row.querySelector('[name=vat_rate]')?.value) || 0;
+    const vatSel = row.querySelector('select[name=vat_rate]');
+    const vatRate = vatSel ? (parseFloat(vatSel.value) || 0) : 0;
     const r = calcRow(qty, price, vatRate);
     subtotal += r.subtotal;
     vat += r.total - r.subtotal;
   });
-  document.getElementById('total-subtotal').textContent = fmtCzk(subtotal);
-  document.getElementById('total-vat').textContent = fmtCzk(vat);
-  document.getElementById('total-grand').textContent = fmtCzk(subtotal + vat);
+  var elSub = document.getElementById('total-subtotal');
+  var elVat = document.getElementById('total-vat');
+  if (elSub) elSub.textContent = fmtCzk(subtotal);
+  if (elVat) elVat.textContent = fmtCzk(vat);
+  document.getElementById('total-grand').textContent = IS_VAT_PAYER ? fmtCzk(subtotal + vat) : fmtCzk(subtotal);
 }
 
 function addItemRow() {
   const tbody = document.getElementById('items-tbody');
   const row = document.createElement('tr');
-  row.innerHTML = `
-    <td data-label="Popis"><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
-    <td data-label="Množství"><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
-    <td data-label="Cena / MJ"><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
-    <td data-label="DPH">
-      <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-        <option value="21" selected>21 %</option>
-        <option value="12">12 %</option>
-        <option value="0">0 %</option>
-      </select>
-    </td>
-    <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
-    <td data-label="Celkem" class="text-right row-total">—</td>
-    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
-  `;
+  if (IS_VAT_PAYER) {
+    row.innerHTML = `
+      <td data-label="Popis"><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+      <td data-label="Množství"><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+      <td data-label="Cena / MJ"><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
+      <td data-label="DPH">
+        <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+          <option value="21" selected>21 %</option>
+          <option value="12">12 %</option>
+          <option value="0">0 %</option>
+        </select>
+      </td>
+      <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
+      <td data-label="Celkem" class="text-right row-total">—</td>
+      <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+    `;
+  } else {
+    row.innerHTML = `
+      <td data-label="Popis"><input type="text" name="description" class="form-control" placeholder="Popis" required></td>
+      <td data-label="Množství"><input type="number" name="quantity" value="1" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+      <td data-label="Cena / MJ"><input type="number" name="unit_price" value="" step="0.01" min="0" class="form-control w-32" placeholder="0.00" oninput="recalcRow(this)"></td>
+      <input type="hidden" name="vat_rate" value="0">
+      <td data-label="Celkem" class="text-right row-total">—</td>
+      <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+    `;
+  }
   tbody.appendChild(row);
   row.querySelector('[name=description]').focus();
 }
@@ -393,21 +427,32 @@ async function applyTemplate(tplId) {
     tbody.innerHTML = '';
     data.items.forEach(item => {
       const row = document.createElement('tr');
-      row.innerHTML = `
-        <td data-label="Popis"><input type="text" name="description" value="${item.description}" class="form-control" required></td>
-        <td data-label="Množství"><input type="number" name="quantity" value="${item.quantity}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
-        <td data-label="Cena / MJ"><input type="number" name="unit_price" value="${item.unit_price}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
-        <td data-label="DPH">
-          <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-            <option value="21" ${item.vat_rate == 21 ? 'selected' : ''}>21 %</option>
-            <option value="12" ${item.vat_rate == 12 ? 'selected' : ''}>12 %</option>
-            <option value="0" ${item.vat_rate == 0 ? 'selected' : ''}>0 %</option>
-          </select>
-        </td>
-        <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
-        <td data-label="Celkem" class="text-right row-total">—</td>
-        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
-      `;
+      if (IS_VAT_PAYER) {
+        row.innerHTML = `
+          <td data-label="Popis"><input type="text" name="description" value="${item.description}" class="form-control" required></td>
+          <td data-label="Množství"><input type="number" name="quantity" value="${item.quantity}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+          <td data-label="Cena / MJ"><input type="number" name="unit_price" value="${item.unit_price}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
+          <td data-label="DPH">
+            <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
+              <option value="21" ${item.vat_rate == 21 ? 'selected' : ''}>21 %</option>
+              <option value="12" ${item.vat_rate == 12 ? 'selected' : ''}>12 %</option>
+              <option value="0" ${item.vat_rate == 0 ? 'selected' : ''}>0 %</option>
+            </select>
+          </td>
+          <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
+          <td data-label="Celkem" class="text-right row-total">—</td>
+          <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+        `;
+      } else {
+        row.innerHTML = `
+          <td data-label="Popis"><input type="text" name="description" value="${item.description}" class="form-control" required></td>
+          <td data-label="Množství"><input type="number" name="quantity" value="${item.quantity}" step="0.001" min="0.001" class="form-control w-24" oninput="recalcRow(this)"></td>
+          <td data-label="Cena / MJ"><input type="number" name="unit_price" value="${item.unit_price}" step="0.01" min="0" class="form-control w-32" oninput="recalcRow(this)"></td>
+          <input type="hidden" name="vat_rate" value="0">
+          <td data-label="Celkem" class="text-right row-total">—</td>
+          <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+        `;
+      }
       tbody.appendChild(row);
     });
     recalcAllRows();

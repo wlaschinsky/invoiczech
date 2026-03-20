@@ -51,17 +51,28 @@ function _toggleContactFields(show) {
   if (fields) fields.style.display = show ? '' : 'none';
 }
 
+function _toggleAresGroup(show) {
+  const ares = document.getElementById('ares-group');
+  if (ares) ares.style.display = show ? '' : 'none';
+}
+
+function _clearContactFields() {
+  _fillContactFields({ name: '', ico: '', dic: '', street: '', zip_code: '', city: '' });
+}
+
 /* ---------- veřejné funkce ---------- */
 
 function fillContactFromSelect(sel) {
   const opt = sel.options[sel.selectedIndex];
   if (!opt.value) {
-    // "Zadat ručně" — zobrazit pole
+    // "Zadat ručně" — zobrazit pole, vymazat, zobrazit ARES
+    _clearContactFields();
     _toggleContactFields(true);
+    _toggleAresGroup(true);
     _clearStatus();
     return;
   }
-  // Vybraný kontakt z adresáře — vyplnit skrytá pole (pro submit) a skrýt
+  // Vybraný kontakt z adresáře — vyplnit skrytá pole, skrýt ruční i ARES
   _fillContactFields({
     name: opt.dataset.name,
     ico: opt.dataset.ico,
@@ -71,6 +82,7 @@ function fillContactFromSelect(sel) {
     city: opt.dataset.city,
   });
   _toggleContactFields(false);
+  _toggleAresGroup(false);
   _clearStatus();
 }
 

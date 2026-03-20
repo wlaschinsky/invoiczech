@@ -70,7 +70,7 @@
           {% endfor %}
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="ares-group" {% if invoice and invoice.contact_id %}style="display:none"{% endif %}>
         <label>IČO pro ARES</label>
         <div class="input-group">
           <input type="text" id="ares_ico" placeholder="12345678" class="form-control">

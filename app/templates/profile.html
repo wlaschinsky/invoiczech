@@ -13,7 +13,7 @@
   <h1>Profil podnikatele</h1>
 </div>
 
-<form method="post" action="/profil">
+<form method="post" action="/profil" class="form-card">
 
   {# ── Sekce 1: Osobní a firemní údaje ── #}
   <div class="detail-card">
@@ -294,5 +294,6 @@ document.getElementById('fu_pracufo_manual').addEventListener('input', function(
   sel.value = 'custom';
   onFuChange();
 })();
+
 </script>
 {% endblock %}

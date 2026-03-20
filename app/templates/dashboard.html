@@ -23,12 +23,16 @@
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_month_label }}</div>
     <div class="stat-value stat-value--income">{{ income_month_total | czk }}</div>
+    {% if profile.vat_payer %}
     <div class="stat-sub">bez DPH: {{ income_month_base | czk }}</div>
+    {% endif %}
   </div>
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_year }}</div>
     <div class="stat-value stat-value--income">{{ income_year_total | czk }}</div>
+    {% if profile.vat_payer %}
     <div class="stat-sub">bez DPH: {{ income_year_base | czk }}</div>
+    {% endif %}
   </div>
 </div>
 
@@ -37,21 +41,28 @@
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_month_label }}</div>
     <div class="stat-value">{{ costs_month_total | czk }}</div>
+    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_month_vat | czk }}</div>
+    {% endif %}
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ prev_month_label }}</div>
     <div class="stat-value">{{ costs_prev_total | czk }}</div>
+    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_prev_vat | czk }}</div>
+    {% endif %}
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_year }}</div>
     <div class="stat-value">{{ costs_year_total | czk }}</div>
+    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_year_vat | czk }}</div>
+    {% endif %}
   </div>
 </div>
 
 {# ── Řádek 3: DPH + Neuhrazené ── #}
+{% if profile.vat_payer %}
 <div class="stats-row stats-row--2">
   <div class="stat-card stat-card--info">
     <div class="stat-label">Daň na výstupu {{ prev_month_label }}</div>
@@ -63,4 +74,13 @@
     <div class="stat-sub">celkem {{ unpaid_total | czk }}</div>
   </div>
 </div>
+{% else %}
+<div class="stats-row stats-row--1">
+  <div class="stat-card {% if unpaid_count > 0 %}stat-card--warning{% endif %}">
+    <div class="stat-label">Neuhrazené faktury</div>
+    <div class="stat-value">{{ unpaid_count }}</div>
+    <div class="stat-sub">celkem {{ unpaid_total | czk }}</div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

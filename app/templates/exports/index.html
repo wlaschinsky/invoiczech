@@ -17,6 +17,7 @@
   Generování XML souborů pro portál <strong>Moje Daně</strong> (Finanční správa ČR).
 </p>
 
+{% if profile.vat_payer %}
 <div class="export-grid">
 
   <!-- Kontrolní hlášení -->
@@ -127,6 +128,13 @@
   Zkontrolujte prosím, že všechny faktury a náklady mají správně vyplněná data před generováním exportu.
   Hodnoty DPH jsou zaokrouhleny na celé Kč.
 </div>
+{% else %}
+<div class="info-box">
+  <strong>Exporty DPH nejsou dostupné.</strong>
+  Kontrolní hlášení (KH1) a Přiznání k DPH (DP3) jsou dostupné pouze pro plátce DPH.
+  Nastavení lze změnit v <a href="/profil">profilu</a>.
+</div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

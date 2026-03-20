@@ -255,7 +255,7 @@
     <div class="header-logo">
       <span style="color:#1a1a3e; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Invoi</span><span style="color:#00d68f; font-size:22px; font-weight:700;">·</span><span style="color:#6366f1; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Czech</span>
     </div>
-    <div class="doc-type">DAŇOVÝ DOKLAD</div>
+    <div class="doc-type">{% if profile.vat_payer %}DAŇOVÝ DOKLAD{% else %}FAKTURA{% endif %}</div>
   </div>
   <div class="header-number">
     <div class="number">{{ invoice.number }}</div>
@@ -271,8 +271,8 @@
     <div class="party-line">{{ profile.full_street }}</div>
     <div class="party-line">{{ profile.zip_code }} {{ profile.city }}</div>
     <div class="party-ids">
-      IČO: {{ profile.ico }} &nbsp;|&nbsp; DIČ: {{ profile.dic }}<br>
-      Plátce DPH
+      IČO: {{ profile.ico }} &nbsp;|&nbsp; DIČ: {{ profile.dic }}
+      {% if profile.vat_payer %}<br>Plátce DPH{% endif %}
     </div>
   </div>
   <div class="party">
@@ -327,7 +327,7 @@
     </div>
     {% endif %}
     <div class="payment-total">
-      Celkem k úhradě: {{ invoice.total | czk }}
+      Celkem k úhradě: {% if profile.vat_payer %}{{ invoice.total | czk }}{% else %}{{ invoice.subtotal | czk }}{% endif %}
     </div>
     {% if invoice.invoice_text %}
     <div class="payment-invoice-text">{{ invoice.invoice_text }}</div>
@@ -348,9 +348,13 @@
       <th>Popis</th>
       <th class="text-right">Množství</th>
       <th class="text-right">Cena / MJ</th>
+      {% if profile.vat_payer %}
       <th class="text-right">DPH %</th>
       <th class="text-right">Základ DPH</th>
       <th class="text-right">Celkem s DPH</th>
+      {% else %}
+      <th class="text-right">Celkem</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -359,14 +363,19 @@
       <td>{{ item.description }}</td>
       <td class="text-right">{{ item.quantity | num(2) }}</td>
       <td class="text-right">{{ item.unit_price | czk }}</td>
+      {% if profile.vat_payer %}
       <td class="text-right">{{ item.vat_rate }} %</td>
       <td class="text-right">{{ item.subtotal | czk }}</td>
       <td class="text-right">{{ item.total | czk }}</td>
+      {% else %}
+      <td class="text-right">{{ item.subtotal | czk }}</td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
+{% if profile.vat_payer %}
 <!-- VAT recap -->
 <div class="vat-section">
   <div class="vat-table-wrap">
@@ -392,11 +401,12 @@
     </table>
   </div>
 </div>
+{% endif %}
 
 <!-- Grand total -->
 <div class="grand-total-box">
   <div class="grand-total-label">Celkem k úhradě</div>
-  <div class="grand-total-value">{{ invoice.total | czk }}</div>
+  <div class="grand-total-value">{% if profile.vat_payer %}{{ invoice.total | czk }}{% else %}{{ invoice.subtotal | czk }}{% endif %}</div>
 </div>
 
 

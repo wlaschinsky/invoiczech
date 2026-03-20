@@ -73,7 +73,8 @@
       "Bash(python -c \":*)",
       "Bash(git log:*)",
       "Bash(grep -viE \"^\\(\\\\+\\\\+\\\\+|\\\\+#|\\\\+$\\)\")",
-      "Bash(chmod +x /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/scripts/backup.sh)"
+      "Bash(chmod +x /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/scripts/backup.sh)",
+      "Bash(grep -r \"vat_payer\\\\|profile\\\\.vat_payer\" --include=*.py --include=*.html .)"
     ]
   }
 }

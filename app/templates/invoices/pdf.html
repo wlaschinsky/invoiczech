@@ -255,7 +255,7 @@
     <div class="header-logo">
       <span style="color:#1a1a3e; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Invoi</span><span style="color:#00d68f; font-size:22px; font-weight:700;">·</span><span style="color:#6366f1; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Czech</span>
     </div>
-    <div class="doc-type">{% if profile.vat_payer %}DAŇOVÝ DOKLAD{% else %}FAKTURA{% endif %}</div>
+    <div class="doc-type">{% if profile.vat_payer %}FAKTURA — DAŇOVÝ DOKLAD{% else %}FAKTURA{% endif %}</div>
   </div>
   <div class="header-number">
     <div class="number">{{ invoice.number }}</div>

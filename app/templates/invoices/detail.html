@@ -76,9 +76,13 @@
         <th>Popis</th>
         <th class="text-right">Množství</th>
         <th class="text-right">Cena / MJ</th>
+        {% if profile.vat_payer %}
         <th class="text-right">DPH %</th>
         <th class="text-right">Bez DPH</th>
         <th class="text-right">Celkem</th>
+        {% else %}
+        <th class="text-right">Celkem</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -87,15 +91,20 @@
         <td>{{ item.description }}</td>
         <td class="text-right">{{ item.quantity | num(2) }}</td>
         <td class="text-right">{{ item.unit_price | czk }}</td>
+        {% if profile.vat_payer %}
         <td class="text-right">{{ item.vat_rate }} %</td>
         <td class="text-right">{{ item.subtotal | czk }}</td>
         <td class="text-right font-medium">{{ item.total | czk }}</td>
+        {% else %}
+        <td class="text-right font-medium">{{ item.subtotal | czk }}</td>
+        {% endif %}
       </tr>
       {% endfor %}
     </tbody>
   </table>
   </div>
 
+  {% if profile.vat_payer %}
   <!-- Rekapitulace DPH -->
   <div class="vat-summary">
     <div class="vat-table-wrap">
@@ -125,6 +134,14 @@
       <span class="grand-total-value">{{ invoice.total | czk }}</span>
     </div>
   </div>
+  {% else %}
+  <div class="vat-summary">
+    <div class="grand-total">
+      <span>Celkem k úhradě:</span>
+      <span class="grand-total-value">{{ invoice.subtotal | czk }}</span>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 {% if invoice.invoice_text %}

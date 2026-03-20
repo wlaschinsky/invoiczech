@@ -1932,11 +1932,11 @@ a.attachment-filename:hover {
   .detail-actions-bottom .btn { flex: 1; justify-content: center; }
   .detail-actions-bottom form { flex: 1; display: flex; }
   .detail-actions-bottom form .btn { flex: 1; }
-  .action-buttons { flex-direction: row; gap: 12px; }
-  .action-buttons > form,
-  .action-buttons > .inline-form { flex: 1; display: flex; }
-  .action-buttons .btn { flex: 1; justify-content: center; }
-  .action-buttons .inline-form { flex-direction: column; gap: 8px; }
+  .action-buttons { flex-wrap: wrap; }
+  .akce-datum { width: 100%; margin-bottom: 12px; }
+  .akce-tlacitka { display: flex; flex-direction: row; gap: 12px; width: 100%; }
+  .akce-tlacitka form { flex: 1; display: flex; }
+  .akce-tlacitka .btn { flex: 1; justify-content: center; }
   /* Form groups min-width reset */
   .form-group-lg { min-width: 0; }
   /* Dashboard actions */

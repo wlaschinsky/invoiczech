@@ -1901,7 +1901,7 @@ a.attachment-filename:hover {
   align-items: center;
   gap: 12px;
 }
-.akce-datum { width: 160px; flex: none; }
+.akce-datum { max-width: 160px; flex: none; }
 .akce-tlacitka {
   display: flex;
   flex-direction: row;

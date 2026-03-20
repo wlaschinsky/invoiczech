@@ -1928,8 +1928,10 @@ a.attachment-filename:hover {
   /* Totals box full width */
   .totals-box { width: 100%; }
   /* Detail page actions */
-  .detail-actions-bottom { flex-direction: column; gap: 8px; }
-  .detail-actions-bottom .btn { width: 100%; justify-content: center; }
+  .detail-actions-bottom { flex-direction: row; gap: 12px; }
+  .detail-actions-bottom .btn { flex: 1; justify-content: center; }
+  .detail-actions-bottom form { flex: 1; display: flex; }
+  .detail-actions-bottom form .btn { flex: 1; }
   .action-buttons { flex-direction: column; gap: 8px; }
   .action-buttons > form,
   .action-buttons > .inline-form { width: 100%; }

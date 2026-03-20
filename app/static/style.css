@@ -1529,16 +1529,7 @@ a.attachment-filename:hover {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  align-items: stretch;
-}
-.action-buttons > form,
-.action-buttons > .inline-form {
-  flex: 1 1 0;
-  display: flex;
-}
-.action-buttons .btn {
-  flex: 1;
-  justify-content: center;
+  align-items: center;
 }
 .detail-actions-bottom {
   display: flex;
@@ -2024,7 +2015,7 @@ a.attachment-filename:hover {
 
   /* Form sections: reduce padding on mobile */
   .form-section { padding: 16px; }
-  .form-actions { padding: 16px; flex-direction: row-reverse; flex-wrap: wrap; }
+  .form-actions { padding: 16px; flex-direction: row; flex-wrap: wrap; }
   .form-actions .btn { flex: 1 1 0; justify-content: center; }
 
   /* Prevent iOS zoom on input focus (requires >= 16px) */

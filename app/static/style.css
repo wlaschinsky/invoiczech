@@ -1901,7 +1901,7 @@ a.attachment-filename:hover {
   align-items: center;
   gap: 12px;
 }
-.akce-datum { flex: 1; }
+.akce-datum { width: 160px; flex: none; }
 .akce-tlacitka {
   display: flex;
   flex-direction: row;
@@ -1948,7 +1948,8 @@ a.attachment-filename:hover {
   .detail-actions-bottom form { flex: 1; display: flex; }
   .detail-actions-bottom form .btn { flex: 1; }
   .action-buttons { flex-wrap: wrap; }
-  .akce-datum { width: 100%; margin-bottom: 12px; }
+  .akce-wrapper { flex-wrap: wrap; }
+  .akce-datum { width: 100%; flex: none; margin-bottom: 12px; }
   .akce-tlacitka { display: flex; flex-direction: row; gap: 12px; width: 100%; }
   .akce-tlacitka form { flex: 1; display: flex; }
   .akce-tlacitka .btn { flex: 1; justify-content: center; }

@@ -162,7 +162,7 @@
 <!-- Akce -->
 <div class="detail-card mt-4">
   <h3>Akce</h3>
-  <div class="action-buttons">
+  <div class="akce-wrapper">
     <input type="date" name="paid_date" form="form-uhradit" value="{{ today.isoformat() }}" class="form-control form-control-sm akce-datum">
     <div class="akce-tlacitka">
       <form method="post" action="/faktury/{{ invoice.id }}/uhradit" id="form-uhradit">

@@ -1529,7 +1529,16 @@ a.attachment-filename:hover {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
+}
+.action-buttons > form,
+.action-buttons > .inline-form {
+  flex: 1 1 0;
+  display: flex;
+}
+.action-buttons .btn {
+  flex: 1;
+  justify-content: center;
 }
 .detail-actions-bottom {
   display: flex;
@@ -1931,6 +1940,8 @@ a.attachment-filename:hover {
   .detail-actions-bottom { flex-direction: column; gap: 8px; }
   .detail-actions-bottom .btn { width: 100%; justify-content: center; }
   .action-buttons { flex-direction: column; gap: 8px; }
+  .action-buttons > form,
+  .action-buttons > .inline-form { width: 100%; }
   .action-buttons .inline-form { display: flex; flex-direction: column; gap: 8px; }
   /* Form groups min-width reset */
   .form-group-lg { min-width: 0; }
@@ -2013,8 +2024,8 @@ a.attachment-filename:hover {
 
   /* Form sections: reduce padding on mobile */
   .form-section { padding: 16px; }
-  .form-actions { padding: 16px; flex-direction: column-reverse; }
-  .form-actions .btn { width: 100%; justify-content: center; }
+  .form-actions { padding: 16px; flex-direction: row-reverse; flex-wrap: wrap; }
+  .form-actions .btn { flex: 1 1 0; justify-content: center; }
 
   /* Prevent iOS zoom on input focus (requires >= 16px) */
   input[type="text"],

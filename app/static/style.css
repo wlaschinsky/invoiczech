@@ -937,6 +937,8 @@ textarea.form-control { resize: vertical; min-height: 70px; }
 .form-actions {
   padding: 20px 28px;
   display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
   gap: 10px;
   align-items: center;
   background: var(--color-bg-tertiary);
@@ -945,6 +947,7 @@ textarea.form-control { resize: vertical; min-height: 70px; }
   border-bottom-left-radius: var(--radius);
   border-bottom-right-radius: var(--radius);
 }
+.form-actions .btn { padding: 12px 24px; font-size: 1rem; }
 
 /* Width helpers */
 .w-16 { width: 60px !important; flex: none !important; }

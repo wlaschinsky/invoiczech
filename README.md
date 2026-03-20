@@ -16,49 +16,43 @@ brew install pango
 ## Instalace
 
 ```bash
-# Klonování repozitáře
-git clone <repo-url> && cd account_app
+git clone https://github.com/wlaschinsky/invoiczech.git && cd invoiczech
 
-# Virtuální prostředí
 python -m venv venv
 source venv/bin/activate
-
-# Závislosti
 pip install -r requirements.txt
 ```
 
 ## Konfigurace
 
-Zkopíruj `.env.example` do `.env` a vyplň hodnoty:
-
 ```bash
 cp .env.example .env
 ```
 
-### Povinné proměnné
+### Proměnné prostředí
 
-| Proměnná | Popis |
-|---|---|
-| `SECRET_KEY` | Náhodný řetězec pro šifrování sessions |
-| `PASSWORD_HASH` | Bcrypt hash hesla (viz níže) |
-
-### Profil podnikatele
-
-Údaje podnikatele (jméno, adresa, IČO, DIČ, bankovní účet, finanční úřad) se nastavují přímo v aplikaci na stránce **Profil** (`/profil`). Při prvním spuštění se automaticky naplní z `.env` proměnných (pokud existují).
+| Proměnná | Povinná | Popis |
+|---|---|---|
+| `SECRET_KEY` | Ano | Náhodný řetězec pro šifrování sessions |
+| `PASSWORD_HASH` | Ano | Bcrypt hash hesla (viz níže) |
+| `DATABASE_URL` | Ne | SQLite cesta (default `sqlite:///./faktury.db`) |
+| `UPLOAD_DIR` | Ne | Adresář pro přílohy (default `uploads`) |
 
 ### Nastavení hesla
-
-Heslo se neukládá v plaintextu — v `.env` je pouze bcrypt hash. Vygeneruj ho pomocí:
 
 ```bash
 python setup.py
 ```
 
-Skript se zeptá na heslo (min. 8 znaků), vygeneruje hash a vypíše ho. Hash vlož do `.env`:
+Skript vygeneruje bcrypt hash, který vložíš do `.env`:
 
 ```
 PASSWORD_HASH=$2b$12$...
 ```
+
+### Profil podnikatele
+
+Všechny údaje (jméno, adresa, IČO, DIČ, banka, finanční úřad, výchozí nastavení faktur) se nastavují v aplikaci na stránce **Profil** (`/profil`). Žádné osobní údaje se neukládají do konfiguračních souborů.
 
 ## Spuštění
 
@@ -69,45 +63,67 @@ uvicorn app.main:app --reload
 
 Aplikace běží na `http://localhost:8000`.
 
+## Migrace databáze
+
+Při přidání nových sloupců do modelů spusť migraci:
+
+```bash
+python migrate.py
+```
+
+Skript je idempotentní — přidá chybějící sloupce, existující data neovlivní.
+
 ## Struktura projektu
 
 ```
 app/
-├── main.py              # FastAPI app, middleware, startup
-├── config.py            # Pydantic Settings (.env)
-├── database.py          # SQLAlchemy engine + session
-├── tmpl.py              # Jinja2 šablony, filtry, flash injection
-├── flash.py             # Flash messages
+├── main.py                # FastAPI app, middleware, startup
+├── config.py              # Pydantic Settings (.env)
+├── database.py            # SQLAlchemy engine + session
+├── tmpl.py                # Jinja2 šablony, filtry, flash injection
 ├── models/
-│   ├── contact.py       # Kontakty
-│   ├── invoice.py       # Faktury + položky
-│   └── expense.py       # Náklady + položky
+│   ├── contact.py         # Kontakty
+│   ├── invoice.py         # Faktury + položky
+│   ├── invoice_template.py # Šablony faktur
+│   ├── expense.py         # Náklady + položky
+│   └── profile.py         # Profil podnikatele (singleton)
 ├── routers/
-│   ├── auth.py          # Přihlášení / odhlášení
-│   ├── dashboard.py     # Dashboard se statistikami
-│   ├── invoices.py      # CRUD faktury
-│   ├── expenses.py      # CRUD náklady
-│   ├── contacts.py      # CRUD kontakty + ARES
-│   └── exports.py       # DPH exporty (KH1, DP3)
+│   ├── auth.py            # Přihlášení / odhlášení
+│   ├── dashboard.py       # Dashboard se statistikami
+│   ├── invoices.py        # CRUD faktury
+│   ├── invoice_templates.py # Šablony faktur
+│   ├── expenses.py        # CRUD náklady
+│   ├── contacts.py        # CRUD kontakty + ARES
+│   ├── exports.py         # XML exporty (KH1, DP3)
+│   ├── overview.py        # Roční přehled
+│   ├── profile.py         # Profil podnikatele
+│   └── search.py          # Globální vyhledávání
 ├── services/
-│   ├── pdf_generator.py # PDF faktur (WeasyPrint)
-│   ├── qr_code.py       # QR platba (SPD formát)
-│   ├── xml_generator.py # XML exporty pro FÚ
-│   └── ares.py          # Napojení na ARES API
-├── templates/           # Jinja2 šablony
-└── static/              # CSS, favicon, PWA assets
+│   ├── pdf_generator.py   # PDF faktur (WeasyPrint)
+│   ├── qr_code.py         # QR platba (SPD formát)
+│   ├── xml_generator.py   # XML exporty pro FÚ
+│   └── ares.py            # Napojení na ARES API
+├── templates/             # Jinja2 šablony
+└── static/                # CSS, favicon, PWA assets
 ```
-
-## Databáze
-
-SQLite (`faktury.db`). Tabulky se vytvoří automaticky při prvním spuštění — žádné migrace nejsou potřeba.
 
 ## Funkce
 
-- Správa faktur (vystavení, úprava, storno, úhrada, PDF export)
-- Správa nákladů s přílohami
-- Adresář kontaktů s napojením na ARES (automatické doplnění dle IČO)
-- QR kód pro platbu na PDF faktuře (český SPD formát)
-- XML exporty pro kontrolní hlášení (KH1) a daňové přiznání (DP3)
-- PWA podpora (offline-ready)
-- Session autentizace s 8h timeoutem
+- **Faktury** — vystavení, úprava, storno, úhrada, PDF export s QR kódem
+- **Náklady** — evidence s přílohami, daňová uznatelnost
+- **Kontakty** — adresář s napojením na ARES (automatické doplnění dle IČO)
+- **Šablony faktur** — opakované fakturace
+- **Dashboard** — měsíční statistiky příjmů, nákladů, DPH a neuhrazených faktur
+- **Roční přehled** — měsíční breakdown s PDF/CSV exportem
+- **XML exporty** — kontrolní hlášení (KH1) a přiznání k DPH (DP3) pro portál Moje Daně
+- **Profil** — veškeré údaje podnikatele na jednom místě (osobní, banka, FÚ, výchozí nastavení)
+- **PWA** — instalovatelná jako aplikace, offline-ready
+- **Autentizace** — session s 8h timeoutem
+
+## Deploy
+
+Automatický deploy přes GitHub Actions při push do `main` nebo vytvoření tagu `v*`. Viz `.github/workflows/deploy.yml`.
+
+## Licence
+
+MIT

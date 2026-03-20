@@ -70,7 +70,10 @@
       "Bash(venv/bin/python -c \"from app.main import app; print\\(''App OK''\\)\")",
       "Bash(timeout 5 python -c \"from app.main import app; print\\(''App loads OK''\\)\")",
       "Bash(python -c \"from app.main import app; print\\(''App loads OK''\\)\")",
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "Bash(git log:*)",
+      "Bash(grep -viE \"^\\(\\\\+\\\\+\\\\+|\\\\+#|\\\\+$\\)\")",
+      "Bash(chmod +x /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/scripts/backup.sh)"
     ]
   }
 }

@@ -74,7 +74,9 @@
       "Bash(git log:*)",
       "Bash(grep -viE \"^\\(\\\\+\\\\+\\\\+|\\\\+#|\\\\+$\\)\")",
       "Bash(chmod +x /Users/samuelwlaschinsky/Development/samko_dev/invoiczech/scripts/backup.sh)",
-      "Bash(grep -r \"vat_payer\\\\|profile\\\\.vat_payer\" --include=*.py --include=*.html .)"
+      "Bash(grep -r \"vat_payer\\\\|profile\\\\.vat_payer\" --include=*.py --include=*.html .)",
+      "Bash(curl -s http://localhost:8000/static/style.css)",
+      "Bash(curl -s http://127.0.0.1:8000/static/style.css)"
     ]
   }
 }

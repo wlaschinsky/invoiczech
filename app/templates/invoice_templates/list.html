@@ -28,7 +28,7 @@
   <tbody>
     {% for t in templates %}
     <tr>
-      <td><a href="/sablony/{{ t.id }}/upravit" class="link-strong">{{ t.name }}</a></td>
+      <td><a href="/sablony/{{ t.id }}" class="link-strong">{{ t.name }}</a></td>
       <td>{{ t.contact.name if t.contact else '—' }}</td>
       <td class="text-right">{{ t.total | czk }}</td>
       <td class="actions">

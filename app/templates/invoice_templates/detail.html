@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ tpl.name }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <span class="breadcrumb-home">InvoiCzech <span class="breadcrumb-sep">›</span></span>
+  <a href="/sablony">Šablony</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">{{ tpl.name }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ tpl.name }}</h1>
+  <div class="header-actions">
+    <a href="/sablony/{{ tpl.id }}/upravit" class="btn btn-secondary">Upravit</a>
+    <a href="/sablony" class="btn btn-ghost">Zpět</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <!-- Odběratel -->
+  <div class="detail-card">
+    <h3>Odběratel</h3>
+    <div class="detail-contact">
+      {% if tpl.contact %}
+      <strong>{{ tpl.contact.name }}</strong>
+      {% if tpl.contact.street or tpl.contact.city %}
+      <div>{{ tpl.contact.street or '' }}</div>
+      <div>{{ tpl.contact.zip_code or '' }} {{ tpl.contact.city or '' }}</div>
+      {% endif %}
+      {% if tpl.contact.ico %}<div>IČO: {{ tpl.contact.ico }}</div>{% endif %}
+      {% if tpl.contact.dic %}<div>DIČ: {{ tpl.contact.dic }}</div>{% endif %}
+      {% elif tpl.contact_name %}
+      <strong>{{ tpl.contact_name }}</strong>
+      {% if tpl.contact_street or tpl.contact_city %}
+      <div>{{ tpl.contact_street or '' }}</div>
+      <div>{{ tpl.contact_zip or '' }} {{ tpl.contact_city or '' }}</div>
+      {% endif %}
+      {% if tpl.contact_ico %}<div>IČO: {{ tpl.contact_ico }}</div>{% endif %}
+      {% if tpl.contact_dic %}<div>DIČ: {{ tpl.contact_dic }}</div>{% endif %}
+      {% else %}
+      <span class="text-muted">Bez odběratele</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Platební podmínky -->
+  <div class="detail-card">
+    <h3>Platební podmínky</h3>
+    <table class="detail-table">
+      <tr><th>Způsob úhrady</th><td>{{ tpl.payment_method or 'Bankovní převod' }}</td></tr>
+      <tr><th>Splatnost</th><td>{{ tpl.due_days or 10 }} dní</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Položky -->
+<div class="detail-card mt-4">
+  <h3>Položky</h3>
+  {% if tpl.items %}
+  <div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Popis</th>
+        <th class="text-right">Množství</th>
+        <th class="text-right">Cena / MJ</th>
+        {% if profile.vat_payer %}
+        <th class="text-right">DPH %</th>
+        <th class="text-right">Bez DPH</th>
+        <th class="text-right">Celkem</th>
+        {% else %}
+        <th class="text-right">Celkem</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in tpl.items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td class="text-right">{{ item.quantity | num(2) }}</td>
+        <td class="text-right">{{ item.unit_price | czk }}</td>
+        {% if profile.vat_payer %}
+        <td class="text-right">{{ item.vat_rate }} %</td>
+        <td class="text-right">{{ item.subtotal | czk }}</td>
+        <td class="text-right font-medium">{{ item.total | czk }}</td>
+        {% else %}
+        <td class="text-right font-medium">{{ item.subtotal | czk }}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  <div class="vat-summary">
+    <div class="grand-total">
+      <span>Celkem:</span>
+      <span class="grand-total-value">{{ tpl.total | czk }}</span>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Šablona nemá žádné položky.</p>
+  {% endif %}
+</div>
+
+<div class="detail-actions-bottom mt-4">
+  <a href="/sablony" class="btn btn-ghost">Zpět</a>
+  <form method="post" action="/sablony/{{ tpl.id }}/smazat"
+        onsubmit="return confirm('Opravdu smazat šablonu {{ tpl.name }}? Tato akce je nevratná.')">
+    <button type="submit" class="btn btn-danger">Smazat šablonu</button>
+  </form>
+</div>
+{% endblock %}

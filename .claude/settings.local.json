@@ -77,7 +77,12 @@
       "Bash(grep -r \"vat_payer\\\\|profile\\\\.vat_payer\" --include=*.py --include=*.html .)",
       "Bash(curl -s http://localhost:8000/static/style.css)",
       "Bash(curl -s http://127.0.0.1:8000/static/style.css)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(python -c \"from app.routers.invoice_templates import router; print\\(''OK''\\)\")",
+      "Bash(python3 -c \"from app.routers.invoice_templates import router; print\\(''OK''\\)\")",
+      "Bash(cat logs/*.log)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s http://localhost:8000/sablony/1)"
     ]
   }
 }

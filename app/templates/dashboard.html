@@ -39,29 +39,25 @@
 </div>
 
 {# ── Řádek 2: Náklady ── #}
+{% if profile.vat_payer %}
 <div class="stats-row stats-row--3">
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_month_label }}</div>
     <div class="stat-value">{{ costs_month_total | czk }}</div>
-    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_month_vat | czk }}</div>
-    {% endif %}
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ prev_month_label }}</div>
     <div class="stat-value">{{ costs_prev_total | czk }}</div>
-    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_prev_vat | czk }}</div>
-    {% endif %}
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_year }}</div>
     <div class="stat-value">{{ costs_year_total | czk }}</div>
-    {% if profile.vat_payer %}
     <div class="stat-sub">z toho DPH: {{ costs_year_vat | czk }}</div>
-    {% endif %}
   </div>
 </div>
+{% endif %}
 
 {# ── Řádek 3: DPH + Neuhrazené ── #}
 {% if profile.vat_payer %}

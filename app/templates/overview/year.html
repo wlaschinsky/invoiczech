@@ -34,6 +34,7 @@
 </div>
 
 {# ── Souhrnné karty ── #}
+{% if profile.vat_payer %}
 <div class="stats-row stats-row--3 mb-4">
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ year }}</div>
@@ -51,6 +52,14 @@
     <div class="stat-sub">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
   </div>
 </div>
+{% else %}
+<div class="stats-row stats-row--1 mb-4">
+  <div class="stat-card stat-card--income">
+    <div class="stat-label">Příjmy {{ year }}</div>
+    <div class="stat-value stat-value--income">{{ income_base | czk }}</div>
+  </div>
+</div>
+{% endif %}
 
 {# ── Měsíční tabulka ── #}
 <div class="detail-card">
@@ -60,6 +69,7 @@
     <thead>
       <tr>
         <th>Měsíc</th>
+        {% if profile.vat_payer %}
         <th class="text-right">Příjmy bez DPH</th>
         <th class="text-right">Příjmy s DPH</th>
         <th class="text-right">DPH výstup</th>
@@ -67,12 +77,16 @@
         <th class="text-right">Náklady s DPH</th>
         <th class="text-right">DPH vstup</th>
         <th class="text-right">Daň. povinnost</th>
+        {% else %}
+        <th class="text-right">Příjmy</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
       {% for m in months %}
       <tr>
         <td>{{ m.name | capitalize }}</td>
+        {% if profile.vat_payer %}
         <td class="text-right">{{ m.income_base | czk }}</td>
         <td class="text-right">{{ m.income_total | czk }}</td>
         <td class="text-right">{{ m.vat_output | czk }}</td>
@@ -80,12 +94,16 @@
         <td class="text-right">{{ m.costs_total | czk }}</td>
         <td class="text-right">{{ m.vat_input | czk }}</td>
         <td class="text-right font-medium">{{ m.vat_liability | czk }}</td>
+        {% else %}
+        <td class="text-right">{{ m.income_base | czk }}</td>
+        {% endif %}
       </tr>
       {% endfor %}
     </tbody>
     <tfoot>
       <tr class="row-total">
         <td><strong>Celkem</strong></td>
+        {% if profile.vat_payer %}
         <td class="text-right"><strong>{{ income_base | czk }}</strong></td>
         <td class="text-right"><strong>{{ income_total | czk }}</strong></td>
         <td class="text-right"><strong>{{ vat_output | czk }}</strong></td>
@@ -93,6 +111,9 @@
         <td class="text-right"><strong>{{ costs_total | czk }}</strong></td>
         <td class="text-right"><strong>{{ vat_input | czk }}</strong></td>
         <td class="text-right"><strong>{{ vat_liability | czk }}</strong></td>
+        {% else %}
+        <td class="text-right"><strong>{{ income_base | czk }}</strong></td>
+        {% endif %}
       </tr>
     </tfoot>
   </table>

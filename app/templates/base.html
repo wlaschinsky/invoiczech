@@ -172,7 +172,7 @@
 
     // Unsaved changes detection for form pages
     (function() {
-      var form = document.querySelector('form.form-card');
+      var form = document.querySelector('form.form-card, form[data-guard-unsaved]');
       if (!form) return;
       var submitting = false;
 

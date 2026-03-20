@@ -163,14 +163,16 @@
 <div class="detail-card mt-4">
   <h3>Akce</h3>
   <div class="action-buttons">
-    <form method="post" action="/faktury/{{ invoice.id }}/uhradit" class="inline-form">
-      <input type="date" name="paid_date" value="{{ today.isoformat() }}" class="form-control form-control-sm">
-      <button type="submit" class="btn btn-success">Označit jako uhrazenou</button>
-    </form>
-    <form method="post" action="/faktury/{{ invoice.id }}/stornovat"
-          onsubmit="return confirm('Opravdu stornovat fakturu {{ invoice.number }}?')">
-      <button type="submit" class="btn btn-danger">Stornovat</button>
-    </form>
+    <input type="date" name="paid_date" form="form-uhradit" value="{{ today.isoformat() }}" class="form-control form-control-sm akce-datum">
+    <div class="akce-tlacitka">
+      <form method="post" action="/faktury/{{ invoice.id }}/uhradit" id="form-uhradit">
+        <button type="submit" class="btn btn-success">Označit jako uhrazenou</button>
+      </form>
+      <form method="post" action="/faktury/{{ invoice.id }}/stornovat"
+            onsubmit="return confirm('Opravdu stornovat fakturu {{ invoice.number }}?')">
+        <button type="submit" class="btn btn-danger">Stornovat</button>
+      </form>
+    </div>
   </div>
 </div>
 {% endif %}

@@ -1894,6 +1894,21 @@ a.attachment-filename:hover {
   opacity: 1;
 }
 
+/* Akce section – invoice detail */
+.akce-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.akce-datum { flex: 1; }
+.akce-tlacitka {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .topbar { padding: 0 12px; }
   .hamburger { display: flex; }

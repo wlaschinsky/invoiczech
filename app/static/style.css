@@ -769,7 +769,7 @@ td.actions {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .form-section:has(+ .form-actions) {
   border-bottom-left-radius: 0;

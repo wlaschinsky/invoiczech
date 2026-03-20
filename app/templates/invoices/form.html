@@ -36,10 +36,10 @@
     <h2 class="form-section-title">Použít šablonu</h2>
     <div class="form-row">
       <div class="form-group">
-        <select id="template_select" class="form-control" onchange="applyTemplate(this.value)">
-          <option value="">— Bez šablony —</option>
+        <select id="template_select" class="form-control" onchange="applyTemplate(this.value)" data-testid="invoice-template-select">
+          <option value="" data-value="">— Bez šablony —</option>
           {% for t in inv_templates %}
-          <option value="{{ t.id }}">{{ t.name }}</option>
+          <option value="{{ t.id }}" data-value="{{ t.id }}">{{ t.name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -54,9 +54,9 @@
       <div class="form-group">
         <label for="contact_id">Vybrat z adresáře</label>
         <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="invoice-contact">
-          <option value="">— Zadat ručně —</option>
+          <option value="" data-value="">— Zadat ručně —</option>
           {% for c in contacts %}
-          <option value="{{ c.id }}"
+          <option value="{{ c.id }}" data-value="{{ c.id }}"
                   data-name="{{ c.name }}"
                   data-ico="{{ c.ico or '' }}"
                   data-dic="{{ c.dic or '' }}"
@@ -73,8 +73,8 @@
       <div class="form-group" id="ares-group" {% if invoice and invoice.contact_id %}style="display:none"{% endif %}>
         <label>IČO pro ARES</label>
         <div class="input-group">
-          <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
-          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+          <input type="text" id="ares_ico" placeholder="12345678" class="form-control" data-testid="invoice-ares-ico-field">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()" data-testid="invoice-ares-load-btn">Načíst z ARES</button>
         </div>
         <div id="ares-status" class="mt-1"></div>
       </div>
@@ -85,19 +85,19 @@
         <label for="contact_name">Název *</label>
         <input type="text" id="contact_name" name="contact_name"
                value="{{ invoice.contact_name if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-name-field">
       </div>
       <div class="form-group">
         <label for="contact_ico">IČO</label>
         <input type="text" id="contact_ico" name="contact_ico"
                value="{{ invoice.contact_ico if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-ico-field">
       </div>
       <div class="form-group">
         <label for="contact_dic">DIČ</label>
         <input type="text" id="contact_dic" name="contact_dic"
                value="{{ invoice.contact_dic if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-dic-field">
       </div>
     </div>
     <div class="form-row">
@@ -105,19 +105,19 @@
         <label for="contact_street">Ulice a číslo</label>
         <input type="text" id="contact_street" name="contact_street"
                value="{{ invoice.contact_street if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-street-field">
       </div>
       <div class="form-group">
         <label for="contact_zip">PSČ</label>
         <input type="text" id="contact_zip" name="contact_zip"
                value="{{ invoice.contact_zip if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-zip-field">
       </div>
       <div class="form-group form-group-lg">
         <label for="contact_city">Město</label>
         <input type="text" id="contact_city" name="contact_city"
                value="{{ invoice.contact_city if invoice else '' }}"
-               class="form-control">
+               class="form-control" data-testid="invoice-contact-city-field">
       </div>
     </div>
     </div>
@@ -143,7 +143,7 @@
         <label for="due_date">Datum splatnosti *</label>
         <input type="date" id="due_date" name="due_date"
                value="{{ invoice.due_date.isoformat() if invoice else due_default.isoformat() }}"
-               class="form-control" required>
+               class="form-control" required data-testid="invoice-due-date-field">
       </div>
       <div class="form-group">
         <label for="duzp">DUZP</label>
@@ -155,9 +155,9 @@
         <label for="payment_method">Způsob úhrady</label>
         <select id="payment_method" name="payment_method" class="form-control" data-testid="invoice-payment-method">
           {% set pm = invoice.payment_method if invoice else 'Bankovní převod' %}
-          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
-          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
-          <option {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
+          <option data-value="Bankovní převod" {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option data-value="Hotovost" {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+          <option data-value="Kartou" {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
         </select>
       </div>
     </div>
@@ -170,9 +170,9 @@
     <div class="form-row">
       <div class="form-group">
         <label for="price_mode">Výpočet DPH</label>
-        <select id="price_mode" class="form-control" onchange="recalcAllRows()">
-          <option value="bez" selected>Cenu uvádím bez DPH (základ daně)</option>
-          <option value="s_dph">Cenu uvádím s DPH (koncová cena)</option>
+        <select id="price_mode" class="form-control" onchange="recalcAllRows()" data-testid="invoice-price-mode-select">
+          <option value="bez" data-value="bez" selected>Cenu uvádím bez DPH (základ daně)</option>
+          <option value="s_dph" data-value="s_dph">Cenu uvádím s DPH (koncová cena)</option>
         </select>
       </div>
     </div>
@@ -202,9 +202,9 @@
             {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
-                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
-                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+                <option value="21" data-value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" data-value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" data-value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
               </select>
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">{{ item.subtotal | czk }}</td>
@@ -224,9 +224,9 @@
             {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" selected>21 %</option>
-                <option value="12">12 %</option>
-                <option value="0">0 %</option>
+                <option value="21" data-value="21" selected>21 %</option>
+                <option value="12" data-value="12">12 %</option>
+                <option value="0" data-value="0">0 %</option>
               </select>
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
@@ -242,7 +242,7 @@
     </table>
     </div>
     <div class="items-actions">
-      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()" data-testid="invoice-add-item-btn">+ Přidat položku</button>
     </div>
 
     <div class="totals-box" id="totals-box">
@@ -267,7 +267,7 @@
   <div class="form-section">
     <h2 class="form-section-title">Text faktury</h2>
     <div class="form-group">
-      <textarea name="invoice_text" rows="3" class="form-control">{{ invoice.invoice_text if invoice else default_text }}</textarea>
+      <textarea name="invoice_text" rows="3" class="form-control" data-testid="invoice-text-field">{{ invoice.invoice_text if invoice else default_text }}</textarea>
     </div>
   </div>
 
@@ -275,7 +275,7 @@
   <div class="form-section">
     <h2 class="form-section-title">Interní poznámka</h2>
     <div class="form-group">
-      <textarea name="internal_note" rows="2" class="form-control" placeholder="Poznámka se nezobrazí na PDF">{{ invoice.internal_note if invoice and invoice.internal_note else '' }}</textarea>
+      <textarea name="internal_note" rows="2" class="form-control" placeholder="Poznámka se nezobrazí na PDF" data-testid="invoice-internal-note-field">{{ invoice.internal_note if invoice and invoice.internal_note else '' }}</textarea>
     </div>
   </div>
 
@@ -284,9 +284,9 @@
       {% if invoice %}Uložit změny{% else %}Vystavit fakturu{% endif %}
     </button>
     {% if invoice %}
-    <a href="/faktury/{{ invoice.id }}" class="btn btn-ghost">Zrušit</a>
+    <a href="/faktury/{{ invoice.id }}" class="btn btn-ghost" data-testid="invoice-cancel-btn">Zrušit</a>
     {% else %}
-    <a href="/faktury" class="btn btn-ghost">Zrušit</a>
+    <a href="/faktury" class="btn btn-ghost" data-testid="invoice-cancel-btn">Zrušit</a>
     {% endif %}
   </div>
 </form>

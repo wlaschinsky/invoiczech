@@ -13,19 +13,19 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <h1>{{ expense.number }}{% if expense.title %} — {{ expense.title }}{% endif %}</h1>
-    <span class="badge badge-neutral badge-lg">{{ expense.document_type }}</span>
+    <h1 data-testid="expense-number-value">{{ expense.number }}{% if expense.title %} — {{ expense.title }}{% endif %}</h1>
+    <span class="badge badge-neutral badge-lg" data-testid="expense-type-value">{{ expense.document_type }}</span>
     {% if expense.tax_deductible == 'Ano' %}
-    <span class="badge badge-uhrazena badge-lg">Daň. uznatelný</span>
+    <span class="badge badge-uhrazena badge-lg" data-testid="expense-tax-deductible-value">Daň. uznatelný</span>
     {% elif expense.tax_deductible == 'Ne' %}
-    <span class="badge badge-stornova badge-lg">Neuznatelný</span>
+    <span class="badge badge-stornova badge-lg" data-testid="expense-tax-deductible-value">Neuznatelný</span>
     {% else %}
-    <span class="badge badge-neutral badge-lg">Uznatelnost: Nevím</span>
+    <span class="badge badge-neutral badge-lg" data-testid="expense-tax-deductible-value">Uznatelnost: Nevím</span>
     {% endif %}
   </div>
   <div class="header-actions">
-    <a href="/naklady/{{ expense.id }}/upravit" class="btn btn-secondary">Upravit</a>
-    <a href="/naklady" class="btn btn-ghost">Zpět</a>
+    <a href="/naklady/{{ expense.id }}/upravit" class="btn btn-secondary" data-testid="expense-edit-btn">Upravit</a>
+    <a href="/naklady" class="btn btn-ghost" data-testid="expense-back-btn">Zpět</a>
   </div>
 </div>
 
@@ -33,7 +33,7 @@
   <div class="detail-card">
     <h3>Dodavatel</h3>
     <div class="detail-contact">
-      <strong>{{ expense.contact_name or '—' }}</strong>
+      <strong data-testid="expense-contact-name-value">{{ expense.contact_name or '—' }}</strong>
       {% if expense.contact %}
       {% if expense.contact.street %}<div>{{ expense.contact.street }}</div>{% endif %}
       {% if expense.contact.city %}<div>{{ expense.contact.zip_code or '' }} {{ expense.contact.city }}</div>{% endif %}
@@ -45,13 +45,13 @@
   <div class="detail-card">
     <h3>Informace o dokladu</h3>
     <table class="detail-table">
-      <tr><th>Č. dokladu dodavatele</th><td>{{ expense.supplier_document_number or '—' }}</td></tr>
-      <tr><th>Datum vystavení</th><td>{{ expense.issue_date | date_cs }}</td></tr>
-      <tr><th>DUZP</th><td>{{ expense.duzp | date_cs }}</td></tr>
-      <tr><th>Způsob úhrady</th><td>{{ expense.payment_method }}</td></tr>
-      {% if expense.paid_date %}<tr><th>Uhrazeno</th><td>{{ expense.paid_date | date_cs }}</td></tr>{% endif %}
-      <tr><th>Daňová uznatelnost</th><td>{{ expense.tax_deductible }}</td></tr>
-      {% if expense.fulfillment_code %}<tr><th>Kód předmětu plnění</th><td>{{ expense.fulfillment_code }}</td></tr>{% endif %}
+      <tr><th>Č. dokladu dodavatele</th><td data-testid="expense-supplier-doc-value">{{ expense.supplier_document_number or '—' }}</td></tr>
+      <tr><th>Datum vystavení</th><td data-testid="expense-issue-date-value">{{ expense.issue_date | date_cs }}</td></tr>
+      <tr><th>DUZP</th><td data-testid="expense-duzp-value">{{ expense.duzp | date_cs }}</td></tr>
+      <tr><th>Způsob úhrady</th><td data-testid="expense-payment-method-value">{{ expense.payment_method }}</td></tr>
+      {% if expense.paid_date %}<tr><th>Uhrazeno</th><td data-testid="expense-paid-date-value">{{ expense.paid_date | date_cs }}</td></tr>{% endif %}
+      <tr><th>Daňová uznatelnost</th><td data-testid="expense-deductibility-value">{{ expense.tax_deductible }}</td></tr>
+      {% if expense.fulfillment_code %}<tr><th>Kód předmětu plnění</th><td data-testid="expense-fulfillment-code-value">{{ expense.fulfillment_code }}</td></tr>{% endif %}
     </table>
   </div>
 </div>
@@ -73,7 +73,7 @@
     </thead>
     <tbody>
       {% for item in expense.items %}
-      <tr>
+      <tr data-testid="expense-item-row-{{ loop.index }}">
         <td>{{ item.description }}</td>
         <td class="text-right">{{ item.quantity | num(2) }}</td>
         <td>{{ item.unit }}</td>
@@ -112,7 +112,7 @@
     </div>
     <div class="grand-total">
       <span>Celkem s DPH:</span>
-      <span class="grand-total-value">{{ expense.total | czk }}</span>
+      <span class="grand-total-value" data-testid="expense-total-value">{{ expense.total | czk }}</span>
     </div>
   </div>
 </div>
@@ -120,7 +120,7 @@
 {% if expense.notes %}
 <div class="detail-card mt-4">
   <h3>Poznámky</h3>
-  <p>{{ expense.notes }}</p>
+  <p data-testid="expense-notes-value">{{ expense.notes }}</p>
 </div>
 {% endif %}
 
@@ -149,10 +149,10 @@
 {% endif %}
 
 <div class="detail-actions-bottom mt-4">
-  <a href="/naklady" class="btn btn-ghost">Zpět</a>
+  <a href="/naklady" class="btn btn-ghost" data-testid="expense-back-bottom-btn">Zpět</a>
   <form method="post" action="/naklady/{{ expense.id }}/smazat"
         onsubmit="return confirm('Opravdu smazat náklad {{ expense.number }}? Tato akce je nevratná.')">
-    <button type="submit" class="btn btn-danger">Smazat náklad</button>
+    <button type="submit" class="btn btn-danger" data-testid="expense-delete-btn">Smazat náklad</button>
   </form>
 </div>
 {% endblock %}

@@ -13,10 +13,10 @@
   <h1>Dashboard</h1>
 </div>
 <div class="dashboard-actions">
-  <a href="/faktury/nova" class="btn btn-primary">Nová faktura</a>
+  <a href="/faktury/nova" class="btn btn-primary" data-testid="dashboard-new-invoice-btn">Nová faktura</a>
   {% if profile.vat_payer %}
-  <a href="/naklady/novy" class="btn btn-secondary">Nový náklad</a>
-  <a href="/exporty" class="btn btn-secondary">Exporty</a>
+  <a href="/naklady/novy" class="btn btn-secondary" data-testid="dashboard-new-expense-btn">Nový náklad</a>
+  <a href="/exporty" class="btn btn-secondary" data-testid="dashboard-exports-btn">Exporty</a>
   {% endif %}
 </div>
 
@@ -24,16 +24,16 @@
 <div class="stats-row stats-row--2">
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_month_label }}</div>
-    <div class="stat-value stat-value--income">{{ income_month_total | czk }}</div>
+    <div class="stat-value stat-value--income" data-testid="dashboard-income-month-value">{{ income_month_total | czk }}</div>
     {% if profile.vat_payer %}
-    <div class="stat-sub">bez DPH: {{ income_month_base | czk }}</div>
+    <div class="stat-sub" data-testid="dashboard-income-month-base-value">bez DPH: {{ income_month_base | czk }}</div>
     {% endif %}
   </div>
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ current_year }}</div>
-    <div class="stat-value stat-value--income">{{ income_year_total | czk }}</div>
+    <div class="stat-value stat-value--income" data-testid="dashboard-income-year-value">{{ income_year_total | czk }}</div>
     {% if profile.vat_payer %}
-    <div class="stat-sub">bez DPH: {{ income_year_base | czk }}</div>
+    <div class="stat-sub" data-testid="dashboard-income-year-base-value">bez DPH: {{ income_year_base | czk }}</div>
     {% endif %}
   </div>
 </div>
@@ -43,18 +43,18 @@
 <div class="stats-row stats-row--3">
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_month_label }}</div>
-    <div class="stat-value">{{ costs_month_total | czk }}</div>
-    <div class="stat-sub">z toho DPH: {{ costs_month_vat | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-costs-month-value">{{ costs_month_total | czk }}</div>
+    <div class="stat-sub" data-testid="dashboard-costs-month-vat-value">z toho DPH: {{ costs_month_vat | czk }}</div>
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ prev_month_label }}</div>
-    <div class="stat-value">{{ costs_prev_total | czk }}</div>
-    <div class="stat-sub">z toho DPH: {{ costs_prev_vat | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-costs-prev-value">{{ costs_prev_total | czk }}</div>
+    <div class="stat-sub" data-testid="dashboard-costs-prev-vat-value">z toho DPH: {{ costs_prev_vat | czk }}</div>
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ current_year }}</div>
-    <div class="stat-value">{{ costs_year_total | czk }}</div>
-    <div class="stat-sub">z toho DPH: {{ costs_year_vat | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-costs-year-value">{{ costs_year_total | czk }}</div>
+    <div class="stat-sub" data-testid="dashboard-costs-year-vat-value">z toho DPH: {{ costs_year_vat | czk }}</div>
   </div>
 </div>
 {% endif %}
@@ -64,20 +64,20 @@
 <div class="stats-row stats-row--2">
   <div class="stat-card stat-card--info">
     <div class="stat-label">Daň na výstupu {{ prev_month_label }}</div>
-    <div class="stat-value">{{ vat_output_prev | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-vat-output-value">{{ vat_output_prev | czk }}</div>
   </div>
   <div class="stat-card {% if unpaid_count > 0 %}stat-card--warning{% endif %}">
     <div class="stat-label">Neuhrazené faktury</div>
-    <div class="stat-value">{{ unpaid_count }}</div>
-    <div class="stat-sub">celkem {{ unpaid_total | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-unpaid-count-value">{{ unpaid_count }}</div>
+    <div class="stat-sub" data-testid="dashboard-unpaid-total-value">celkem {{ unpaid_total | czk }}</div>
   </div>
 </div>
 {% else %}
 <div class="stats-row stats-row--1">
   <div class="stat-card {% if unpaid_count > 0 %}stat-card--warning{% endif %}">
     <div class="stat-label">Neuhrazené faktury</div>
-    <div class="stat-value">{{ unpaid_count }}</div>
-    <div class="stat-sub">celkem {{ unpaid_total | czk }}</div>
+    <div class="stat-value" data-testid="dashboard-unpaid-count-value">{{ unpaid_count }}</div>
+    <div class="stat-sub" data-testid="dashboard-unpaid-total-value">celkem {{ unpaid_total | czk }}</div>
   </div>
 </div>
 {% endif %}

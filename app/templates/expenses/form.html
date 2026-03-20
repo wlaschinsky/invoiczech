@@ -37,7 +37,7 @@
       <label for="title">Název nákladu *</label>
       <input type="text" id="title" name="title"
              value="{{ expense.title if expense else '' }}"
-             class="form-control" placeholder="Např. Hosting, Kancelářské potřeby, Licence…" required>
+             class="form-control" placeholder="Např. Hosting, Kancelářské potřeby, Licence…" required data-testid="expense-title-field">
     </div>
   </div>
 
@@ -48,9 +48,9 @@
       <div class="form-group">
         <label for="contact_id">Vybrat z adresáře</label>
         <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="expense-contact">
-          <option value="">— Zadat ručně —</option>
+          <option value="" data-value="">— Zadat ručně —</option>
           {% for c in contacts %}
-          <option value="{{ c.id }}"
+          <option value="{{ c.id }}" data-value="{{ c.id }}"
                   data-name="{{ c.name }}"
                   data-ico="{{ c.ico or '' }}"
                   data-dic="{{ c.dic or '' }}"
@@ -67,8 +67,8 @@
       <div class="form-group" id="ares-group" {% if expense and expense.contact_id %}style="display:none"{% endif %}>
         <label>IČO pro ARES</label>
         <div class="input-group">
-          <input type="text" id="ares_ico" placeholder="12345678" class="form-control">
-          <button type="button" class="btn btn-secondary" onclick="loadFromAres()">Načíst z ARES</button>
+          <input type="text" id="ares_ico" placeholder="12345678" class="form-control" data-testid="expense-ares-ico-field">
+          <button type="button" class="btn btn-secondary" onclick="loadFromAres()" data-testid="expense-ares-load-btn">Načíst z ARES</button>
         </div>
         <div id="ares-status" class="mt-1"></div>
       </div>
@@ -79,13 +79,13 @@
         <label for="contact_name">Název dodavatele *</label>
         <input type="text" id="contact_name" name="contact_name"
                value="{{ expense.contact_name if expense else '' }}"
-               class="form-control" required>
+               class="form-control" required data-testid="expense-contact-name-field">
       </div>
       <div class="form-group">
         <label for="supplier_document_number">Číslo dokladu dodavatele</label>
         <input type="text" name="supplier_document_number"
                value="{{ expense.supplier_document_number if expense else '' }}"
-               class="form-control">
+               class="form-control" data-testid="expense-supplier-doc-field">
       </div>
     </div>
     </div>
@@ -105,48 +105,48 @@
         <label for="duzp">DUZP</label>
         <input type="date" name="duzp"
                value="{{ expense.duzp.isoformat() if expense and expense.duzp else today.isoformat() }}"
-               class="form-control">
+               class="form-control" data-testid="expense-duzp-field">
       </div>
       <div class="form-group">
         <label for="paid_date">Datum uhrazení</label>
         <input type="date" name="paid_date"
                value="{{ expense.paid_date.isoformat() if expense and expense.paid_date else '' }}"
-               class="form-control">
+               class="form-control" data-testid="expense-paid-date-field">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label for="payment_method">Způsob úhrady</label>
-        <select name="payment_method" class="form-control">
+        <select name="payment_method" class="form-control" data-testid="expense-payment-method-select">
           {% set pm = expense.payment_method if expense else 'Bankovní převod' %}
-          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
-          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
-          <option {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
+          <option data-value="Bankovní převod" {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option data-value="Hotovost" {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+          <option data-value="Kartou" {% if pm == 'Kartou' %}selected{% endif %}>Kartou</option>
         </select>
       </div>
       <div class="form-group">
         <label for="document_type">Typ dokladu</label>
         <select name="document_type" class="form-control" data-testid="expense-type">
           {% set dt = expense.document_type if expense else 'Faktura' %}
-          <option {% if dt == 'Faktura' %}selected{% endif %}>Faktura</option>
-          <option {% if dt == 'Účtenka' %}selected{% endif %}>Účtenka</option>
-          <option {% if dt == 'Jiný' %}selected{% endif %}>Jiný</option>
+          <option data-value="Faktura" {% if dt == 'Faktura' %}selected{% endif %}>Faktura</option>
+          <option data-value="Účtenka" {% if dt == 'Účtenka' %}selected{% endif %}>Účtenka</option>
+          <option data-value="Jiný" {% if dt == 'Jiný' %}selected{% endif %}>Jiný</option>
         </select>
       </div>
       <div class="form-group">
         <label for="tax_deductible">Daňově uznatelný</label>
         <select name="tax_deductible" class="form-control" data-testid="expense-tax-deductible">
           {% set td = expense.tax_deductible if expense else 'Nevím' %}
-          <option {% if td == 'Ano' %}selected{% endif %}>Ano</option>
-          <option {% if td == 'Ne' %}selected{% endif %}>Ne</option>
-          <option {% if td == 'Nevím' %}selected{% endif %}>Nevím</option>
+          <option data-value="Ano" {% if td == 'Ano' %}selected{% endif %}>Ano</option>
+          <option data-value="Ne" {% if td == 'Ne' %}selected{% endif %}>Ne</option>
+          <option data-value="Nevím" {% if td == 'Nevím' %}selected{% endif %}>Nevím</option>
         </select>
       </div>
       <div class="form-group">
         <label for="fulfillment_code">Kód předmětu plnění</label>
         <input type="text" name="fulfillment_code"
                value="{{ expense.fulfillment_code if expense else '' }}"
-               class="form-control">
+               class="form-control" data-testid="expense-fulfillment-code-field">
       </div>
     </div>
   </div>
@@ -156,7 +156,7 @@
     <h2 class="form-section-title">Položky</h2>
     <div class="form-group form-group-check">
       <label class="check-label">
-        <input type="checkbox" name="price_includes_vat" value="1" id="price_includes_vat"
+        <input type="checkbox" name="price_includes_vat" value="1" id="price_includes_vat" data-testid="expense-price-includes-vat-field"
                {% if expense and expense.price_includes_vat %}checked{% elif not expense %}checked{% endif %}>
         Ceny jsou zadány <strong>s DPH</strong> (automaticky přepočítám na základ)
       </label>
@@ -186,9 +186,9 @@
             <td data-label="Cena / MJ"><input type="number" name="unit_price" value="{{ item.unit_price | num(4) }}" step="0.0001" min="0" class="form-control w-28" oninput="recalcRow(this)"></td>
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
-                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
-                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+                <option value="21" data-value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" data-value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" data-value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
               </select>
             </td>
             <td data-label="Základ" class="text-right row-subtotal">{{ item.subtotal | czk }}</td>
@@ -204,9 +204,9 @@
             <td data-label="Cena / MJ"><input type="number" name="unit_price" step="0.0001" min="0" class="form-control w-28" placeholder="0.00" oninput="recalcRow(this)"></td>
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" selected>21 %</option>
-                <option value="12">12 %</option>
-                <option value="0">0 %</option>
+                <option value="21" data-value="21" selected>21 %</option>
+                <option value="12" data-value="12">12 %</option>
+                <option value="0" data-value="0">0 %</option>
               </select>
             </td>
             <td data-label="Základ" class="text-right row-subtotal">—</td>
@@ -218,7 +218,7 @@
     </table>
     </div>
     <div class="items-actions">
-      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()" data-testid="expense-add-item-btn">+ Přidat položku</button>
     </div>
 
     <div class="totals-box">
@@ -250,14 +250,14 @@
     {% endif %}
     <div class="form-group">
       <label for="attachment">Nahrát {% if expense and expense.attachments %}další {% endif %}přílohy</label>
-      <input type="file" id="attachment" name="attachment" class="form-control" multiple
+      <input type="file" id="attachment" name="attachment" class="form-control" data-testid="expense-attachment-field" multiple
              accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic">
       <small class="text-muted">PDF, JPG, PNG, GIF, WebP, HEIC — max 10 MB na soubor</small>
       <div id="attachment-error" class="text-danger" style="display:none; margin-top:4px; font-size:0.85rem;"></div>
     </div>
     <div class="form-group">
       <label for="notes">Poznámky</label>
-      <textarea name="notes" rows="2" class="form-control">{{ expense.notes if expense else '' }}</textarea>
+      <textarea name="notes" rows="2" class="form-control" data-testid="expense-notes-field">{{ expense.notes if expense else '' }}</textarea>
     </div>
   </div>
 
@@ -266,9 +266,9 @@
       {% if expense %}Uložit změny{% else %}Přidat náklad{% endif %}
     </button>
     {% if expense %}
-    <a href="/naklady/{{ expense.id }}" class="btn btn-ghost">Zrušit</a>
+    <a href="/naklady/{{ expense.id }}" class="btn btn-ghost" data-testid="expense-cancel-btn">Zrušit</a>
     {% else %}
-    <a href="/naklady" class="btn btn-ghost">Zrušit</a>
+    <a href="/naklady" class="btn btn-ghost" data-testid="expense-cancel-btn">Zrušit</a>
     {% endif %}
   </div>
 </form>

@@ -13,25 +13,25 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <h1>{{ invoice.number }}</h1>
-    <span class="badge badge-{{ invoice.status | lower | replace('á','a') | replace('í','i') | replace('ó','o') }} badge-lg">
+    <h1 data-testid="invoice-number-value">{{ invoice.number }}</h1>
+    <span class="badge badge-{{ invoice.status | lower | replace('á','a') | replace('í','i') | replace('ó','o') }} badge-lg" data-testid="invoice-status-value">
       {{ invoice.status }}
     </span>
     {% if invoice.status == 'Vystavena' and invoice.due_date < today %}
-    <span class="badge badge-po-splatnosti badge-lg">Po splatnosti</span>
+    <span class="badge badge-po-splatnosti badge-lg" data-testid="invoice-overdue-value">Po splatnosti</span>
     {% endif %}
   </div>
   <div class="header-actions">
     {% if invoice.status != 'Stornována' %}
-    <a href="/faktury/{{ invoice.id }}/upravit" class="btn btn-secondary">Upravit</a>
+    <a href="/faktury/{{ invoice.id }}/upravit" class="btn btn-secondary" data-testid="invoice-edit-btn">Upravit</a>
     {% endif %}
     <a href="/faktury/{{ invoice.id }}/pdf" class="btn btn-primary" data-testid="invoice-download-pdf">Stáhnout PDF</a>
     {% if invoice.status == 'Uhrazena' %}
     <form method="post" action="/faktury/{{ invoice.id }}/neuhrazena" class="inline-form">
-      <button type="submit" class="btn btn-warning">Zrušit uhrazení</button>
+      <button type="submit" class="btn btn-warning" data-testid="invoice-cancel-paid-btn">Zrušit uhrazení</button>
     </form>
     {% endif %}
-    <a href="/faktury" class="btn btn-ghost">Zpět</a>
+    <a href="/faktury" class="btn btn-ghost" data-testid="invoice-back-btn">Zpět</a>
   </div>
 </div>
 
@@ -40,14 +40,14 @@
   <div class="detail-card">
     <h3>Odběratel</h3>
     <div class="detail-contact">
-      <strong>{{ invoice.contact_name or '—' }}</strong>
+      <strong data-testid="invoice-contact-name-value">{{ invoice.contact_name or '—' }}</strong>
       {% if invoice.contact_street or invoice.contact_city %}
-      <div>{{ invoice.contact_street or '' }}</div>
-      <div>{{ invoice.contact_zip or '' }} {{ invoice.contact_city or '' }}</div>
+      <div data-testid="invoice-contact-street-value">{{ invoice.contact_street or '' }}</div>
+      <div data-testid="invoice-contact-city-value">{{ invoice.contact_zip or '' }} {{ invoice.contact_city or '' }}</div>
       {% endif %}
-      {% if invoice.contact_ico %}<div>IČO: {{ invoice.contact_ico }}</div>{% endif %}
-      {% if invoice.contact_dic %}<div>DIČ: {{ invoice.contact_dic }}</div>{% endif %}
-      {% if invoice.contact_email %}<div>{{ invoice.contact_email }}</div>{% endif %}
+      {% if invoice.contact_ico %}<div data-testid="invoice-contact-ico-value">IČO: {{ invoice.contact_ico }}</div>{% endif %}
+      {% if invoice.contact_dic %}<div data-testid="invoice-contact-dic-value">DIČ: {{ invoice.contact_dic }}</div>{% endif %}
+      {% if invoice.contact_email %}<div data-testid="invoice-contact-email-value">{{ invoice.contact_email }}</div>{% endif %}
     </div>
   </div>
 
@@ -55,13 +55,13 @@
   <div class="detail-card">
     <h3>Platební informace</h3>
     <table class="detail-table">
-      <tr><th>Způsob úhrady</th><td>{{ invoice.payment_method }}</td></tr>
-      <tr><th>Variabilní symbol</th><td><strong>{{ invoice.variable_symbol }}</strong></td></tr>
-      <tr><th>Datum vystavení</th><td>{{ invoice.issue_date | date_cs }}</td></tr>
-      <tr><th>Datum splatnosti</th><td class="{% if invoice.status == 'Vystavena' and invoice.due_date < today %}text-danger{% endif %}">
+      <tr><th>Způsob úhrady</th><td data-testid="invoice-payment-method-value">{{ invoice.payment_method }}</td></tr>
+      <tr><th>Variabilní symbol</th><td data-testid="invoice-variable-symbol-value"><strong>{{ invoice.variable_symbol }}</strong></td></tr>
+      <tr><th>Datum vystavení</th><td data-testid="invoice-issue-date-value">{{ invoice.issue_date | date_cs }}</td></tr>
+      <tr><th>Datum splatnosti</th><td data-testid="invoice-due-date-value" class="{% if invoice.status == 'Vystavena' and invoice.due_date < today %}text-danger{% endif %}">
         {{ invoice.due_date | date_cs }}</td></tr>
-      <tr><th>DUZP</th><td>{{ invoice.duzp | date_cs }}</td></tr>
-      {% if invoice.paid_date %}<tr><th>Uhrazeno</th><td>{{ invoice.paid_date | date_cs }}</td></tr>{% endif %}
+      <tr><th>DUZP</th><td data-testid="invoice-duzp-value">{{ invoice.duzp | date_cs }}</td></tr>
+      {% if invoice.paid_date %}<tr><th>Uhrazeno</th><td data-testid="invoice-paid-date-value">{{ invoice.paid_date | date_cs }}</td></tr>{% endif %}
     </table>
   </div>
 </div>
@@ -87,7 +87,7 @@
     </thead>
     <tbody>
       {% for item in invoice.items %}
-      <tr>
+      <tr data-testid="invoice-item-row-{{ loop.index }}">
         <td>{{ item.description }}</td>
         <td class="text-right">{{ item.quantity | num(2) }}</td>
         <td class="text-right">{{ item.unit_price | czk }}</td>
@@ -131,14 +131,14 @@
     </div>
     <div class="grand-total">
       <span>Celkem k úhradě:</span>
-      <span class="grand-total-value">{{ invoice.total | czk }}</span>
+      <span class="grand-total-value" data-testid="invoice-total-value">{{ invoice.total | czk }}</span>
     </div>
   </div>
   {% else %}
   <div class="vat-summary">
     <div class="grand-total">
       <span>Celkem k úhradě:</span>
-      <span class="grand-total-value">{{ invoice.subtotal | czk }}</span>
+      <span class="grand-total-value" data-testid="invoice-total-value">{{ invoice.subtotal | czk }}</span>
     </div>
   </div>
   {% endif %}
@@ -147,14 +147,14 @@
 {% if invoice.invoice_text %}
 <div class="detail-card mt-4">
   <h3>Text faktury</h3>
-  <p>{{ invoice.invoice_text }}</p>
+  <p data-testid="invoice-text-value">{{ invoice.invoice_text }}</p>
 </div>
 {% endif %}
 
 {% if invoice.internal_note %}
 <div class="detail-card detail-card--note mt-4">
   <h3>Interní poznámka</h3>
-  <p>{{ invoice.internal_note }}</p>
+  <p data-testid="invoice-internal-note-value">{{ invoice.internal_note }}</p>
 </div>
 {% endif %}
 
@@ -163,14 +163,14 @@
 <div class="detail-card mt-4">
   <h3>Akce</h3>
   <div class="akce-wrapper">
-    <input type="date" name="paid_date" form="form-uhradit" value="{{ today.isoformat() }}" class="form-control form-control-sm akce-datum">
+    <input type="date" name="paid_date" form="form-uhradit" value="{{ today.isoformat() }}" class="form-control form-control-sm akce-datum" data-testid="invoice-paid-date-field">
     <div class="akce-tlacitka">
       <form method="post" action="/faktury/{{ invoice.id }}/uhradit" id="form-uhradit">
-        <button type="submit" class="btn btn-success">Označit jako uhrazenou</button>
+        <button type="submit" class="btn btn-success" data-testid="invoice-mark-paid-btn">Označit jako uhrazenou</button>
       </form>
       <form method="post" action="/faktury/{{ invoice.id }}/stornovat"
             onsubmit="return confirm('Opravdu stornovat fakturu {{ invoice.number }}?')">
-        <button type="submit" class="btn btn-danger">Stornovat</button>
+        <button type="submit" class="btn btn-danger" data-testid="invoice-storno-btn">Stornovat</button>
       </form>
     </div>
   </div>
@@ -178,10 +178,10 @@
 {% endif %}
 
 <div class="detail-actions-bottom mt-4">
-  <a href="/faktury" class="btn btn-ghost">Zpět</a>
+  <a href="/faktury" class="btn btn-ghost" data-testid="invoice-back-bottom-btn">Zpět</a>
   <form method="post" action="/faktury/{{ invoice.id }}/smazat"
         onsubmit="return confirm('Opravdu smazat fakturu {{ invoice.number }}? Tato akce je nevratná.')">
-    <button type="submit" class="btn btn-danger">Smazat fakturu</button>
+    <button type="submit" class="btn btn-danger" data-testid="invoice-delete-btn">Smazat fakturu</button>
   </form>
 </div>
 {% endblock %}

@@ -22,7 +22,7 @@
 
 <form method="post"
       action="{% if tpl %}/sablony/{{ tpl.id }}/upravit{% else %}/sablony/nova{% endif %}"
-      class="form-card">
+      class="form-card" data-testid="template-form">
 
   <!-- Název -->
   <div class="form-section">
@@ -32,7 +32,7 @@
         <label for="name">Název *</label>
         <input type="text" id="name" name="name"
                value="{{ tpl.name if tpl else '' }}"
-               class="form-control" required>
+               class="form-control" required data-testid="template-name-field">
       </div>
     </div>
   </div>
@@ -43,10 +43,10 @@
     <div class="form-row">
       <div class="form-group">
         <label for="contact_id">Vybrat z adresáře</label>
-        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)">
-          <option value="">— Bez odběratele —</option>
+        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="template-contact-select">
+          <option value="" data-value="">— Bez odběratele —</option>
           {% for c in contacts %}
-          <option value="{{ c.id }}"
+          <option value="{{ c.id }}" data-value="{{ c.id }}"
                   data-name="{{ c.name }}"
                   data-ico="{{ c.ico or '' }}"
                   data-dic="{{ c.dic or '' }}"
@@ -75,19 +75,19 @@
         <label for="contact_name">Název</label>
         <input type="text" id="contact_name" name="contact_name"
                value="{{ tpl.contact_name if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-name-field">
       </div>
       <div class="form-group">
         <label for="contact_ico">IČO</label>
         <input type="text" id="contact_ico" name="contact_ico"
                value="{{ tpl.contact_ico if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-ico-field">
       </div>
       <div class="form-group">
         <label for="contact_dic">DIČ</label>
         <input type="text" id="contact_dic" name="contact_dic"
                value="{{ tpl.contact_dic if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-dic-field">
       </div>
     </div>
     <div class="form-row">
@@ -95,19 +95,19 @@
         <label for="contact_street">Ulice a číslo</label>
         <input type="text" id="contact_street" name="contact_street"
                value="{{ tpl.contact_street if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-street-field">
       </div>
       <div class="form-group">
         <label for="contact_zip">PSČ</label>
         <input type="text" id="contact_zip" name="contact_zip"
                value="{{ tpl.contact_zip if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-zip-field">
       </div>
       <div class="form-group form-group-lg">
         <label for="contact_city">Město</label>
         <input type="text" id="contact_city" name="contact_city"
                value="{{ tpl.contact_city if tpl else '' }}"
-               class="form-control">
+               class="form-control" data-testid="template-contact-city-field">
       </div>
     </div>
     </div>
@@ -119,17 +119,17 @@
     <div class="form-row">
       <div class="form-group">
         <label for="payment_method">Způsob úhrady</label>
-        <select id="payment_method" name="payment_method" class="form-control">
+        <select id="payment_method" name="payment_method" class="form-control" data-testid="template-payment-method-select">
           {% set pm = tpl.payment_method if tpl and tpl.payment_method else 'Bankovní převod' %}
-          <option {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
-          <option {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
+          <option data-value="Bankovní převod" {% if pm == 'Bankovní převod' %}selected{% endif %}>Bankovní převod</option>
+          <option data-value="Hotovost" {% if pm == 'Hotovost' %}selected{% endif %}>Hotovost</option>
         </select>
       </div>
       <div class="form-group">
         <label for="due_days">Splatnost (dní)</label>
         <input type="number" id="due_days" name="due_days" min="1" step="1"
                value="{{ tpl.due_days if tpl and tpl.due_days else 10 }}"
-               class="form-control w-24">
+               class="form-control w-24" data-testid="template-due-days-field">
       </div>
     </div>
   </div>
@@ -141,9 +141,9 @@
     <div class="form-row">
       <div class="form-group">
         <label for="price_mode">Výpočet DPH</label>
-        <select id="price_mode" class="form-control" onchange="recalcAllRows()">
-          <option value="bez" selected>Cenu uvádím bez DPH (základ daně)</option>
-          <option value="s_dph">Cenu uvádím s DPH (koncová cena)</option>
+        <select id="price_mode" class="form-control" onchange="recalcAllRows()" data-testid="template-price-mode-select">
+          <option value="bez" data-value="bez" selected>Cenu uvádím bez DPH (základ daně)</option>
+          <option value="s_dph" data-value="s_dph">Cenu uvádím s DPH (koncová cena)</option>
         </select>
       </div>
     </div>
@@ -173,9 +173,9 @@
             {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
-                <option value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
-                <option value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
+                <option value="21" data-value="21" {% if item.vat_rate == 21 %}selected{% endif %}>21 %</option>
+                <option value="12" data-value="12" {% if item.vat_rate == 12 %}selected{% endif %}>12 %</option>
+                <option value="0" data-value="0" {% if item.vat_rate == 0 %}selected{% endif %}>0 %</option>
               </select>
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
@@ -195,9 +195,9 @@
             {% if profile.vat_payer %}
             <td data-label="DPH">
               <select name="vat_rate" class="form-control w-20" onchange="recalcRow(this)">
-                <option value="21" selected>21 %</option>
-                <option value="12">12 %</option>
-                <option value="0">0 %</option>
+                <option value="21" data-value="21" selected>21 %</option>
+                <option value="12" data-value="12">12 %</option>
+                <option value="0" data-value="0">0 %</option>
               </select>
             </td>
             <td data-label="Bez DPH" class="text-right row-subtotal">—</td>
@@ -213,15 +213,15 @@
     </table>
     </div>
     <div class="items-actions">
-      <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Přidat položku</button>
+      <button type="button" class="btn btn-secondary" onclick="addItemRow()" data-testid="template-add-item-btn">+ Přidat položku</button>
     </div>
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary btn-lg">
+    <button type="submit" class="btn btn-primary btn-lg" data-testid="template-submit-btn">
       {% if tpl %}Uložit změny{% else %}Vytvořit šablonu{% endif %}
     </button>
-    <a href="/sablony" class="btn btn-ghost">Zrušit</a>
+    <a href="/sablony" class="btn btn-ghost" data-testid="template-cancel-btn">Zrušit</a>
   </div>
 </form>
 {% endblock %}

@@ -11,25 +11,25 @@
 {% block content %}
 <div class="page-header">
   <h1>Vydané faktury</h1>
-  {% if total_count %}<a href="/faktury/nova" class="btn btn-primary">+ Nová faktura</a>{% endif %}
+  {% if total_count %}<a href="/faktury/nova" class="btn btn-primary" data-testid="invoice-create-btn">+ Nová faktura</a>{% endif %}
 </div>
 
 {% if total_count %}
 <!-- Filtry -->
 <div class="filter-bar">
-  <form method="get" action="/faktury" class="filter-form">
-    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm">
-    <select name="status" class="form-control form-control-sm">
-      <option value="" {% if not status_filter %}selected{% endif %}>Všechny stavy</option>
-      <option value="Vystavena" {% if status_filter == 'Vystavena' %}selected{% endif %}>Vystavena</option>
-      <option value="Uhrazena" {% if status_filter == 'Uhrazena' %}selected{% endif %}>Uhrazena</option>
-      <option value="Stornována" {% if status_filter == 'Stornována' %}selected{% endif %}>Stornována</option>
+  <form method="get" action="/faktury" class="filter-form" data-testid="invoice-filter-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="Hledat…" class="form-control form-control-sm" data-testid="invoice-filter-field">
+    <select name="status" class="form-control form-control-sm" data-testid="invoice-filter-status-select">
+      <option value="" data-value="" {% if not status_filter %}selected{% endif %}>Všechny stavy</option>
+      <option value="Vystavena" data-value="Vystavena" {% if status_filter == 'Vystavena' %}selected{% endif %}>Vystavena</option>
+      <option value="Uhrazena" data-value="Uhrazena" {% if status_filter == 'Uhrazena' %}selected{% endif %}>Uhrazena</option>
+      <option value="Stornována" data-value="Stornována" {% if status_filter == 'Stornována' %}selected{% endif %}>Stornována</option>
     </select>
-    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm form-control-date" title="Datum od">
-    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm form-control-date" title="Datum do">
-    <button type="submit" class="btn btn-secondary btn-sm">Filtrovat</button>
+    <input type="date" name="od" value="{{ od }}" class="form-control form-control-sm form-control-date" title="Datum od" data-testid="invoice-filter-from-date-field">
+    <input type="date" name="do" value="{{ do }}" class="form-control form-control-sm form-control-date" title="Datum do" data-testid="invoice-filter-to-date-field">
+    <button type="submit" class="btn btn-secondary btn-sm" data-testid="invoice-filter-btn">Filtrovat</button>
     {% if q or status_filter or od or do %}
-    <a href="/faktury" class="btn btn-danger btn-sm">Zrušit filtr</a>
+    <a href="/faktury" class="btn btn-danger btn-sm" data-testid="invoice-filter-clear-btn">Zrušit filtr</a>
     {% endif %}
   </form>
 </div>
@@ -41,9 +41,9 @@
   <div class="bulk-bar-inner">
     <span class="bulk-count"><strong id="bulk-count">0</strong> vybráno z {{ invoices | length }}</span>
     <div class="bulk-actions">
-      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/faktury/hromadne/uhradit" data-bulk-confirm="Označit vybrané faktury jako uhrazené?">Označit uhrazeno</button>
-      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/faktury/hromadne/csv">Exportovat CSV</button>
-      <button type="button" class="btn btn-sm btn-danger" data-bulk-action="/faktury/hromadne/smazat" data-bulk-confirm="Smazat vybrané faktury? Tato akce je nevratná.">Smazat</button>
+      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/faktury/hromadne/uhradit" data-bulk-confirm="Označit vybrané faktury jako uhrazené?" data-testid="invoice-bulk-mark-paid-btn">Označit uhrazeno</button>
+      <button type="button" class="btn btn-sm btn-secondary" data-bulk-action="/faktury/hromadne/csv" data-testid="invoice-bulk-csv-btn">Exportovat CSV</button>
+      <button type="button" class="btn btn-sm btn-danger" data-bulk-action="/faktury/hromadne/smazat" data-bulk-confirm="Smazat vybrané faktury? Tato akce je nevratná." data-testid="invoice-bulk-delete-btn">Smazat</button>
     </div>
   </div>
 </div>
@@ -52,7 +52,7 @@
 <table class="table table-hover" id="bulk-table" data-testid="invoice-list">
   <thead>
     <tr>
-      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše"></th>
+      <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše" data-testid="invoice-select-all-field"></th>
       <th>Číslo</th>
       <th>Odběratel</th>
       <th class="mobile-hide">Vystavení</th>
@@ -87,11 +87,11 @@
         </span>
       </td>
       <td class="actions mobile-hide">
-        <a href="/faktury/{{ inv.id }}" class="btn btn-sm btn-ghost">Detail</a>
-        <a href="/faktury/{{ inv.id }}/pdf" class="btn btn-sm btn-ghost">PDF</a>
+        <a href="/faktury/{{ inv.id }}" class="btn btn-sm btn-ghost" data-testid="invoice-detail-btn-{{ inv.id }}">Detail</a>
+        <a href="/faktury/{{ inv.id }}/pdf" class="btn btn-sm btn-ghost" data-testid="invoice-pdf-btn-{{ inv.id }}">PDF</a>
         <form method="post" action="/faktury/{{ inv.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat fakturu {{ inv.number }}?')">
-          <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Smazat">
+          <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Smazat" data-testid="invoice-delete-btn-{{ inv.id }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
         </form>

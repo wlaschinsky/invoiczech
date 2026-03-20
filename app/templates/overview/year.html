@@ -12,11 +12,11 @@
 <div class="page-header">
   <h1>Roční přehled {{ year }}</h1>
   <div class="header-actions">
-    <a href="/prehled/rok/pdf?rok={{ year }}" class="btn btn-primary">
+    <a href="/prehled/rok/pdf?rok={{ year }}" class="btn btn-primary" data-testid="year-download-pdf-btn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       PDF
     </a>
-    <a href="/prehled/rok/csv?rok={{ year }}" class="btn btn-secondary">
+    <a href="/prehled/rok/csv?rok={{ year }}" class="btn btn-secondary" data-testid="year-download-csv-btn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       CSV
     </a>
@@ -25,9 +25,9 @@
 
 <div class="filter-bar">
   <form method="get" action="/prehled/rok" class="filter-form">
-    <select name="rok" class="form-control form-control-sm" onchange="this.form.submit()">
+    <select name="rok" class="form-control form-control-sm" onchange="this.form.submit()" data-testid="year-select">
       {% for y in available_years %}
-      <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+      <option value="{{ y }}" data-value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
       {% endfor %}
     </select>
   </form>
@@ -38,25 +38,25 @@
 <div class="stats-row stats-row--3 mb-4">
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ year }}</div>
-    <div class="stat-value stat-value--income">{{ income_total | czk }}</div>
-    <div class="stat-sub">bez DPH: {{ income_base | czk }}</div>
+    <div class="stat-value stat-value--income" data-testid="year-income-total-value">{{ income_total | czk }}</div>
+    <div class="stat-sub" data-testid="year-income-base-value">bez DPH: {{ income_base | czk }}</div>
   </div>
   <div class="stat-card stat-card--expense">
     <div class="stat-label">Náklady {{ year }}</div>
-    <div class="stat-value">{{ costs_total | czk }}</div>
-    <div class="stat-sub">bez DPH: {{ costs_base | czk }}</div>
+    <div class="stat-value" data-testid="year-costs-total-value">{{ costs_total | czk }}</div>
+    <div class="stat-sub" data-testid="year-costs-base-value">bez DPH: {{ costs_base | czk }}</div>
   </div>
   <div class="stat-card stat-card--info">
     <div class="stat-label">Vlastní daňová povinnost</div>
-    <div class="stat-value">{{ vat_liability | czk }}</div>
-    <div class="stat-sub">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
+    <div class="stat-value" data-testid="year-vat-liability-value">{{ vat_liability | czk }}</div>
+    <div class="stat-sub" data-testid="year-vat-detail-value">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
   </div>
 </div>
 {% else %}
 <div class="stats-row stats-row--1 mb-4">
   <div class="stat-card stat-card--income">
     <div class="stat-label">Příjmy {{ year }}</div>
-    <div class="stat-value stat-value--income">{{ income_base | czk }}</div>
+    <div class="stat-value stat-value--income" data-testid="year-income-total-value">{{ income_base | czk }}</div>
   </div>
 </div>
 {% endif %}
@@ -84,7 +84,7 @@
     </thead>
     <tbody>
       {% for m in months %}
-      <tr>
+      <tr data-testid="year-month-row-{{ loop.index }}">
         <td>{{ m.name | capitalize }}</td>
         {% if profile.vat_payer %}
         <td class="text-right">{{ m.income_base | czk }}</td>

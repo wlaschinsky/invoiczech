@@ -30,24 +30,24 @@
       Obsahuje vydané faktury B2B (základ &gt; 10 000 Kč) v sekci A4
       a souhrnný řádek daňově uznatelných nákladů v sekci B3.
     </p>
-    <form method="post" action="/exporty/kh1" class="export-form">
+    <form method="post" action="/exporty/kh1" class="export-form" data-testid="export-kh1-form">
       <div class="form-row">
         <div class="form-group">
           <label>Rok</label>
-          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24">
+          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24" data-testid="export-kh1-year-field">
         </div>
         <div class="form-group">
           <label>Typ období</label>
-          <select name="period_type" class="form-control" id="kh1-period-type" onchange="togglePeriod('kh1')">
-            <option value="month">Měsíc</option>
-            <option value="quarter">Čtvrtletí</option>
+          <select name="period_type" class="form-control" id="kh1-period-type" onchange="togglePeriod('kh1')" data-testid="export-kh1-period-type-select">
+            <option value="month" data-value="month">Měsíc</option>
+            <option value="quarter" data-value="quarter">Čtvrtletí</option>
           </select>
         </div>
         <div class="form-group" id="kh1-month-group">
           <label>Měsíc</label>
-          <select name="period" class="form-control">
+          <select name="period" class="form-control" data-testid="export-kh1-month-select">
             {% for m in range(1, 13) %}
-            <option value="{{ m }}" {% if m == today.month %}selected{% endif %}>
+            <option value="{{ m }}" data-value="{{ m }}" {% if m == today.month %}selected{% endif %}>
               {{ ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][m-1] }}
             </option>
             {% endfor %}
@@ -55,19 +55,19 @@
         </div>
         <div class="form-group hidden" id="kh1-quarter-group">
           <label>Čtvrtletí</label>
-          <select name="period" class="form-control">
-            <option value="1">Q1 (leden–březen)</option>
-            <option value="2">Q2 (duben–červen)</option>
-            <option value="3">Q3 (červenec–září)</option>
-            <option value="4">Q4 (říjen–prosinec)</option>
+          <select name="period" class="form-control" data-testid="export-kh1-quarter-select">
+            <option value="1" data-value="1">Q1 (leden–březen)</option>
+            <option value="2" data-value="2">Q2 (duben–červen)</option>
+            <option value="3" data-value="3">Q3 (červenec–září)</option>
+            <option value="4" data-value="4">Q4 (říjen–prosinec)</option>
           </select>
         </div>
         <div class="form-group">
           <label>Datum podání</label>
-          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
+          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control" data-testid="export-kh1-submission-date-field">
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Stáhnout KH1 XML</button>
+      <button type="submit" class="btn btn-primary" data-testid="export-kh1-submit-btn">Stáhnout KH1 XML</button>
     </form>
   </div>
 
@@ -81,24 +81,24 @@
       Přiznání k dani z přidané hodnoty. Obsahuje výstupy (vydané faktury),
       vstupy (uznatelné náklady) a výslednou daňovou povinnost nebo přeplatek.
     </p>
-    <form method="post" action="/exporty/dp3" class="export-form">
+    <form method="post" action="/exporty/dp3" class="export-form" data-testid="export-dp3-form">
       <div class="form-row">
         <div class="form-group">
           <label>Rok</label>
-          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24">
+          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24" data-testid="export-dp3-year-field">
         </div>
         <div class="form-group">
           <label>Typ období</label>
-          <select name="period_type" class="form-control" id="dp3-period-type" onchange="togglePeriod('dp3')">
-            <option value="month">Měsíc</option>
-            <option value="quarter">Čtvrtletí</option>
+          <select name="period_type" class="form-control" id="dp3-period-type" onchange="togglePeriod('dp3')" data-testid="export-dp3-period-type-select">
+            <option value="month" data-value="month">Měsíc</option>
+            <option value="quarter" data-value="quarter">Čtvrtletí</option>
           </select>
         </div>
         <div class="form-group" id="dp3-month-group">
           <label>Měsíc</label>
-          <select name="period" class="form-control">
+          <select name="period" class="form-control" data-testid="export-dp3-month-select">
             {% for m in range(1, 13) %}
-            <option value="{{ m }}" {% if m == today.month %}selected{% endif %}>
+            <option value="{{ m }}" data-value="{{ m }}" {% if m == today.month %}selected{% endif %}>
               {{ ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][m-1] }}
             </option>
             {% endfor %}
@@ -106,19 +106,19 @@
         </div>
         <div class="form-group hidden" id="dp3-quarter-group">
           <label>Čtvrtletí</label>
-          <select name="period" class="form-control">
-            <option value="1">Q1 (leden–březen)</option>
-            <option value="2">Q2 (duben–červen)</option>
-            <option value="3">Q3 (červenec–září)</option>
-            <option value="4">Q4 (říjen–prosinec)</option>
+          <select name="period" class="form-control" data-testid="export-dp3-quarter-select">
+            <option value="1" data-value="1">Q1 (leden–březen)</option>
+            <option value="2" data-value="2">Q2 (duben–červen)</option>
+            <option value="3" data-value="3">Q3 (červenec–září)</option>
+            <option value="4" data-value="4">Q4 (říjen–prosinec)</option>
           </select>
         </div>
         <div class="form-group">
           <label>Datum podání</label>
-          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control">
+          <input type="date" name="submission_date" value="{{ today.isoformat() }}" class="form-control" data-testid="export-dp3-submission-date-field">
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Stáhnout DP3 XML</button>
+      <button type="submit" class="btn btn-primary" data-testid="export-dp3-submit-btn">Stáhnout DP3 XML</button>
     </form>
   </div>
 

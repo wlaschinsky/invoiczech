@@ -784,6 +784,7 @@ td.actions {
   color: var(--color-text-primary);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
 }
 .form-row {
   display: flex;
@@ -1290,7 +1291,7 @@ input[type=date].form-control.dp-native {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);

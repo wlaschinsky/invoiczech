@@ -2011,6 +2011,11 @@ a.attachment-filename:hover {
   .vat-table-wrap { min-width: 0; width: 100%; }
   .grand-total { text-align: center; }
 
+  /* Form sections: reduce padding on mobile */
+  .form-section { padding: 16px; }
+  .form-actions { padding: 16px; flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; justify-content: center; }
+
   /* Prevent iOS zoom on input focus (requires >= 16px) */
   input[type="text"],
   input[type="number"],

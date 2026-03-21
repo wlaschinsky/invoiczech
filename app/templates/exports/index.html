@@ -141,8 +141,18 @@
 <script>
 function togglePeriod(prefix) {
   const type = document.getElementById(`${prefix}-period-type`).value;
-  document.getElementById(`${prefix}-month-group`).classList.toggle('hidden', type !== 'month');
-  document.getElementById(`${prefix}-quarter-group`).classList.toggle('hidden', type === 'month');
+  const isMonth = type === 'month';
+  const monthGroup = document.getElementById(`${prefix}-month-group`);
+  const quarterGroup = document.getElementById(`${prefix}-quarter-group`);
+  monthGroup.classList.toggle('hidden', !isMonth);
+  quarterGroup.classList.toggle('hidden', isMonth);
+  monthGroup.querySelector('select').disabled = !isMonth;
+  quarterGroup.querySelector('select').disabled = isMonth;
 }
+// Nastav správný stav při načtení stránky
+document.addEventListener('DOMContentLoaded', () => {
+  togglePeriod('kh1');
+  togglePeriod('dp3');
+});
 </script>
 {% endblock %}

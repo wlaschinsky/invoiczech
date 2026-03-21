@@ -67,7 +67,6 @@ def _get_profile(db: Session) -> Profile:
 
 def _veta_p(parent: ET.Element, profile: Profile) -> None:
     """Společný element VetaP pro všechny exporty."""
-    fix = _fix_mojibake
     ET.SubElement(
         parent,
         "VetaP",
@@ -76,15 +75,15 @@ def _veta_p(parent: ET.Element, profile: Profile) -> None:
         email=profile.email or "",
         typ_ds="F",
         dic=(profile.dic or "").replace("CZ", ""),
-        ulice=fix(profile.street or ""),
+        ulice=profile.street or "",
         c_pop=profile.house_number or "",
         c_orient=profile.orientation_number or "",
         c_telef=profile.phone or "",
-        naz_obce=fix(profile.city or ""),
+        naz_obce=profile.city or "",
         psc=(profile.zip_code or "").replace(" ", ""),
         stat="Česká republika",
-        jmeno=fix(profile.first_name or ""),
-        prijmeni=fix(profile.last_name or ""),
+        jmeno=profile.first_name or "",
+        prijmeni=profile.last_name or "",
         titul="",
     )
 
@@ -169,17 +168,34 @@ def generate_kh1(
 
     ET.SubElement(dphkh1, "VetaA5")
     ET.SubElement(dphkh1, "VetaB1")
-    ET.SubElement(dphkh1, "VetaB2")
 
-    # VetaB3 — souhrnný řádek daňově uznatelných nákladů
-    b3_base = sum(
-        sum(item.subtotal for item in exp.items if item.vat_rate == 21)
-        for exp in deductible_expenses
-    )
-    b3_vat = sum(
-        sum(item.vat_amount for item in exp.items if item.vat_rate == 21)
-        for exp in deductible_expenses
-    )
+    # VetaB2 — náklady B2B, základ > 10 000 Kč (individuální záznamy)
+    b3_base = Decimal("0")
+    b3_vat = Decimal("0")
+    for exp in deductible_expenses:
+        exp_base = sum(item.subtotal for item in exp.items if item.vat_rate == 21)
+        exp_vat = sum(item.vat_amount for item in exp.items if item.vat_rate == 21)
+        if exp_base > Decimal("10000"):
+            supplier_dic = ""
+            if exp.contact:
+                supplier_dic = (exp.contact.dic or "").replace("CZ", "")
+            c_evid = (exp.supplier_document_number or exp.number or "").strip()
+            ET.SubElement(
+                dphkh1,
+                "VetaB2",
+                c_evid_dd=c_evid,
+                dan1=_fmt_czk(exp_vat),
+                dic_dod=supplier_dic,
+                dppd=(exp.duzp or exp.issue_date).strftime("%Y-%m-%d"),
+                pomer="A",
+                zakl_dane1=_fmt_czk(exp_base),
+                zdph_44="N",
+            )
+        else:
+            b3_base += exp_base
+            b3_vat += exp_vat
+
+    # VetaB3 — souhrnný řádek zbývajících nákladů (základ ≤ 10 000 Kč)
     if b3_base > 0:
         ET.SubElement(
             dphkh1,
@@ -193,7 +209,11 @@ def generate_kh1(
         sum(item.subtotal for item in inv.items if item.vat_rate == 21)
         for inv in invoices
     )
-    odpocet_21 = b3_base
+    # pln23 = všechny náklady (VetaB2 + VetaB3)
+    odpocet_21 = sum(
+        sum(item.subtotal for item in exp.items if item.vat_rate == 21)
+        for exp in deductible_expenses
+    )
 
     ET.SubElement(
         dphkh1,

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pip list:*)",
       "Bash(./venv/bin/python3 -c \":*)",
-      "WebFetch(domain:qr-platba.cz)"
+      "WebFetch(domain:qr-platba.cz)",
+      "Bash(kill 78548 78549 78550)"
     ]
   }
 }

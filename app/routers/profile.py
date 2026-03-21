@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models.profile import Profile
+from ..services.qr_code import compute_czech_iban
 from ..tmpl import templates
 from .utils import flash
 
@@ -57,7 +58,7 @@ async def save_profile(request: Request, db: Session = Depends(get_db)):
     # Sekce 2 — Bankovní spojení
     profile.bank_name = form.get("bank_name", "").strip()
     profile.bank_account = form.get("bank_account", "").strip()
-    profile.iban = form.get("iban", "").strip()
+    profile.iban = compute_czech_iban(profile.bank_account) if profile.bank_account else ""
     profile.currency = form.get("currency", "CZK").strip()
 
     # Sekce 3 — Finanční úřad

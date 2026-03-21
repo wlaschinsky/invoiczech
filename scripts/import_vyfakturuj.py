@@ -308,6 +308,10 @@ def import_expenses(db, rows: list[dict], ico_map: dict, dry_run: bool):
             ico_map, dry_run
         )
 
+        # Výpočet DPH: 1 = cena BEZ DPH, 2 = cena S DPH
+        dph_calc = (row.get("Výpočet DPH") or row.get("Výpoèet DPH") or "2").strip()
+        price_already_without_vat = (dph_calc == "1")
+
         # Parsování položek
         descriptions = split_pipe(row.get("Položky text") or row.get("Poloky text") or "")
         prices_raw = split_pipe(row.get("Položky cena") or row.get("Poloky cena") or "")
@@ -359,8 +363,11 @@ def import_expenses(db, rows: list[dict], ico_map: dict, dry_run: bool):
             except Exception:
                 qty = Decimal("1")
 
-            # Cena je v CSV S DPH → přepočítáme na bez DPH
-            unit_price = price_without_vat(price_with_vat, vat)
+            # Výpočet DPH=1: cena je již BEZ DPH; =2: cena JE S DPH → přepočítat
+            if price_already_without_vat:
+                unit_price = price_with_vat
+            else:
+                unit_price = price_without_vat(price_with_vat, vat)
 
             if not dry_run:
                 item = ExpenseItem(

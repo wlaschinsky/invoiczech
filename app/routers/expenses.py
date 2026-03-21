@@ -83,7 +83,7 @@ async def expenses_list(
 @router.get("/novy", response_class=HTMLResponse)
 async def new_expense_form(request: Request, db: Session = Depends(get_db)):
     contacts = db.query(Contact).filter(
-        Contact.contact_type.in_(["Dodavatel", "Obojí"])
+        Contact.contact_type.in_(["Dodavatel", "Obojí", "Odběratel"])
     ).order_by(Contact.name).all()
     today = date.today()
     next_number = generate_expense_number(db)
@@ -103,7 +103,7 @@ async def new_expense_form(request: Request, db: Session = Depends(get_db)):
 async def create_expense(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     contacts = db.query(Contact).filter(
-        Contact.contact_type.in_(["Dodavatel", "Obojí"])
+        Contact.contact_type.in_(["Dodavatel", "Obojí", "Odběratel"])
     ).order_by(Contact.name).all()
 
     issue_date = parse_date(form.get("issue_date", ""))
@@ -256,7 +256,7 @@ async def edit_expense_form(request: Request, expense_id: int, db: Session = Dep
     if not expense:
         raise HTTPException(status_code=404, detail="Náklad nenalezen")
     contacts = db.query(Contact).filter(
-        Contact.contact_type.in_(["Dodavatel", "Obojí"])
+        Contact.contact_type.in_(["Dodavatel", "Obojí", "Odběratel"])
     ).order_by(Contact.name).all()
     return templates.TemplateResponse(
         "expenses/form.html",
@@ -278,7 +278,7 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
 
     form = await request.form()
     contacts = db.query(Contact).filter(
-        Contact.contact_type.in_(["Dodavatel", "Obojí"])
+        Contact.contact_type.in_(["Dodavatel", "Obojí", "Odběratel"])
     ).order_by(Contact.name).all()
 
     issue_date = parse_date(form.get("issue_date", ""))

@@ -379,6 +379,21 @@ function fillContactFromSelect(sel) {
   if (zipEl) zipEl.value = opt.dataset.zip || '';
 }
 
+function syncTitleFromFirstItem(descInput) {
+  const titleEl = document.getElementById('title');
+  if (!titleEl || titleEl.dataset.userEdited) return;
+  const firstDesc = document.querySelector('#items-tbody [name=description]');
+  if (descInput === firstDesc) titleEl.value = descInput.value;
+}
+
+document.getElementById('title').addEventListener('input', function() {
+  this.dataset.userEdited = '1';
+});
+
+document.getElementById('items-tbody').addEventListener('input', function(e) {
+  if (e.target.name === 'description') syncTitleFromFirstItem(e.target);
+});
+
 document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
 document.addEventListener('DOMContentLoaded', recalcTotals);
 

@@ -354,6 +354,31 @@ function removeRow(btn) {
 }
 
 
+function fillContactFromSelect(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  const contactFields = document.getElementById('contact-fields');
+  const aresGroup = document.getElementById('ares-group');
+  if (!opt.value) {
+    contactFields.style.display = '';
+    aresGroup.style.display = '';
+    return;
+  }
+  // Skryj manuální pole, vyplň z data atributů
+  contactFields.style.display = 'none';
+  aresGroup.style.display = 'none';
+  document.getElementById('contact_name').value = opt.dataset.name || '';
+  const icoEl = document.getElementById('contact_ico');
+  const dicEl = document.getElementById('contact_dic');
+  const streetEl = document.getElementById('contact_street');
+  const cityEl = document.getElementById('contact_city');
+  const zipEl = document.getElementById('contact_zip');
+  if (icoEl) icoEl.value = opt.dataset.ico || '';
+  if (dicEl) dicEl.value = opt.dataset.dic || '';
+  if (streetEl) streetEl.value = opt.dataset.street || '';
+  if (cityEl) cityEl.value = opt.dataset.city || '';
+  if (zipEl) zipEl.value = opt.dataset.zip || '';
+}
+
 document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
 document.addEventListener('DOMContentLoaded', recalcTotals);
 

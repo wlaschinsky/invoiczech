@@ -1743,8 +1743,9 @@ a.attachment-filename:hover {
   align-items: center;
   justify-content: center;
 }
-.login-container { width: 100%; max-width: 400px; padding: 20px; }
+.login-container { width: 100%; max-width: 480px; padding: 20px; flex: 1; display: flex; align-items: center; justify-content: center; }
 .login-card {
+  width: 100%;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -2099,6 +2100,11 @@ a.attachment-filename:hover {
   /* Scroll wrapper not needed for card layout */
   .items-table { overflow: visible; }
   .table-wrap:has(.items-table) { overflow: visible; border: none; }
+  /* Login: vycentrovat kartu na obrazovce */
+  .login-page { justify-content: center; }
+  .login-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .login-card { padding: 28px 24px; }
+  .app-footer--login { margin-top: 0; padding: 12px 16px; }
 }
 
 @media (max-width: 400px) {

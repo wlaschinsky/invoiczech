@@ -30,6 +30,16 @@ def _period_dates(year: int, month: int, quarter: bool) -> tuple[date, date]:
     return date(year, first_month, 1), _next_month_start(year, last_month)
 
 
+def _fix_mojibake(s: str) -> str:
+    """Opraví řetězce poškozené double-encodingem (UTF-8 bajty čtené jako Latin-1)."""
+    if not s:
+        return s
+    try:
+        return s.encode("latin-1").decode("utf-8")
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return s
+
+
 def _round_czk(value) -> int:
     return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
@@ -57,7 +67,7 @@ def _get_profile(db: Session) -> Profile:
 
 def _veta_p(parent: ET.Element, profile: Profile) -> None:
     """Společný element VetaP pro všechny exporty."""
-    street_name = profile.street or ""
+    fix = _fix_mojibake
     ET.SubElement(
         parent,
         "VetaP",
@@ -66,15 +76,15 @@ def _veta_p(parent: ET.Element, profile: Profile) -> None:
         email=profile.email or "",
         typ_ds="F",
         dic=(profile.dic or "").replace("CZ", ""),
-        ulice=street_name,
+        ulice=fix(profile.street or ""),
         c_pop=profile.house_number or "",
         c_orient=profile.orientation_number or "",
         c_telef=profile.phone or "",
-        naz_obce=profile.city or "",
+        naz_obce=fix(profile.city or ""),
         psc=(profile.zip_code or "").replace(" ", ""),
         stat="Česká republika",
-        jmeno=profile.first_name or "",
-        prijmeni=profile.last_name or "",
+        jmeno=fix(profile.first_name or ""),
+        prijmeni=fix(profile.last_name or ""),
         titul="",
     )
 

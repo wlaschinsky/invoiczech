@@ -52,34 +52,40 @@ def generate_payment_qr(
     Vygeneruje QR kód pro českou platbu ve formátu SPD a vrátí base64 PNG.
     Vrátí prázdný řetězec, pokud není k dispozici IBAN.
     """
-    resolved_iban = iban or ""
-    if not resolved_iban and account_number:
+    # Přednost má výpočet z čísla účtu (spolehlivější než ručně zadaný IBAN)
+    resolved_iban = ""
+    if account_number:
         resolved_iban = compute_czech_iban(account_number)
+    if not resolved_iban:
+        resolved_iban = (iban or "").replace(" ", "").strip()
 
     if not resolved_iban:
         return ""
 
+    # SPD 1.0 — Short Payment Descriptor pro české QR platby
+    # Spec: qr-platba.cz — doporučená znaková sada: 0-9, A-Z (uppercase), mezera
+    amt = Decimal(str(amount)).quantize(Decimal("0.01"))
     spd_parts = [
         "SPD",
         "1.0",
         f"ACC:{resolved_iban}",
-        f"AM:{float(amount):.2f}",
+        f"AM:{amt}",
         "CC:CZK",
     ]
     if variable_symbol:
-        spd_parts.append(f"VS:{variable_symbol}")
+        spd_parts.append(f"X-VS:{variable_symbol}")
     if message:
-        spd_parts.append(f"MSG:{message[:35]}")
+        spd_parts.append(f"MSG:{message[:60].upper()}")
 
     spd = "*".join(spd_parts)
 
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=5,
-        border=2,
+        box_size=6,
+        border=4,
     )
-    qr.add_data(spd)
+    qr.add_data(spd, optimize=0)
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")

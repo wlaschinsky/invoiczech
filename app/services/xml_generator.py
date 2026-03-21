@@ -34,6 +34,11 @@ def _round_czk(value) -> int:
     return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
+def _fmt_czk(value) -> str:
+    """Formátuje částku na 2 desetinná místa (bez zaokrouhlení na celé Kč)."""
+    return str(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
 def _prettify(root: ET.Element) -> str:
     raw = ET.tostring(root, encoding="unicode")
     parsed = minidom.parseString(raw.encode("utf-8"))
@@ -88,7 +93,6 @@ def generate_kh1(
         submission_date = date.today()
 
     date_from, date_to = _period_dates(year, period, quarter)
-    mesic = (period - 1) * 3 + 1 if quarter else period
 
     invoices: List[Invoice] = (
         db.query(Invoice)
@@ -114,16 +118,18 @@ def generate_kh1(
     pisemnost = ET.Element("Pisemnost", nazevSW="InvoiCzech", verzeSW="1.0")
     dphkh1 = ET.SubElement(pisemnost, "DPHKH1", verzePis="02.01")
 
-    ET.SubElement(
-        dphkh1,
-        "VetaD",
-        mesic=str(mesic),
+    veta_d_attrs = dict(
         rok=str(year),
         dokument="KH1",
         d_poddp=submission_date.strftime("%Y-%m-%d"),
         k_uladis="DPH",
         khdph_forma="B",
     )
+    if quarter:
+        veta_d_attrs["ctvrt"] = str(period)
+    else:
+        veta_d_attrs["mesic"] = str(period)
+    ET.SubElement(dphkh1, "VetaD", **veta_d_attrs)
     _veta_p(dphkh1, profile)
 
     ET.SubElement(dphkh1, "VetaA1")
@@ -138,14 +144,15 @@ def generate_kh1(
         )
         if base_21 > Decimal("10000"):
             contact_dic = (inv.contact_dic or "").replace("CZ", "")
+            c_evid = (inv.variable_symbol or inv.number or "").strip()
             ET.SubElement(
                 dphkh1,
                 "VetaA4",
-                c_evid_dd=inv.number,
-                dan1=str(_round_czk(vat_21)),
+                c_evid_dd=c_evid,
+                dan1=_fmt_czk(vat_21),
                 dic_odb=contact_dic,
                 dppd=(inv.duzp or inv.issue_date).strftime("%Y-%m-%d"),
-                zakl_dane1=str(_round_czk(base_21)),
+                zakl_dane1=_fmt_czk(base_21),
                 kod_rezim_pl="0",
                 zdph_44="N",
             )
@@ -167,8 +174,8 @@ def generate_kh1(
         ET.SubElement(
             dphkh1,
             "VetaB3",
-            dan1=str(_round_czk(b3_vat)),
-            zakl_dane1=str(_round_czk(b3_base)),
+            dan1=_fmt_czk(b3_vat),
+            zakl_dane1=_fmt_czk(b3_base),
         )
 
     # VetaC — celkové obraty
@@ -183,7 +190,7 @@ def generate_kh1(
         "VetaC",
         obrat23=str(_round_czk(obrat_21)),
         obrat5="0",
-        pln23=str(_round_czk(odpocet_21)),
+        pln23=_fmt_czk(odpocet_21),
         pln5="0",
     )
 
@@ -204,7 +211,6 @@ def generate_dp3(
         submission_date = date.today()
 
     date_from, date_to = _period_dates(year, period, quarter)
-    mesic = (period - 1) * 3 + 1 if quarter else period
 
     invoices: List[Invoice] = (
         db.query(Invoice)
@@ -255,11 +261,8 @@ def generate_dp3(
     pisemnost = ET.Element("Pisemnost", nazevSW="InvoiCzech", verzeSW="1.0")
     dphdp3 = ET.SubElement(pisemnost, "DPHDP3", verzePis="01.02")
 
-    ET.SubElement(
-        dphdp3,
-        "VetaD",
+    dp3_veta_d_attrs = dict(
         dapdph_forma="B",
-        mesic=str(mesic),
         rok=str(year),
         dokument="DP3",
         d_poddp=submission_date.strftime("%Y-%m-%d"),
@@ -267,6 +270,11 @@ def generate_dp3(
         typ_platce="P",
         c_okec=profile.okec or "",
     )
+    if quarter:
+        dp3_veta_d_attrs["ctvrt"] = str(period)
+    else:
+        dp3_veta_d_attrs["mesic"] = str(period)
+    ET.SubElement(dphdp3, "VetaD", **dp3_veta_d_attrs)
     _veta_p(dphdp3, profile)
 
     ET.SubElement(

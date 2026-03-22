@@ -30,8 +30,8 @@ _MONTHS_CS = [
 
 _BASIS_LABELS = {
     "duzp": "DUZP",
-    "issue_date": "Vystavení",
-    "paid_date": "Úhrada",
+    "issue_date": "Vystaveno",
+    "paid_date": "Uhrazeno",
 }
 
 
@@ -123,8 +123,13 @@ async def yearly_overview(
     year = rok or date.today().year
     data = _compute(db, year, basis)
 
-    inv_years = {i.duzp.year for i in db.query(Invoice).all() if i.duzp}
-    exp_years = {e.issue_date.year for e in db.query(Expense).all() if e.issue_date}
+    all_inv = db.query(Invoice).all()
+    all_exp = db.query(Expense).all()
+    inv_years = {i.duzp.year for i in all_inv if i.duzp} | \
+                {i.issue_date.year for i in all_inv if i.issue_date} | \
+                {i.paid_date.year for i in all_inv if i.paid_date}
+    exp_years = {e.issue_date.year for e in all_exp if e.issue_date} | \
+                {e.paid_date.year for e in all_exp if e.paid_date}
     available_years = sorted(inv_years | exp_years | {year}, reverse=True)
 
     return templates.TemplateResponse(

@@ -52,6 +52,7 @@
                  placeholder="Hledat dodavatele…" autocomplete="off"
                  data-testid="expense-contact-search-field"
                  value="{% if expense and expense.contact_id %}{{ expense.contact_name or '' }}{% endif %}">
+          <span class="combobox-arrow" aria-hidden="true">▾</span>
           <div class="combobox-dropdown" id="contact-dropdown" role="listbox"></div>
         </div>
         <input type="hidden" id="contact_id" name="contact_id"
@@ -271,6 +272,16 @@
 {% block scripts %}
 <style>
 .combobox-wrap { position: relative; }
+.combobox-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.combobox-input { padding-right: 32px !important; }
 .combobox-dropdown {
   display: none;
   position: absolute;

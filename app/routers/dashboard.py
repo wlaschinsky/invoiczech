@@ -95,6 +95,7 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "costs_year_vat": costs_year_vat,
             # DPH
             "vat_output_prev": vat_output_prev,
+            "vat_liability_prev": vat_output_prev - costs_prev_vat,
             # Neuhrazené
             "unpaid_count": len(unpaid),
             "unpaid_total": unpaid_total,

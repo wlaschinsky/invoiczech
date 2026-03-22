@@ -62,7 +62,7 @@
 {# ── Řádek 3: DPH + Neuhrazené ── #}
 {% if profile.vat_payer %}
 <div class="stats-row stats-row--2">
-  <div class="stat-card stat-card--info" data-tooltip="DPH z vydaných faktur s DUZP v {{ prev_month_label }}. Tvoří základ pro přiznání DP3 a kontrolní hlášení KH1.">
+  <div class="stat-card stat-card--info" data-tooltip="Součet DPH ze všech vydaných faktur s DUZP v {{ prev_month_label }}. Základ pro přiznání DP3 a KH1.">
     <div class="stat-label">Daň na výstupu {{ prev_month_label }}</div>
     <div class="stat-value" data-testid="dashboard-vat-output-value">{{ vat_output_prev | czk }}</div>
   </div>

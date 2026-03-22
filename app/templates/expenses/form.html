@@ -52,7 +52,12 @@
                  placeholder="Hledat dodavatele…" autocomplete="off"
                  data-testid="expense-contact-search-field"
                  value="{% if expense and expense.contact_id %}{{ expense.contact_name or '' }}{% endif %}">
-          <span class="combobox-arrow" aria-hidden="true">▾</span>
+          <span class="combobox-clear" id="contact-clear" aria-label="Vymazat" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </span>
+          <span class="combobox-arrow" id="contact-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
           <div class="combobox-dropdown" id="contact-dropdown" role="listbox"></div>
         </div>
         <input type="hidden" id="contact_id" name="contact_id"
@@ -277,11 +282,30 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.65rem;
   opacity: 0.5;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  transition: transform 0.15s;
 }
-.combobox-input { padding-right: 32px !important; }
+.combobox-wrap.open .combobox-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+.combobox-clear {
+  position: absolute;
+  right: 34px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: opacity 0.15s;
+}
+.combobox-clear:hover { opacity: 1; }
+.combobox-input { padding-right: 56px !important; }
 .combobox-dropdown {
   display: none;
   position: absolute;
@@ -429,8 +453,22 @@ function fillContact(contact) {
   const input = document.getElementById('contact_search');
   const dropdown = document.getElementById('contact-dropdown');
   const hiddenInput = document.getElementById('contact_id');
+  const wrap = document.getElementById('contact-combobox');
+  const clearBtn = document.getElementById('contact-clear');
   let activeIdx = -1;
   let filtered = [];
+
+  function openDropdown() {
+    wrap.classList.add('open');
+  }
+  function closeDropdown() {
+    dropdown.style.display = 'none';
+    wrap.classList.remove('open');
+  }
+
+  function updateClear() {
+    clearBtn.style.display = hiddenInput.value ? '' : 'none';
+  }
 
   function renderDropdown(query) {
     const q = query.trim().toLowerCase();
@@ -439,11 +477,8 @@ function fillContact(contact) {
     );
     dropdown.innerHTML = '';
     activeIdx = -1;
-    if (!filtered.length) {
-      dropdown.style.display = 'none';
-      return;
-    }
-    filtered.forEach((c, i) => {
+    if (!filtered.length) { closeDropdown(); return; }
+    filtered.forEach((c) => {
       const div = document.createElement('div');
       div.className = 'combobox-option';
       div.setAttribute('role', 'option');
@@ -455,12 +490,20 @@ function fillContact(contact) {
       dropdown.appendChild(div);
     });
     dropdown.style.display = 'block';
+    openDropdown();
   }
 
   function selectContact(c) {
     input.value = c.id ? c.name : '';
-    dropdown.style.display = 'none';
+    closeDropdown();
     fillContact(c);
+    updateClear();
+  }
+
+  function clearContact() {
+    selectContact(CONTACTS_DATA[0]);
+    input.value = '';
+    input.focus();
   }
 
   function setActive(idx) {
@@ -474,12 +517,12 @@ function fillContact(contact) {
   }
 
   input.addEventListener('input', function() {
-    renderDropdown(this.value);
-    // Pokud byl kontakt vybrán a user začne znovu psát, reset hidden
     if (hiddenInput.value) {
       hiddenInput.value = '';
       fillContact(CONTACTS_DATA[0]);
+      updateClear();
     }
+    renderDropdown(this.value);
   });
 
   input.addEventListener('focus', function() {
@@ -487,8 +530,7 @@ function fillContact(contact) {
   });
 
   input.addEventListener('blur', function() {
-    setTimeout(() => { dropdown.style.display = 'none'; }, 150);
-    // Pokud je vybrán kontakt, zobraz jeho jméno; jinak nech prázdné
+    setTimeout(() => { closeDropdown(); }, 150);
     if (!hiddenInput.value) input.value = '';
   });
 
@@ -500,15 +542,21 @@ function fillContact(contact) {
       e.preventDefault();
       if (activeIdx >= 0 && filtered[activeIdx]) selectContact(filtered[activeIdx]);
     } else if (e.key === 'Escape') {
-      dropdown.style.display = 'none';
+      closeDropdown();
     }
   });
 
-  // Pokud editujeme a contact_id je vyplněn, ponech text v inputu
+  clearBtn.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    clearContact();
+  });
+
+  // Init — editace existujícího záznamu
   if (hiddenInput.value) {
     const existing = CONTACTS_DATA.find(c => c.id == hiddenInput.value);
     if (existing) input.value = existing.name;
   }
+  updateClear();
 })();
 
 function syncTitleFromFirstItem(descInput) {

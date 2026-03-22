@@ -17,8 +17,8 @@ async def exports_page(request: Request, db: Session = Depends(get_db)):
     from ..models.invoice import Invoice
     from ..models.expense import Expense
     today = date.today()
-    inv_years = {r.year for r in db.query(Invoice.issue_date).all() if r.issue_date}
-    exp_years = {r.year for r in db.query(Expense.issue_date).all() if r.issue_date}
+    inv_years = {r[0].year for r in db.query(Invoice.issue_date).all() if r[0]}
+    exp_years = {r[0].year for r in db.query(Expense.issue_date).all() if r[0]}
     years = sorted(inv_years | exp_years, reverse=True)
     return templates.TemplateResponse(
         "exports/index.html",

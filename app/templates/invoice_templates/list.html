@@ -31,7 +31,7 @@
       <td><a href="/sablony/{{ t.id }}" class="link-strong">{{ t.name }}</a></td>
       <td>{{ t.contact.name if t.contact else '—' }}</td>
       <td class="text-right">{{ t.total | czk }}</td>
-      <td class="actions">
+      <td class="actions tpl-actions">
         <a href="/sablony/{{ t.id }}/upravit" class="btn btn-sm btn-ghost" data-testid="template-edit-btn-{{ t.id }}">Upravit</a>
         <form method="post" action="/sablony/{{ t.id }}/smazat" class="inline-form"
               onsubmit="return confirm('Smazat šablonu {{ t.name }}?')">

@@ -1934,6 +1934,9 @@ a.attachment-filename:hover {
   .breadcrumb-home { position: static; }
   /* Hide less important table columns on mobile */
   .mobile-hide { display: none !important; }
+  /* Šablony — tlačítka Upravit/Smazat pod sebou */
+  .tpl-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .tpl-actions .inline-form { display: contents; }
   /* Content padding + prevent overflow */
   .content-inner { padding: 16px; overflow-x: hidden; }
   .table-wrap { max-width: 100%; }

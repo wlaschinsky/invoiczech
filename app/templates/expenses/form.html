@@ -283,13 +283,15 @@
   top: 50%;
   transform: translateY(-50%);
   opacity: 0.5;
-  pointer-events: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  transition: transform 0.15s;
+  transition: opacity 0.15s;
 }
+.combobox-arrow:hover { opacity: 1; }
 .combobox-wrap.open .combobox-arrow {
   transform: translateY(-50%) rotate(180deg);
+  opacity: 1;
 }
 .combobox-clear {
   position: absolute;
@@ -527,6 +529,24 @@ function fillContact(contact) {
 
   input.addEventListener('focus', function() {
     renderDropdown(this.value);
+  });
+
+  input.addEventListener('click', function() {
+    if (wrap.classList.contains('open')) {
+      closeDropdown();
+    } else {
+      renderDropdown(this.value);
+    }
+  });
+
+  document.getElementById('contact-arrow').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    if (wrap.classList.contains('open')) {
+      closeDropdown();
+    } else {
+      input.focus();
+      renderDropdown(input.value);
+    }
   });
 
   input.addEventListener('blur', function() {

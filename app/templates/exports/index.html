@@ -34,7 +34,9 @@
       <div class="form-row">
         <div class="form-group">
           <label>Rok</label>
-          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24" data-testid="export-kh1-year-field">
+          <select name="year" class="form-control w-24" data-testid="export-kh1-year-select">
+            {% for y in years %}<option value="{{ y }}" data-value="{{ y }}" {% if y == today.year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+          </select>
         </div>
         <div class="form-group">
           <label>Typ období</label>
@@ -85,7 +87,9 @@
       <div class="form-row">
         <div class="form-group">
           <label>Rok</label>
-          <input type="number" name="year" value="{{ today.year }}" min="2020" max="2099" class="form-control w-24" data-testid="export-dp3-year-field">
+          <select name="year" class="form-control w-24" data-testid="export-dp3-year-select">
+            {% for y in years %}<option value="{{ y }}" data-value="{{ y }}" {% if y == today.year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+          </select>
         </div>
         <div class="form-group">
           <label>Typ období</label>

@@ -18,6 +18,7 @@ class InvoiceTemplate(Base):
     contact_street = Column(String)
     contact_city = Column(String)
     contact_zip = Column(String)
+    invoice_text = Column(Text)
     payment_method = Column(String, default="Bankovní převod")
     due_days = Column(Integer, default=10)
 

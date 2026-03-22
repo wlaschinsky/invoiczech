@@ -77,6 +77,7 @@ async def create_template(request: Request, db: Session = Depends(get_db)):
         contact_street=form.get("contact_street", "").strip() or None,
         contact_city=form.get("contact_city", "").strip() or None,
         contact_zip=form.get("contact_zip", "").strip() or None,
+        invoice_text=form.get("invoice_text", "").strip() or None,
         payment_method=payment_method,
         due_days=due_days,
     )
@@ -131,6 +132,7 @@ async def update_template(request: Request, tpl_id: int, db: Session = Depends(g
     tpl.contact_street = form.get("contact_street", "").strip() or None
     tpl.contact_city = form.get("contact_city", "").strip() or None
     tpl.contact_zip = form.get("contact_zip", "").strip() or None
+    tpl.invoice_text = form.get("invoice_text", "").strip() or None
     tpl.payment_method = form.get("payment_method", "Bankovní převod")
     try:
         tpl.due_days = int(form.get("due_days", "10"))
@@ -177,6 +179,7 @@ async def template_json(tpl_id: int, db: Session = Depends(get_db)):
         "contact_city": tpl.contact_city or (contact.city if contact else ""),
         "contact_zip": tpl.contact_zip or (contact.zip_code if contact else ""),
         "contact_email": contact.email if contact else "",
+        "invoice_text": tpl.invoice_text or "",
         "items": [
             {
                 "description": item.description,

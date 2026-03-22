@@ -36,17 +36,17 @@
 {# ── Souhrnné karty ── #}
 {% if profile.vat_payer %}
 <div class="stats-row stats-row--3 mb-4">
-  <div class="stat-card stat-card--income">
+  <div class="stat-card stat-card--income" data-tooltip="Součet všech vydaných faktur za rok {{ year }} s DPH. Základ bez DPH je uveden níže.">
     <div class="stat-label">Příjmy {{ year }}</div>
     <div class="stat-value stat-value--income" data-testid="year-income-total-value">{{ income_total | czk }}</div>
     <div class="stat-sub" data-testid="year-income-base-value">bez DPH: {{ income_base | czk }}</div>
   </div>
-  <div class="stat-card stat-card--expense">
+  <div class="stat-card stat-card--expense" data-tooltip="Součet všech nákladů za rok {{ year }} s DPH. Základ bez DPH je uveden níže.">
     <div class="stat-label">Náklady {{ year }}</div>
     <div class="stat-value" data-testid="year-costs-total-value">{{ costs_total | czk }}</div>
     <div class="stat-sub" data-testid="year-costs-base-value">bez DPH: {{ costs_base | czk }}</div>
   </div>
-  <div class="stat-card stat-card--info">
+  <div class="stat-card stat-card--info" data-tooltip="DPH výstup (z faktur) mínus DPH vstup (z nákladů). Kladná hodnota = odvod finančnímu úřadu. Záporná = nadměrný odpočet.">
     <div class="stat-label">Vlastní daňová povinnost</div>
     <div class="stat-value" data-testid="year-vat-liability-value">{{ vat_liability | czk }}</div>
     <div class="stat-sub" data-testid="year-vat-detail-value">výstup {{ vat_output | czk }} − vstup {{ vat_input | czk }}</div>
@@ -54,7 +54,7 @@
 </div>
 {% else %}
 <div class="stats-row stats-row--1 mb-4">
-  <div class="stat-card stat-card--income">
+  <div class="stat-card stat-card--income" data-tooltip="Součet příjmů z vydaných faktur za rok {{ year }}.">
     <div class="stat-label">Příjmy {{ year }}</div>
     <div class="stat-value stat-value--income" data-testid="year-income-total-value">{{ income_base | czk }}</div>
   </div>

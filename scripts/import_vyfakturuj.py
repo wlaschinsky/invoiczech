@@ -394,28 +394,42 @@ def import_expenses(db, rows: list[dict], ico_map: dict, dry_run: bool):
 
 def main():
     parser = argparse.ArgumentParser(description="Import z Vyfakturuj.cz")
-    parser.add_argument("--contacts", required=True, help="CSV adresáře")
-    parser.add_argument("--invoices", required=True, help="CSV faktur")
-    parser.add_argument("--expenses", required=True, help="CSV nákladů")
+    parser.add_argument("--contacts", help="CSV adresáře")
+    parser.add_argument("--invoices", help="CSV faktur")
+    parser.add_argument("--expenses", help="CSV nákladů")
     parser.add_argument("--dry-run", action="store_true", help="Pouze simulace, nezapisuje do DB")
     args = parser.parse_args()
+
+    if not any([args.contacts, args.invoices, args.expenses]):
+        parser.error("Zadej alespoň jeden z: --contacts, --invoices, --expenses")
 
     if args.dry_run:
         print("=== DRY RUN — do DB se nic nezapíše ===\n")
 
     db = SessionLocal()
     try:
-        print("Načítám kontakty...")
-        contact_rows = read_csv(args.contacts)
-        ico_map = import_contacts(db, contact_rows, args.dry_run)
+        ico_map: dict[str, int] = {}
 
-        print("Načítám faktury...")
-        invoice_rows = read_csv(args.invoices)
-        import_invoices(db, invoice_rows, ico_map, args.dry_run)
+        if args.contacts:
+            print("Načítám kontakty...")
+            contact_rows = read_csv(args.contacts)
+            ico_map = import_contacts(db, contact_rows, args.dry_run)
+        else:
+            # Načti existující kontakty z DB pro mapping IČO → id
+            from app.models.contact import Contact as _C
+            for c in db.query(_C).all():
+                if c.ico:
+                    ico_map[c.ico] = c.id
 
-        print("Načítám náklady...")
-        expense_rows = read_csv(args.expenses)
-        import_expenses(db, expense_rows, ico_map, args.dry_run)
+        if args.invoices:
+            print("Načítám faktury...")
+            invoice_rows = read_csv(args.invoices)
+            import_invoices(db, invoice_rows, ico_map, args.dry_run)
+
+        if args.expenses:
+            print("Načítám náklady...")
+            expense_rows = read_csv(args.expenses)
+            import_expenses(db, expense_rows, ico_map, args.dry_run)
 
         print("\nHotovo.")
     except Exception as e:

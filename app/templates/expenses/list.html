@@ -48,15 +48,21 @@
 
 <div class="table-wrap">
 <table class="table table-hover" id="bulk-table" data-testid="expense-list">
+  {%- macro sth(col, label, cls='') -%}
+    {%- set active = (sort == col) -%}
+    {%- set no = 'asc' if (active and order == 'desc') else 'desc' if (active and order == 'asc') else 'asc' -%}
+    {%- set qs = (filter_qs + '&') if filter_qs else '' -%}
+    <th class="sortable{% if active %} sort-active{% endif %}{% if cls %} {{ cls }}{% endif %}"><a href="?{{ qs }}sort={{ col }}&order={{ no }}">{{ label }}<span class="sort-icon">{% if active %}{{ '↑' if order == 'asc' else '↓' }}{% else %}⇅{% endif %}</span></a></th>
+  {%- endmacro -%}
   <thead>
     <tr>
       <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše" data-testid="expense-select-all-field"></th>
-      <th>Číslo</th>
-      <th>Název</th>
-      <th class="mobile-hide">Dodavatel</th>
-      <th class="mobile-hide">Typ</th>
-      <th class="mobile-hide">Datum</th>
-      <th class="mobile-hide">Daň. uznatelný</th>
+      {{ sth('number', 'Číslo') }}
+      {{ sth('title', 'Název') }}
+      {{ sth('contact_name', 'Dodavatel', 'mobile-hide') }}
+      {{ sth('document_type', 'Typ', 'mobile-hide') }}
+      {{ sth('issue_date', 'Datum', 'mobile-hide') }}
+      {{ sth('tax_deductible', 'Daň. uznatelný', 'mobile-hide') }}
       <th class="text-right mobile-hide">Bez DPH</th>
       <th class="text-right">Celkem</th>
       <th class="mobile-hide"></th>

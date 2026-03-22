@@ -1,6 +1,7 @@
 import csv
 import io
 import os
+from urllib.parse import urlencode
 import shutil
 from datetime import date
 from decimal import Decimal
@@ -29,6 +30,8 @@ async def expenses_list(
     q: str = "",
     od: str = "",
     do: str = "",
+    sort: str = "",
+    order: str = "",
     db: Session = Depends(get_db),
 ):
     query = db.query(Expense)
@@ -56,7 +59,24 @@ async def expenses_list(
         if d:
             query = query.filter(Expense.issue_date <= d)
 
-    expenses = query.order_by(Expense.issue_date.desc(), Expense.number.desc()).all()
+    _sortable = {
+        "number": Expense.number,
+        "title": Expense.title,
+        "contact_name": Expense.contact_name,
+        "document_type": Expense.document_type,
+        "issue_date": Expense.issue_date,
+        "tax_deductible": Expense.tax_deductible,
+    }
+    sort_col = _sortable.get(sort)
+    if sort_col is not None:
+        query = query.order_by(sort_col.desc() if order == "desc" else sort_col.asc())
+    else:
+        query = query.order_by(Expense.issue_date.desc(), Expense.number.desc())
+    expenses = query.all()
+
+    filter_params = {k: v for k, v in [("typ", typ), ("rok", rok), ("q", q), ("od", od), ("do", do)] if v}
+    filter_qs = urlencode(filter_params)
+
     years = sorted(
         {e.issue_date.year for e in db.query(Expense).all()},
         reverse=True,
@@ -76,6 +96,9 @@ async def expenses_list(
             "do": do,
             "years": years,
             "total_count": total_count,
+            "sort": sort,
+            "order": order,
+            "filter_qs": filter_qs,
         },
     )
 

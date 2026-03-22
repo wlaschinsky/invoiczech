@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from ..tmpl import templates
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
@@ -12,7 +14,7 @@ router = APIRouter(prefix="/adresar")
 
 
 @router.get("", response_class=HTMLResponse)
-async def contacts_list(request: Request, q: str = "", typ: str = "", db: Session = Depends(get_db)):
+async def contacts_list(request: Request, q: str = "", typ: str = "", sort: str = "", order: str = "", db: Session = Depends(get_db)):
     from ..models.invoice import Invoice
     from ..models.expense import Expense
     from sqlalchemy import func
@@ -24,7 +26,16 @@ async def contacts_list(request: Request, q: str = "", typ: str = "", db: Sessio
         )
     if typ:
         query = query.filter(Contact.contact_type == typ)
-    contacts = query.order_by(Contact.name).all()
+    _sortable = {"name": Contact.name, "ico": Contact.ico}
+    sort_col = _sortable.get(sort)
+    if sort_col is not None:
+        query = query.order_by(sort_col.desc() if order == "desc" else sort_col.asc())
+    else:
+        query = query.order_by(Contact.name)
+    contacts = query.all()
+
+    filter_params = {k: v for k, v in [("q", q), ("typ", typ)] if v}
+    filter_qs = urlencode(filter_params)
 
     # Počítat podle contact_id i contact_name (starší záznamy nemají FK)
     inv_by_id = dict(
@@ -70,6 +81,9 @@ async def contacts_list(request: Request, q: str = "", typ: str = "", db: Sessio
             "inv_counts": inv_counts,
             "exp_counts": exp_counts,
             "total_count": total_count,
+            "sort": sort,
+            "order": order,
+            "filter_qs": filter_qs,
         },
     )
 

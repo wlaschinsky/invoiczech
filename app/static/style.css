@@ -2112,3 +2112,26 @@ a.attachment-filename:hover {
   .stats-row--2,
   .stats-row--3 { grid-template-columns: 1fr; }
 }
+
+/* ── Sortovatelné hlavičky tabulky (jen desktop) ─────────────────────── */
+@media (min-width: 769px) {
+  th.sortable { white-space: nowrap; }
+  th.sortable a {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  th.sortable a:hover { color: var(--color-primary); }
+  .sort-icon {
+    font-size: 0.7rem;
+    opacity: 0.35;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  th.sort-active .sort-icon {
+    opacity: 1;
+    color: var(--color-primary);
+  }
+}

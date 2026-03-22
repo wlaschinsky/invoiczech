@@ -2,6 +2,7 @@ import csv
 import io
 from datetime import date, timedelta
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
@@ -28,6 +29,8 @@ async def invoices_list(
     q: str = "",
     od: str = "",
     do: str = "",
+    sort: str = "",
+    order: str = "",
     db: Session = Depends(get_db),
 ):
     query = db.query(Invoice)
@@ -53,7 +56,23 @@ async def invoices_list(
         if d:
             query = query.filter(Invoice.issue_date <= d)
 
-    invoices = query.order_by(Invoice.issue_date.desc(), Invoice.number.desc()).all()
+    _sortable = {
+        "number": Invoice.number,
+        "contact_name": Invoice.contact_name,
+        "issue_date": Invoice.issue_date,
+        "due_date": Invoice.due_date,
+        "status": Invoice.status,
+    }
+    sort_col = _sortable.get(sort)
+    if sort_col is not None:
+        query = query.order_by(sort_col.desc() if order == "desc" else sort_col.asc())
+    else:
+        query = query.order_by(Invoice.issue_date.desc(), Invoice.number.desc())
+    invoices = query.all()
+
+    filter_params = {k: v for k, v in [("status", status), ("rok", rok), ("q", q), ("od", od), ("do", do)] if v}
+    filter_qs = urlencode(filter_params)
+
     today = date.today()
 
     years = sorted(
@@ -76,6 +95,9 @@ async def invoices_list(
             "do": do,
             "years": years,
             "total_count": total_count,
+            "sort": sort,
+            "order": order,
+            "filter_qs": filter_qs,
         },
     )
 

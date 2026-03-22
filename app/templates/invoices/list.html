@@ -50,18 +50,24 @@
 
 <div class="table-wrap">
 <table class="table table-hover" id="bulk-table" data-testid="invoice-list">
+  {%- macro sth(col, label, cls='') -%}
+    {%- set active = (sort == col) -%}
+    {%- set no = 'asc' if (active and order == 'desc') else 'desc' if (active and order == 'asc') else 'asc' -%}
+    {%- set qs = (filter_qs + '&') if filter_qs else '' -%}
+    <th class="sortable{% if active %} sort-active{% endif %}{% if cls %} {{ cls }}{% endif %}"><a href="?{{ qs }}sort={{ col }}&order={{ no }}">{{ label }}<span class="sort-icon">{% if active %}{{ '↑' if order == 'asc' else '↓' }}{% else %}⇅{% endif %}</span></a></th>
+  {%- endmacro -%}
   <thead>
     <tr>
       <th class="col-check mobile-hide"><input type="checkbox" id="select-all" title="Vybrat vše" data-testid="invoice-select-all-field"></th>
-      <th>Číslo</th>
-      <th>Odběratel</th>
-      <th class="mobile-hide">Vystavení</th>
-      <th class="mobile-hide">Splatnost</th>
+      {{ sth('number', 'Číslo') }}
+      {{ sth('contact_name', 'Odběratel') }}
+      {{ sth('issue_date', 'Vystavení', 'mobile-hide') }}
+      {{ sth('due_date', 'Splatnost', 'mobile-hide') }}
       {% if profile.vat_payer %}
       <th class="text-right mobile-hide">Bez DPH</th>
       {% endif %}
       <th class="text-right">{% if profile.vat_payer %}Celkem{% else %}Částka{% endif %}</th>
-      <th>Stav</th>
+      {{ sth('status', 'Stav') }}
       <th class="mobile-hide"></th>
     </tr>
   </thead>

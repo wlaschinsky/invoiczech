@@ -29,10 +29,16 @@
 {% if contacts %}
 <div class="table-wrap">
 <table class="table table-hover" data-testid="contact-list">
+  {%- macro sth(col, label, cls='') -%}
+    {%- set active = (sort == col) -%}
+    {%- set no = 'asc' if (active and order == 'desc') else 'desc' if (active and order == 'asc') else 'asc' -%}
+    {%- set qs = (filter_qs + '&') if filter_qs else '' -%}
+    <th class="sortable{% if active %} sort-active{% endif %}{% if cls %} {{ cls }}{% endif %}"><a href="?{{ qs }}sort={{ col }}&order={{ no }}">{{ label }}<span class="sort-icon">{% if active %}{{ '↑' if order == 'asc' else '↓' }}{% else %}⇅{% endif %}</span></a></th>
+  {%- endmacro -%}
   <thead>
     <tr>
-      <th>Název</th>
-      <th>IČO</th>
+      {{ sth('name', 'Název') }}
+      {{ sth('ico', 'IČO') }}
       <th class="mobile-hide">DIČ</th>
       <th class="mobile-hide">Adresa</th>
       <th class="mobile-hide">Faktury</th>

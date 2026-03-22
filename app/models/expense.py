@@ -15,6 +15,11 @@ class Expense(Base):
 
     contact_id = Column(Integer, ForeignKey("contacts.id"), nullable=True)
     contact_name = Column(String)  # denormalizovaný název pro rychlé zobrazení
+    contact_ico = Column(String)
+    contact_dic = Column(String)
+    contact_street = Column(String)
+    contact_city = Column(String)
+    contact_zip = Column(String)
 
     supplier_document_number = Column(String)
     issue_date = Column(Date, nullable=False)

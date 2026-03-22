@@ -486,6 +486,11 @@ async function applyTemplate(tplId) {
       tbody.appendChild(row);
     });
     recalcAllRows();
+
+    // Text faktury
+    if (data.invoice_text) {
+      document.querySelector('[name="invoice_text"]').value = data.invoice_text;
+    }
   } catch(e) {
     alert('Chyba při načítání šablony');
   }

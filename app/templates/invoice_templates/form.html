@@ -217,6 +217,14 @@
     </div>
   </div>
 
+  <!-- Text faktury -->
+  <div class="form-section">
+    <h2 class="form-section-title">Text faktury</h2>
+    <div class="form-group">
+      <textarea name="invoice_text" rows="3" class="form-control" data-testid="template-invoice-text-field">{{ tpl.invoice_text if tpl and tpl.invoice_text else '' }}</textarea>
+    </div>
+  </div>
+
   <div class="form-actions">
     <button type="submit" class="btn btn-primary btn-lg" data-testid="template-submit-btn">
       {% if tpl %}Uložit změny{% else %}Vytvořit šablonu{% endif %}

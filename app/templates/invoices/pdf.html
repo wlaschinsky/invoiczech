@@ -252,9 +252,13 @@
 <!-- Header -->
 <div class="header">
   <div class="header-title">
+    {% if profile.logo_mode == 'custom' and logo_base64 %}
+    <div class="header-logo"><img src="{{ logo_base64 }}" alt="Logo" style="max-height:48px; max-width:180px; object-fit:contain;"></div>
+    {% elif profile.logo_mode != 'none' %}
     <div class="header-logo">
       <span style="color:#1a1a3e; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Invoi</span><span style="color:#00d68f; font-size:22px; font-weight:700;">·</span><span style="color:#6366f1; font-size:22px; font-weight:700; letter-spacing:-0.03em;">Czech</span>
     </div>
+    {% endif %}
     <div class="doc-type">{% if profile.vat_payer %}FAKTURA — DAŇOVÝ DOKLAD{% else %}FAKTURA{% endif %}</div>
   </div>
   <div class="header-number">

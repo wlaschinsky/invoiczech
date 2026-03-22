@@ -1,4 +1,5 @@
 """Generování PDF faktur pomocí WeasyPrint."""
+import base64
 import os
 from decimal import Decimal
 
@@ -72,10 +73,23 @@ def generate_invoice_pdf(invoice: Invoice) -> bytes:
         message=f"Faktura {invoice.number}",
     )
 
+    logo_base64 = None
+    if getattr(profile, "logo_mode", "default") == "custom" and profile.logo_path:
+        try:
+            with open(profile.logo_path, "rb") as f:
+                raw = f.read()
+            ext = profile.logo_path.rsplit(".", 1)[-1].lower()
+            mime = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+                    "svg": "image/svg+xml", "webp": "image/webp"}.get(ext, "image/png")
+            logo_base64 = f"data:{mime};base64,{base64.b64encode(raw).decode()}"
+        except OSError:
+            pass
+
     html_content = template.render(
         invoice=invoice,
         profile=profile,
         qr_base64=qr_base64,
+        logo_base64=logo_base64,
     )
 
     base_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static"))

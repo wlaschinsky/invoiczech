@@ -38,6 +38,10 @@ class Profile(Base):
     okec = Column(String, default="")
     ds_type = Column(String, default="F")
 
+    # Logo na faktuře
+    logo_mode = Column(String, default="default")  # default | custom | none
+    logo_path = Column(String, nullable=True)       # cesta k souboru, jen pro logo_mode="custom"
+
     # Výchozí nastavení faktur
     default_due_days = Column(Integer, default=10)
     default_payment_method = Column(String, default="Bankovní převod")

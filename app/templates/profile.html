@@ -13,7 +13,7 @@
   <h1>Profil podnikatele</h1>
 </div>
 
-<form method="post" action="/profil" data-guard-unsaved data-testid="profile-form">
+<form method="post" action="/profil" enctype="multipart/form-data" data-guard-unsaved data-testid="profile-form">
 
   {# ── Sekce 1: Osobní a firemní údaje ── #}
   <div class="detail-card">
@@ -240,6 +240,31 @@
     </div>
   </div>
 
+  {# ── Sekce: Logo na faktuře ── #}
+  <div class="detail-card">
+    <h2 class="detail-card-title">Logo na faktuře</h2>
+    <div class="form-group">
+      <label>Zobrazit logo</label>
+      <select name="logo_mode" class="form-control" id="logo-mode-select" onchange="toggleLogoUpload()" data-testid="profile-logo-mode-select">
+        <option value="default" data-value="default" {% if profile.logo_mode == 'default' %}selected{% endif %}>Výchozí (InvoiCzech)</option>
+        <option value="custom" data-value="custom" {% if profile.logo_mode == 'custom' %}selected{% endif %}>Vlastní logo</option>
+        <option value="none" data-value="none" {% if profile.logo_mode == 'none' %}selected{% endif %}>Žádné logo</option>
+      </select>
+    </div>
+    <div id="logo-upload-section" {% if profile.logo_mode != 'custom' %}style="display:none"{% endif %}>
+      {% if profile.logo_mode == 'custom' and profile.logo_path %}
+      <div class="form-group">
+        <label>Aktuální logo</label>
+        <div><img src="/profil/logo" alt="Logo" style="max-height:60px; max-width:200px; object-fit:contain; border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:8px; background:white;"></div>
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <label for="logo_file">Nahrát nové logo <span class="text-muted">(PNG, JPG, SVG, WebP — max 512 KB)</span></label>
+        <input type="file" id="logo_file" name="logo_file" accept="image/png,image/jpeg,image/svg+xml,image/webp" class="form-control" data-testid="profile-logo-file-field">
+      </div>
+    </div>
+  </div>
+
   <div class="detail-actions-bottom mt-4">
     <a href="/" class="btn btn-ghost" data-testid="profile-back-btn">Zpět</a>
     <button type="submit" class="btn btn-primary" data-testid="profile-submit-btn">Uložit profil</button>
@@ -300,5 +325,9 @@ document.getElementById('fu_pracufo_manual').addEventListener('input', function(
   onFuChange();
 })();
 
+function toggleLogoUpload() {
+  const mode = document.getElementById('logo-mode-select').value;
+  document.getElementById('logo-upload-section').style.display = mode === 'custom' ? '' : 'none';
+}
 </script>
 {% endblock %}

@@ -28,17 +28,38 @@ _MONTHS_CS = [
 ]
 
 
-def _compute(db: Session, year: int) -> dict:
+_BASIS_LABELS = {
+    "duzp": "DUZP",
+    "issue_date": "Vystavení",
+    "paid_date": "Úhrada",
+}
+
+
+def _inv_date(inv, basis: str):
+    if basis == "issue_date":
+        return inv.issue_date
+    if basis == "paid_date":
+        return inv.paid_date
+    return inv.duzp
+
+
+def _exp_date(exp, basis: str):
+    if basis == "paid_date":
+        return exp.paid_date
+    return exp.issue_date
+
+
+def _compute(db: Session, year: int, basis: str = "duzp") -> dict:
     year_start = date(year, 1, 1)
     year_end = date(year, 12, 31)
 
     invoices = [
         i for i in db.query(Invoice).filter(Invoice.status != "Stornována").all()
-        if i.duzp and year_start <= i.duzp <= year_end
+        if _inv_date(i, basis) and year_start <= _inv_date(i, basis) <= year_end
     ]
     expenses = [
         e for e in db.query(Expense).all()
-        if e.issue_date and year_start <= e.issue_date <= year_end
+        if _exp_date(e, basis) and year_start <= _exp_date(e, basis) <= year_end
         and e.tax_deductible in ("Ano", "Nevím")
     ]
 
@@ -56,34 +77,29 @@ def _compute(db: Session, year: int) -> dict:
     months = []
     for m in range(1, 13):
         m_start = date(year, m, 1)
-        if m == 12:
-            m_end = date(year, 12, 31)
-        else:
-            m_end = date(year, m + 1, 1)
+        m_end = date(year, 12, 31) if m == 12 else date(year, m + 1, 1)
 
-        m_inv = [i for i in invoices if m_start <= i.duzp < m_end] if m < 12 else [i for i in invoices if i.duzp >= m_start]
-        m_exp = [e for e in expenses if m_start <= e.issue_date < m_end] if m < 12 else [e for e in expenses if e.issue_date >= m_start]
+        m_inv = [i for i in invoices if m_start <= _inv_date(i, basis) < m_end] if m < 12 else [i for i in invoices if _inv_date(i, basis) >= m_start]
+        m_exp = [e for e in expenses if m_start <= _exp_date(e, basis) < m_end] if m < 12 else [e for e in expenses if _exp_date(e, basis) >= m_start]
 
-        m_income_base = sum(i.subtotal for i in m_inv)
-        m_income_total = sum(i.total for i in m_inv)
         m_vat_out = sum(i.vat_total for i in m_inv)
-        m_costs_base = sum(e.subtotal for e in m_exp)
-        m_costs_total = sum(e.total for e in m_exp)
         m_vat_in = sum(e.vat_total for e in m_exp)
 
         months.append({
             "name": _MONTHS_CS[m],
-            "income_base": m_income_base,
-            "income_total": m_income_total,
+            "income_base": sum(i.subtotal for i in m_inv),
+            "income_total": sum(i.total for i in m_inv),
             "vat_output": m_vat_out,
-            "costs_base": m_costs_base,
-            "costs_total": m_costs_total,
+            "costs_base": sum(e.subtotal for e in m_exp),
+            "costs_total": sum(e.total for e in m_exp),
             "vat_input": m_vat_in,
             "vat_liability": m_vat_out - m_vat_in,
         })
 
     return {
         "year": year,
+        "basis": basis,
+        "basis_label": _BASIS_LABELS.get(basis, "DUZP"),
         "income_base": income_base,
         "income_total": income_total,
         "vat_output": vat_output,
@@ -100,24 +116,20 @@ async def yearly_overview(
     request: Request,
     db: Session = Depends(get_db),
     rok: int = Query(default=None),
+    basis: str = Query(default="duzp"),
 ):
+    if basis not in _BASIS_LABELS:
+        basis = "duzp"
     year = rok or date.today().year
-    data = _compute(db, year)
+    data = _compute(db, year, basis)
 
-    # Roky s daty (DUZP faktur + issue_date nákladů)
-    inv_years = {
-        i.duzp.year for i in db.query(Invoice).all()
-        if i.duzp
-    }
-    exp_years = {
-        e.issue_date.year for e in db.query(Expense).all()
-        if e.issue_date
-    }
+    inv_years = {i.duzp.year for i in db.query(Invoice).all() if i.duzp}
+    exp_years = {e.issue_date.year for e in db.query(Expense).all() if e.issue_date}
     available_years = sorted(inv_years | exp_years | {year}, reverse=True)
 
     return templates.TemplateResponse(
         "overview/year.html",
-        {"request": request, "available_years": available_years, **data},
+        {"request": request, "available_years": available_years, "basis_options": _BASIS_LABELS, **data},
     )
 
 
@@ -125,9 +137,12 @@ async def yearly_overview(
 async def yearly_csv(
     db: Session = Depends(get_db),
     rok: int = Query(default=None),
+    basis: str = Query(default="duzp"),
 ):
+    if basis not in _BASIS_LABELS:
+        basis = "duzp"
     year = rok or date.today().year
-    data = _compute(db, year)
+    data = _compute(db, year, basis)
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
@@ -171,9 +186,12 @@ async def yearly_csv(
 async def yearly_pdf(
     db: Session = Depends(get_db),
     rok: int = Query(default=None),
+    basis: str = Query(default="duzp"),
 ):
+    if basis not in _BASIS_LABELS:
+        basis = "duzp"
     year = rok or date.today().year
-    data = _compute(db, year)
+    data = _compute(db, year, basis)
 
     templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
     env = Environment(loader=FileSystemLoader(templates_dir))

@@ -82,12 +82,46 @@
                class="form-control" required data-testid="expense-contact-name-field">
       </div>
       <div class="form-group">
+        <label for="contact_ico">IČO</label>
+        <input type="text" id="contact_ico" name="contact_ico"
+               value="{{ expense.contact_ico if expense else '' }}"
+               class="form-control" data-testid="expense-contact-ico-field">
+      </div>
+      <div class="form-group">
+        <label for="contact_dic">DIČ</label>
+        <input type="text" id="contact_dic" name="contact_dic"
+               value="{{ expense.contact_dic if expense else '' }}"
+               class="form-control" data-testid="expense-contact-dic-field">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-lg">
+        <label for="contact_street">Ulice a číslo</label>
+        <input type="text" id="contact_street" name="contact_street"
+               value="{{ expense.contact_street if expense else '' }}"
+               class="form-control" data-testid="expense-contact-street-field">
+      </div>
+      <div class="form-group">
+        <label for="contact_zip">PSČ</label>
+        <input type="text" id="contact_zip" name="contact_zip"
+               value="{{ expense.contact_zip if expense else '' }}"
+               class="form-control" data-testid="expense-contact-zip-field">
+      </div>
+      <div class="form-group">
+        <label for="contact_city">Město</label>
+        <input type="text" id="contact_city" name="contact_city"
+               value="{{ expense.contact_city if expense else '' }}"
+               class="form-control" data-testid="expense-contact-city-field">
+      </div>
+    </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="form-group">
         <label for="supplier_document_number">Číslo dokladu dodavatele</label>
         <input type="text" name="supplier_document_number"
                value="{{ expense.supplier_document_number if expense else '' }}"
                class="form-control" data-testid="expense-supplier-doc-field">
       </div>
-    </div>
     </div>
   </div>
 

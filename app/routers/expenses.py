@@ -125,6 +125,11 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
     contact_id = int(contact_id_raw) if contact_id_raw else None
     contact = db.query(Contact).filter(Contact.id == contact_id).first() if contact_id else None
     contact_name = contact.name if contact else form.get("contact_name", "").strip()
+    contact_ico = contact.ico if contact else form.get("contact_ico", "").strip()
+    contact_dic = contact.dic if contact else form.get("contact_dic", "").strip()
+    contact_street = contact.street if contact else form.get("contact_street", "").strip()
+    contact_city = contact.city if contact else form.get("contact_city", "").strip()
+    contact_zip = contact.zip_code if contact else form.get("contact_zip", "").strip()
 
     price_includes_vat = form.get("price_includes_vat") == "1"
 
@@ -133,6 +138,11 @@ async def create_expense(request: Request, db: Session = Depends(get_db)):
         title=form.get("title", "").strip(),
         contact_id=contact_id,
         contact_name=contact_name,
+        contact_ico=contact_ico,
+        contact_dic=contact_dic,
+        contact_street=contact_street,
+        contact_city=contact_city,
+        contact_zip=contact_zip,
         supplier_document_number=form.get("supplier_document_number", "").strip(),
         issue_date=issue_date,
         duzp=duzp or issue_date,
@@ -301,6 +311,11 @@ async def update_expense(request: Request, expense_id: int, db: Session = Depend
     expense.title = form.get("title", "").strip()
     expense.contact_id = contact_id
     expense.contact_name = contact.name if contact else form.get("contact_name", "").strip()
+    expense.contact_ico = contact.ico if contact else form.get("contact_ico", "").strip()
+    expense.contact_dic = contact.dic if contact else form.get("contact_dic", "").strip()
+    expense.contact_street = contact.street if contact else form.get("contact_street", "").strip()
+    expense.contact_city = contact.city if contact else form.get("contact_city", "").strip()
+    expense.contact_zip = contact.zip_code if contact else form.get("contact_zip", "").strip()
     expense.supplier_document_number = form.get("supplier_document_number", "").strip()
     expense.issue_date = issue_date
     expense.duzp = duzp or issue_date

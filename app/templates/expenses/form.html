@@ -433,7 +433,10 @@ function fillContact(contact) {
   if (!contact.id) {
     contactFields.style.display = '';
     aresGroup.style.display = '';
-    document.getElementById('contact_name').value = '';
+    ['contact_name','contact_ico','contact_dic','contact_street','contact_city','contact_zip'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
     return;
   }
   contactFields.style.display = 'none';

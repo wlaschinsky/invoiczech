@@ -1,4 +1,5 @@
 """Profil podnikatele — údaje uložené v DB."""
+import os
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
@@ -8,6 +9,10 @@ from ..models.profile import Profile
 from ..services.qr_code import compute_czech_iban
 from ..tmpl import templates
 from .utils import flash
+
+UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "uploads"))
+ALLOWED_LOGO_TYPES = {"image/png", "image/jpeg", "image/svg+xml", "image/webp"}
+MAX_LOGO_SIZE = 512 * 1024  # 512 KB
 
 router = APIRouter(prefix="/profil")
 
@@ -23,6 +28,15 @@ def get_profile(db: Session) -> Profile:
     return profile
 
 
+@router.get("/logo")
+async def serve_logo(db: Session = Depends(get_db)):
+    from fastapi.responses import FileResponse, Response
+    profile = get_profile(db)
+    if profile.logo_mode == "custom" and profile.logo_path and os.path.exists(profile.logo_path):
+        return FileResponse(profile.logo_path)
+    return Response(status_code=404)
+
+
 @router.get("", response_class=HTMLResponse)
 async def profile_page(request: Request, db: Session = Depends(get_db)):
     profile = get_profile(db)
@@ -36,6 +50,27 @@ async def profile_page(request: Request, db: Session = Depends(get_db)):
 async def save_profile(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     profile = get_profile(db)
+
+    # Logo
+    logo_mode = form.get("logo_mode", "default")
+    if logo_mode in ("default", "custom", "none"):
+        profile.logo_mode = logo_mode
+    logo_file = form.get("logo_file")
+    if logo_mode == "custom" and logo_file and hasattr(logo_file, "filename") and logo_file.filename:
+        content = await logo_file.read()
+        if len(content) > MAX_LOGO_SIZE:
+            flash(request, "Logo je příliš velké (max 512 KB).", "error")
+        elif logo_file.content_type not in ALLOWED_LOGO_TYPES:
+            flash(request, "Nepodporovaný formát loga (PNG, JPG, SVG, WebP).", "error")
+        else:
+            ext = logo_file.filename.rsplit(".", 1)[-1].lower()
+            dest = os.path.join(UPLOADS_DIR, f"logo_{profile.id}.{ext}")
+            # Smazat staré logo
+            if profile.logo_path and os.path.exists(profile.logo_path):
+                os.remove(profile.logo_path)
+            with open(dest, "wb") as f:
+                f.write(content)
+            profile.logo_path = dest
 
     # Sekce 1 — Osobní a firemní
     profile.first_name = form.get("first_name", "").strip()

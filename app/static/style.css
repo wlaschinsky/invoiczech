@@ -706,9 +706,9 @@ h1, h2, h3, h4, h5, h6 {
 .table-wrap > .table {
   margin-bottom: 0;
 }
-/* ── Horizontální scroll pro list tabulky (desktop only) ─────────────── */
+/* ── List tabulky na desktopu — roztáhnout na plnou šířku ────────────── */
 @media (min-width: 769px) {
-  #bulk-table { min-width: 1050px; }
+  .content-inner:has(#bulk-table) { max-width: 100%; }
 }
 .table {
   width: 100%;

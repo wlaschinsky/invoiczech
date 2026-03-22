@@ -274,30 +274,32 @@
 .combobox-dropdown {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
-  z-index: 200;
-  background: var(--surface, #fff);
-  border: 1px solid var(--border, #ddd);
-  border-top: none;
-  border-radius: 0 0 6px 6px;
+  min-width: 100%;
   max-height: 240px;
   overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  z-index: 1001;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 4px 0;
 }
 .combobox-option {
-  padding: 8px 12px;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
   cursor: pointer;
-  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.1s;
 }
 .combobox-option:hover,
 .combobox-option.combobox-active {
-  background: var(--primary-light, #e8f4fd);
-  color: var(--primary, #2563eb);
+  background: var(--color-bg-secondary);
 }
 </style>
 <script>

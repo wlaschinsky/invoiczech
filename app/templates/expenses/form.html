@@ -46,23 +46,17 @@
     <h2 class="form-section-title">Dodavatel</h2>
     <div class="form-row">
       <div class="form-group">
-        <label for="contact_id">Vybrat z adresáře</label>
-        <select id="contact_id" name="contact_id" class="form-control" onchange="fillContactFromSelect(this)" data-testid="expense-contact">
-          <option value="" data-value="">— Zadat ručně —</option>
-          {% for c in contacts %}
-          <option value="{{ c.id }}" data-value="{{ c.id }}"
-                  data-name="{{ c.name }}"
-                  data-ico="{{ c.ico or '' }}"
-                  data-dic="{{ c.dic or '' }}"
-                  data-street="{{ c.street or '' }}"
-                  data-city="{{ c.city or '' }}"
-                  data-zip="{{ c.zip_code or '' }}"
-                  data-email="{{ c.email or '' }}"
-                  {% if expense and expense.contact_id == c.id %}selected{% endif %}>
-            {{ c.name }} {% if c.ico %}({{ c.ico }}){% endif %}
-          </option>
-          {% endfor %}
-        </select>
+        <label for="contact_search">Vybrat z adresáře</label>
+        <div class="combobox-wrap" id="contact-combobox">
+          <input type="text" id="contact_search" class="form-control combobox-input"
+                 placeholder="Hledat dodavatele…" autocomplete="off"
+                 data-testid="expense-contact-search-field"
+                 value="{% if expense and expense.contact_id %}{{ expense.contact_name or '' }}{% endif %}">
+          <div class="combobox-dropdown" id="contact-dropdown" role="listbox"></div>
+        </div>
+        <input type="hidden" id="contact_id" name="contact_id"
+               value="{{ expense.contact_id if expense and expense.contact_id else '' }}"
+               data-testid="expense-contact">
       </div>
       <div class="form-group" id="ares-group" {% if expense and expense.contact_id %}style="display:none"{% endif %}>
         <label>IČO pro ARES</label>
@@ -275,6 +269,37 @@
 {% endblock %}
 
 {% block scripts %}
+<style>
+.combobox-wrap { position: relative; }
+.combobox-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #ddd);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+.combobox-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.combobox-option:hover,
+.combobox-option.combobox-active {
+  background: var(--primary-light, #e8f4fd);
+  color: var(--primary, #2563eb);
+}
+</style>
 <script>
 function fmtCzk(val) {
   if (isNaN(val)) return '—';
@@ -354,30 +379,124 @@ function removeRow(btn) {
 }
 
 
-function fillContactFromSelect(sel) {
-  const opt = sel.options[sel.selectedIndex];
+// ── Kontakt combobox ─────────────────────────────────────────────────────────
+const CONTACTS_DATA = [
+  {id: '', name: '— Zadat ručně —', ico: '', dic: '', street: '', city: '', zip: '', email: ''},
+  {% for c in contacts %}
+  {id: '{{ c.id }}', name: {{ c.name | tojson }}, ico: {{ (c.ico or '') | tojson }}, dic: {{ (c.dic or '') | tojson }}, street: {{ (c.street or '') | tojson }}, city: {{ (c.city or '') | tojson }}, zip: {{ (c.zip_code or '') | tojson }}, email: {{ (c.email or '') | tojson }}},
+  {% endfor %}
+];
+
+function fillContact(contact) {
+  document.getElementById('contact_id').value = contact.id;
   const contactFields = document.getElementById('contact-fields');
   const aresGroup = document.getElementById('ares-group');
-  if (!opt.value) {
+  if (!contact.id) {
     contactFields.style.display = '';
     aresGroup.style.display = '';
+    document.getElementById('contact_name').value = '';
     return;
   }
-  // Skryj manuální pole, vyplň z data atributů
   contactFields.style.display = 'none';
   aresGroup.style.display = 'none';
-  document.getElementById('contact_name').value = opt.dataset.name || '';
+  document.getElementById('contact_name').value = contact.name;
   const icoEl = document.getElementById('contact_ico');
   const dicEl = document.getElementById('contact_dic');
   const streetEl = document.getElementById('contact_street');
   const cityEl = document.getElementById('contact_city');
   const zipEl = document.getElementById('contact_zip');
-  if (icoEl) icoEl.value = opt.dataset.ico || '';
-  if (dicEl) dicEl.value = opt.dataset.dic || '';
-  if (streetEl) streetEl.value = opt.dataset.street || '';
-  if (cityEl) cityEl.value = opt.dataset.city || '';
-  if (zipEl) zipEl.value = opt.dataset.zip || '';
+  if (icoEl) icoEl.value = contact.ico || '';
+  if (dicEl) dicEl.value = contact.dic || '';
+  if (streetEl) streetEl.value = contact.street || '';
+  if (cityEl) cityEl.value = contact.city || '';
+  if (zipEl) zipEl.value = contact.zip || '';
 }
+
+(function initCombobox() {
+  const input = document.getElementById('contact_search');
+  const dropdown = document.getElementById('contact-dropdown');
+  const hiddenInput = document.getElementById('contact_id');
+  let activeIdx = -1;
+  let filtered = [];
+
+  function renderDropdown(query) {
+    const q = query.trim().toLowerCase();
+    filtered = CONTACTS_DATA.filter(c =>
+      !q || c.name.toLowerCase().includes(q) || c.ico.includes(q)
+    );
+    dropdown.innerHTML = '';
+    activeIdx = -1;
+    if (!filtered.length) {
+      dropdown.style.display = 'none';
+      return;
+    }
+    filtered.forEach((c, i) => {
+      const div = document.createElement('div');
+      div.className = 'combobox-option';
+      div.setAttribute('role', 'option');
+      div.textContent = c.id ? c.name + (c.ico ? ' (' + c.ico + ')' : '') : c.name;
+      div.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        selectContact(c);
+      });
+      dropdown.appendChild(div);
+    });
+    dropdown.style.display = 'block';
+  }
+
+  function selectContact(c) {
+    input.value = c.id ? c.name : '';
+    dropdown.style.display = 'none';
+    fillContact(c);
+  }
+
+  function setActive(idx) {
+    const items = dropdown.querySelectorAll('.combobox-option');
+    items.forEach(el => el.classList.remove('combobox-active'));
+    activeIdx = Math.max(0, Math.min(idx, filtered.length - 1));
+    if (items[activeIdx]) {
+      items[activeIdx].classList.add('combobox-active');
+      items[activeIdx].scrollIntoView({block: 'nearest'});
+    }
+  }
+
+  input.addEventListener('input', function() {
+    renderDropdown(this.value);
+    // Pokud byl kontakt vybrán a user začne znovu psát, reset hidden
+    if (hiddenInput.value) {
+      hiddenInput.value = '';
+      fillContact(CONTACTS_DATA[0]);
+    }
+  });
+
+  input.addEventListener('focus', function() {
+    renderDropdown(this.value);
+  });
+
+  input.addEventListener('blur', function() {
+    setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+    // Pokud je vybrán kontakt, zobraz jeho jméno; jinak nech prázdné
+    if (!hiddenInput.value) input.value = '';
+  });
+
+  input.addEventListener('keydown', function(e) {
+    if (dropdown.style.display === 'none') { renderDropdown(this.value); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIdx + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIdx - 1); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIdx >= 0 && filtered[activeIdx]) selectContact(filtered[activeIdx]);
+    } else if (e.key === 'Escape') {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Pokud editujeme a contact_id je vyplněn, ponech text v inputu
+  if (hiddenInput.value) {
+    const existing = CONTACTS_DATA.find(c => c.id == hiddenInput.value);
+    if (existing) input.value = existing.name;
+  }
+})();
 
 function syncTitleFromFirstItem(descInput) {
   const titleEl = document.getElementById('title');

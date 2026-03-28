@@ -2,6 +2,21 @@
 
 Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým milníkům vývoje, nikoliv git tagům.
 
+## [v1.4.1] — 2026-03-28
+
+### Přidáno
+- release.sh — jeden příkaz pro tag + push + changelog + commit
+
+### Dokumentace
+- opraveno pořadí kroků workflow pro changelog v README
+- doplněny sekce v1.2.0–v1.3.0 v CHANGELOG.md
+
+### Opraveno
+- CHANGELOG.md — odstraněn duplikát Unreleased/v0.8.x, opraveny oddělovače
+- make_changelog.py — správný rozsah commitů (předchozí tag → zadaný tag, ne tag → HEAD)
+
+---
+
 ## [v1.4.0] — 2026-03-28
 
 ### Styl

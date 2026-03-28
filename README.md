@@ -141,16 +141,17 @@ Changelog je dostupný přímo v aplikaci — tlačítko s hodinami v levém pan
 ```bash
 # 1. Vyvíjíš a committuješ normálně (feat:, fix:, style: ...)
 
-# 2. Až je verze hotová — vytvoř tag
-git tag v0.9.0
-
-# 3. Vygeneruj sekci changelogu ze všech commitů od posledního tagu
-python scripts/make_changelog.py v0.9.0
-# → ukáže preview, potvrdíš y/N → zapíše do CHANGELOG.md
-
-# 4. Commitni CHANGELOG.md
-git add CHANGELOG.md && git commit -m "docs: changelog v0.9.0"
+# 2. Až je verze hotová — vytvoř tag a pushni ho
+git tag v1.5.0
 git push && git push --tags
+
+# 3. Vygeneruj sekci changelogu (commity od předchozího tagu po nový)
+python scripts/make_changelog.py v1.5.0
+# → ukáže preview, potvrdíš y → zapíše do CHANGELOG.md
+
+# 4. Commitni a pushni CHANGELOG.md
+git add CHANGELOG.md && git commit -m "docs: changelog v1.5.0"
+git push
 ```
 
 Skript automaticky rozřadí commity do kategorií (feat→Přidáno, fix→Opraveno, style→Styl…).

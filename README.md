@@ -120,6 +120,41 @@ app/
 - **PWA** — instalovatelná jako aplikace, offline-ready
 - **Autentizace** — session s 8h timeoutem
 
+## Claude Code Skills
+
+Projekt obsahuje vlastní skills pro [Claude Code](https://claude.ai/code) v `.claude/skills/`:
+
+```bash
+claude /deploy      # nasadí aktuální větev na produkci
+claude /seed-demo   # re-seeduje demo instanci
+claude /db          # inspekce a dotazy na lokální SQLite
+```
+
+Skills čtou konfiguraci z `.env` — viz `.env.example`.
+
+## Changelog
+
+Changelog je dostupný přímo v aplikaci — tlačítko s hodinami v levém panelu.
+
+### Workflow při vydání verze
+
+```bash
+# 1. Vyvíjíš a committuješ normálně (feat:, fix:, style: ...)
+
+# 2. Až je verze hotová — vytvoř tag
+git tag v0.9.0
+
+# 3. Vygeneruj sekci changelogu ze všech commitů od posledního tagu
+python scripts/make_changelog.py v0.9.0
+# → ukáže preview, potvrdíš y/N → zapíše do CHANGELOG.md
+
+# 4. Commitni CHANGELOG.md
+git add CHANGELOG.md && git commit -m "docs: changelog v0.9.0"
+git push && git push --tags
+```
+
+Skript automaticky rozřadí commity do kategorií (feat→Přidáno, fix→Opraveno, style→Styl…).
+
 ## Deploy
 
 Automatický deploy přes GitHub Actions při push do `main` nebo vytvoření tagu `v*`. Viz `.github/workflows/deploy.yml`.

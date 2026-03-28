@@ -2,6 +2,24 @@
 
 Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým milníkům vývoje, nikoliv git tagům.
 
+## [v1.5.0] — 2026-03-28
+
+### Opraveno
+- release.sh — changelog se generuje před tagem, ne po
+
+---
+
+## [v1.4.4] — 2026-03-28
+
+### Dokumentace
+- plánované funkce — paginace seznamů (faktury, náklady, kontakty)
+
+### Opraveno
+- deploy — git fetch --tags --force aby se přepsaly staré lokální tagy
+- CHANGELOG — odstraněn duplikát v1.4.3
+
+---
+
 ## [v1.4.3] — 2026-03-28
 
 ### Přidáno

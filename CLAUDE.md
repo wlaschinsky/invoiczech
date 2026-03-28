@@ -39,3 +39,24 @@
 - Každá option: `data-value="{hodnota}"`
 
 Prefixy: `invoice-*` `expense-*` `contact-*` `template-*` `export-*` `profile-*` `login-*` `dashboard-*`
+
+## Deploy stack
+- **Uvicorn** — ASGI server, musí poslouchat na `127.0.0.1`, nikdy `0.0.0.0`
+- **Nginx** — reverse proxy (80/443 → uvicorn)
+- **Certbot** — Let's Encrypt SSL
+- **systemd** — správa procesu (autostart, restart při pádu)
+- Každá instance = jiný port (8001, 8002, ...)
+- Konfigurace v `.env` — nikdy v gitu, `chmod 600 .env`
+- Skills `/deploy` a `/seed-demo` čtou `DEPLOY_HOST`, `DEPLOY_PATH` z `.env`
+
+## Bezpečnost
+- Uvicorn: `--host 127.0.0.1`, nikdy `--host 0.0.0.0`
+- UFW: povolit pouze porty 22, 80, 443
+- Appka nesmí běžet jako root — `User=` v systemd service
+- Rate limit na `/prihlaseni` přes nginx (`limit_req_zone`)
+- FastAPI produkce: `docs_url=None, redoc_url=None`
+- Session timeout 8h, HTTPS only
+
+## README pravidla
+- README je veřejné — žádné IP adresy, server paths, SSH targety, tokeny
+- Deployment konfigurace patří pouze do `.env` (lokálně) nebo `.env.example` (jako placeholder)

@@ -1767,7 +1767,8 @@ a.attachment-filename:hover {
 .login-header p { color: var(--color-text-secondary); font-size: 0.9rem; }
 .login-form .form-group { margin-bottom: 16px; }
 .form-group--remember { margin-bottom: 20px; }
-.form-group--remember .checkbox-label { gap: 12px; }
+.form-group--remember .checkbox-label { gap: 0; }
+.form-group--remember .checkbox-label input[type="checkbox"] { margin-right: 12px; }
 .login-form .form-group label {
   display: block;
   margin-bottom: 6px;

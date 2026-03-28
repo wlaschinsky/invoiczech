@@ -2520,6 +2520,23 @@ a.attachment-filename:hover {
 }
 .docs-tip strong { color: var(--color-text-primary); }
 
+.changelog-modal {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  width: min(680px, calc(100vw - 32px));
+  height: min(620px, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.2s ease;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+.docs-overlay.open .changelog-modal {
+  transform: translateY(0) scale(1);
+}
+
 .changelog-body h2 {
   font-size: 0.95rem;
   font-weight: 600;

@@ -101,6 +101,10 @@
         </li>
       </ul>
       <div class="sidebar-bottom">
+        <button class="sidebar-help-btn" id="changelogBtn" data-tooltip="Changelog" data-testid="changelog-btn">
+          <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          <span class="nav-label">Changelog</span>
+        </button>
         <button class="sidebar-help-btn" id="docsBtn" data-tooltip="Nápověda" data-testid="docs-btn">
           <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
           <span class="nav-label">Nápověda</span>
@@ -1038,10 +1042,6 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           Tipy &amp; Zkratky
         </button>
-        <button class="docs-nav-btn" data-section="changelog" data-testid="docs-changelog-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Changelog
-        </button>
       </nav>
       <div class="docs-body">
         <div class="docs-header">
@@ -1286,17 +1286,24 @@
             <div class="docs-tip"><strong>PWA:</strong> InvoiCzech lze nainstalovat jako aplikaci na plochu telefonu nebo počítače — funguje jako nativní aplikace.</div>
           </div>
 
-          <!-- CHANGELOG -->
-          <div class="docs-section" id="doc-changelog" data-testid="docs-changelog-section">
-            <h2>Changelog</h2>
-            <p class="docs-lead">Historie verzí a změn v aplikaci InvoiCzech.</p>
-            <div id="changelog-content" class="changelog-body"><em>Načítám…</em></div>
-          </div>
-
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Changelog modal -->
+  <div class="docs-overlay" id="changelog-overlay" role="dialog" aria-modal="true" aria-label="Changelog">
+    <div class="changelog-modal">
+      <div class="docs-header">
+        <div class="docs-header-title">Changelog</div>
+        <button class="docs-close-btn" id="changelogClose" aria-label="Zavřít">&times;</button>
+      </div>
+      <div class="docs-content">
+        <div id="changelog-content" class="changelog-body" data-testid="changelog-content"><em>Načítám…</em></div>
+      </div>
+    </div>
+  </div>
+
   <script>
   (function() {
     var overlay = document.getElementById('docs-overlay');
@@ -1317,11 +1324,8 @@
       exporty: 'Exporty',
       profil: 'Profil',
       vyhledavani: 'Vyhledávání',
-      tipy: 'Tipy & Zkratky',
-      changelog: 'Changelog'
+      tipy: 'Tipy & Zkratky'
     };
-
-    var changelogLoaded = false;
 
     function openDocs(section) {
       overlay.classList.add('open');
@@ -1340,18 +1344,6 @@
       if (headerTitle && sectionTitles[key]) headerTitle.textContent = sectionTitles[key];
       var content = overlay.querySelector('.docs-content');
       if (content) content.scrollTop = 0;
-      if (key === 'changelog' && !changelogLoaded) {
-        fetch('/api/changelog')
-          .then(function(r) { return r.text(); })
-          .then(function(html) {
-            var el = document.getElementById('changelog-content');
-            if (el) { el.innerHTML = html; changelogLoaded = true; }
-          })
-          .catch(function() {
-            var el = document.getElementById('changelog-content');
-            if (el) el.innerHTML = '<em>Nepodařilo se načíst changelog.</em>';
-          });
-      }
     }
 
     openBtn.addEventListener('click', function() { openDocs('uvod'); });
@@ -1373,6 +1365,46 @@
       if (!overlay.classList.contains('open') && e.key === '?' && !e.target.closest('input, textarea, select')) {
         openDocs('uvod');
       }
+    });
+  })();
+  </script>
+
+  <script>
+  (function() {
+    var clOverlay = document.getElementById('changelog-overlay');
+    var clOpenBtn = document.getElementById('changelogBtn');
+    var clCloseBtn = document.getElementById('changelogClose');
+    var clLoaded = false;
+
+    function openChangelog() {
+      clOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (!clLoaded) {
+        fetch('/api/changelog')
+          .then(function(r) { return r.text(); })
+          .then(function(html) {
+            var el = document.getElementById('changelog-content');
+            if (el) { el.innerHTML = html; clLoaded = true; }
+          })
+          .catch(function() {
+            var el = document.getElementById('changelog-content');
+            if (el) el.innerHTML = '<em>Nepodařilo se načíst changelog.</em>';
+          });
+      }
+    }
+
+    function closeChangelog() {
+      clOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    clOpenBtn.addEventListener('click', openChangelog);
+    clCloseBtn.addEventListener('click', closeChangelog);
+    clOverlay.addEventListener('click', function(e) {
+      if (e.target === clOverlay) closeChangelog();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (clOverlay.classList.contains('open') && e.key === 'Escape') closeChangelog();
     });
   })();
   </script>

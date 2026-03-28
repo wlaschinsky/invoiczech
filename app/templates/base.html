@@ -10,7 +10,7 @@
   <link rel="manifest" href="/static/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <title>{% block title %}InvoiCzech{% endblock %} — InvoiCzech</title>
-  <link rel="stylesheet" href="/static/style.css?v=8">
+  <link rel="stylesheet" href="/static/style.css?v=9">
   <script src="/static/ares.js" defer></script>
 </head>
 <body>
@@ -100,6 +100,12 @@
           </a>
         </li>
       </ul>
+      <div class="sidebar-bottom">
+        <button class="sidebar-help-btn" id="docsBtn" data-tooltip="Nápověda" data-testid="docs-btn">
+          <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+          <span class="nav-label">Nápověda</span>
+        </button>
+      </div>
     </nav>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
@@ -980,5 +986,370 @@
   })();
   </script>
   {% block scripts %}{% endblock %}
+
+  <!-- Documentation modal -->
+  <div class="docs-overlay" id="docs-overlay" role="dialog" aria-modal="true" aria-label="Nápověda">
+    <div class="docs-modal">
+      <nav class="docs-nav">
+        <div class="docs-nav-header">
+          <div class="docs-nav-title">Nápověda</div>
+        </div>
+        <button class="docs-nav-btn active" data-section="uvod">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Úvod
+        </button>
+        <button class="docs-nav-btn" data-section="dashboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="docs-nav-btn" data-section="faktury">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Faktury
+        </button>
+        <button class="docs-nav-btn" data-section="naklady">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Náklady
+        </button>
+        <button class="docs-nav-btn" data-section="adresar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Adresář
+        </button>
+        <button class="docs-nav-btn" data-section="sablony">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          Šablony
+        </button>
+        <button class="docs-nav-btn" data-section="prehled">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Přehled
+        </button>
+        <button class="docs-nav-btn" data-section="exporty">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exporty
+        </button>
+        <button class="docs-nav-btn" data-section="profil">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profil
+        </button>
+        <button class="docs-nav-btn" data-section="vyhledavani">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Vyhledávání
+        </button>
+        <button class="docs-nav-btn" data-section="tipy">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Tipy &amp; Zkratky
+        </button>
+      </nav>
+      <div class="docs-body">
+        <div class="docs-header">
+          <div class="docs-header-title" id="docs-header-title">Úvod do InvoiCzech</div>
+          <button class="docs-close-btn" id="docsClose" aria-label="Zavřít">&times;</button>
+        </div>
+        <div class="docs-content">
+
+          <!-- ÚVOD -->
+          <div class="docs-section active" id="doc-uvod">
+            <h2>Co je InvoiCzech?</h2>
+            <p class="docs-lead">InvoiCzech je fakturační aplikace navržená pro české OSVČ. Umožňuje vystavovat faktury, evidovat náklady, spravovat kontakty a generovat podklady pro daňové přiznání — vše na jednom místě.</p>
+            <div class="docs-cards">
+              <div class="docs-card">
+                <div class="docs-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <h4>Faktury</h4>
+                <p>Vystavujte faktury s QR platebním kódem a exportujte je do PDF.</p>
+              </div>
+              <div class="docs-card">
+                <div class="docs-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <h4>Náklady</h4>
+                <p>Evidujte výdaje s přílohami a sledujte jejich daňovou uznatelnost.</p>
+              </div>
+              <div class="docs-card">
+                <div class="docs-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <h4>Přehled &amp; Exporty</h4>
+                <p>Roční přehledy příjmů a výdajů, XML pro kontrolní hlášení a DP3.</p>
+              </div>
+              <div class="docs-card">
+                <div class="docs-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <h4>Adresář</h4>
+                <p>Správa odběratelů a dodavatelů s automatickým doplněním z ARES.</p>
+              </div>
+            </div>
+            <h3>Jak začít</h3>
+            <ul>
+              <li>Vyplňte <strong>Profil</strong> — IČO, DIČ, bankovní spojení a výchozí nastavení faktur.</li>
+              <li>Přidejte kontakty do <strong>Adresáře</strong> nebo je vytvořte přímo při vystavení faktury.</li>
+              <li>Vystavte první <strong>Fakturu</strong> a odešlete ji klientovi jako PDF.</li>
+              <li>Evidujte <strong>Náklady</strong> průběžně — ulehčíte si přípravu podkladů pro účetnictví.</li>
+            </ul>
+          </div>
+
+          <!-- DASHBOARD -->
+          <div class="docs-section" id="doc-dashboard">
+            <h2>Dashboard</h2>
+            <p class="docs-lead">Hlavní stránka zobrazuje aktuální finanční situaci na první pohled — příjmy, neuhrazené faktury, náklady a daň na výstupu pro aktuální rok.</p>
+            <h3>Přehledové karty</h3>
+            <ul>
+              <li><strong>Celkový příjem</strong> — součet faktur ve stavu Uhrazeno pro vybraný rok (dle data úhrady).</li>
+              <li><strong>Neuhrazeno</strong> — celková částka vystavených, dosud nezaplacených faktur.</li>
+              <li><strong>Náklady</strong> — součet daňově uznatelných výdajů za rok.</li>
+              <li><strong>Daň na výstupu</strong> — součet DPH z faktur dle DUZP (datum zdanitelného plnění).</li>
+            </ul>
+            <h3>Přepínání roku</h3>
+            <p>Pomocí šipek vlevo/vpravo u nadpisu přepínáte mezi roky. Data se okamžitě přepočítají.</p>
+            <h3>Poslední faktury</h3>
+            <p>Tabulka zobrazuje posledních 10 vystavených faktur. Kliknutím na řádek přejdete na detail faktury.</p>
+          </div>
+
+          <!-- FAKTURY -->
+          <div class="docs-section" id="doc-faktury">
+            <h2>Faktury</h2>
+            <p class="docs-lead">Modul pro vystavování, správu a evidenci faktur. Podporuje více sazeb DPH, QR platební kód a export do PDF.</p>
+            <h3>Stavy faktury</h3>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--blue">Vystaveno</span><span class="docs-status-desc">Faktura byla vystavena, ale dosud nebyla uhrazena.</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--green">Uhrazeno</span><span class="docs-status-desc">Platba byla přijata. Faktura je uzavřena.</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--red">Stornováno</span><span class="docs-status-desc">Faktura byla stornována a není zahrnuta do přehledů.</span></div>
+            <h3>Vytvoření faktury</h3>
+            <ul>
+              <li>Klikněte na <strong>Nová faktura</strong> v pravém horním rohu seznamu.</li>
+              <li>Vyberte odběratele z adresáře — údaje se doplní automaticky.</li>
+              <li>Přidejte položky, nastavte sazbu DPH, množství a cenu.</li>
+              <li>Vyplňte datum vystavení, splatnost a DUZP (důležité pro DPH přiznání).</li>
+              <li>Uložte a stáhněte PDF pomocí tlačítka <strong>Stáhnout PDF</strong>.</li>
+            </ul>
+            <h3>PDF a QR kód</h3>
+            <p>Každá faktura obsahuje QR platební kód ve formátu SPD, který lze naskenovat v mobilní bance a platbu provést jedním klepnutím.</p>
+            <h3>Označení jako uhrazeno</h3>
+            <p>Na detailu faktury klikněte na <strong>Označit jako uhrazeno</strong>. Nastavte datum úhrady — toto datum se používá pro statistiky příjmů.</p>
+            <h3>Šablony</h3>
+            <p>Opakující se faktury (např. měsíční paušál) uložte jako šablonu. Novou fakturu pak vytvoříte jedním klikem bez nutnosti vyplňovat položky znovu.</p>
+          </div>
+
+          <!-- NÁKLADY -->
+          <div class="docs-section" id="doc-naklady">
+            <h2>Náklady</h2>
+            <p class="docs-lead">Evidence přijatých faktur a jiných výdajů. Podporuje přílohy, více sazeb DPH a rozlišení daňové uznatelnosti.</p>
+            <h3>Daňová uznatelnost</h3>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--green">Ano</span><span class="docs-status-desc">Výdaj je daňově uznatelný — zahrnut do přehledů a statistik.</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--red">Ne</span><span class="docs-status-desc">Výdaj není daňově uznatelný (např. soukromý nákup).</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--yellow">Není určeno</span><span class="docs-status-desc">Zatím nerozhodnuto — výdaj není zahrnut do součtů.</span></div>
+            <h3>Typy dokladů</h3>
+            <ul>
+              <li><strong>Faktura</strong> — přijatá faktura od dodavatele.</li>
+              <li><strong>Paragon</strong> — pokladní doklad / stvrzenka.</li>
+              <li><strong>Jiné</strong> — ostatní doklady (smlouvy, výpisy apod.).</li>
+            </ul>
+            <h3>Přílohy</h3>
+            <p>Ke každému nákladu lze nahrát neomezený počet příloh (obrázky, PDF). Kliknutím na miniaturu otevřete lightbox pro náhled. Přílohy lze přetahovat pro změnu pořadí.</p>
+            <h3>Cena s DPH / bez DPH</h3>
+            <p>Přepínačem <strong>Cena obsahuje DPH</strong> zvolíte, zda zadáváte částky brutto (s DPH) nebo netto (bez DPH). Aplikace dopočítá ostatní hodnoty automaticky.</p>
+          </div>
+
+          <!-- ADRESÁŘ -->
+          <div class="docs-section" id="doc-adresar">
+            <h2>Adresář</h2>
+            <p class="docs-lead">Centrální evidence kontaktů — odběratelů, dodavatelů nebo obojí. Údaje se automaticky propisují do faktur a nákladů.</p>
+            <h3>Typy kontaktů</h3>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--blue">Odběratel</span><span class="docs-status-desc">Zákazník, kterému vystavujete faktury.</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--yellow">Dodavatel</span><span class="docs-status-desc">Firma, od které přijímáte faktury (náklady).</span></div>
+            <div class="docs-status-row"><span class="docs-badge docs-badge--green">Obojí</span><span class="docs-status-desc">Kontakt figuruje jako odběratel i dodavatel.</span></div>
+            <h3>Automatické doplnění z ARES</h3>
+            <p>Zadejte IČO a klikněte na <strong>Načíst z ARES</strong>. Aplikace automaticky doplní název firmy, sídlo a DIČ z veřejného registru ARES Ministerstva financí.</p>
+            <h3>Historie transakcí</h3>
+            <p>Na detailu kontaktu vidíte přehled všech faktur a nákladů spojených s tímto kontaktem včetně celkových součtů.</p>
+          </div>
+
+          <!-- ŠABLONY -->
+          <div class="docs-section" id="doc-sablony">
+            <h2>Šablony faktur</h2>
+            <p class="docs-lead">Šablony umožňují uložit opakující se faktury (paušály, pravidelné služby) a vytvářet z nich nové faktury jedním klikem bez přepisování položek.</p>
+            <h3>Vytvoření šablony</h3>
+            <ul>
+              <li>Přejděte do sekce <strong>Šablony</strong> a klikněte na <strong>Nová šablona</strong>.</li>
+              <li>Pojmenujte šablonu (např. „Měsíční paušál — web") a nastavte výchozí kontakt, splatnost a položky.</li>
+              <li>Uložte. Šablona se zobrazí v přehledu.</li>
+            </ul>
+            <h3>Vytvoření faktury ze šablony</h3>
+            <p>Na detailu šablony klikněte na <strong>Vystavit fakturu</strong>. Otevře se předvyplněný formulář — zkontrolujte data a uložte. Položky, kontakt i splatnost jsou předvyplněny ze šablony.</p>
+          </div>
+
+          <!-- PŘEHLED -->
+          <div class="docs-section" id="doc-prehled">
+            <h2>Přehled</h2>
+            <p class="docs-lead">Roční přehled zobrazuje měsíční rozpad příjmů, výdajů a DPH. Slouží jako podklad pro kontrolu financí nebo přípravu daňového přiznání.</p>
+            <h3>Filtr základu</h3>
+            <p>Přepínačem v záhlaví vyberte, podle jakého data se mají data počítat:</p>
+            <ul>
+              <li><strong>DUZP</strong> — datum zdanitelného plnění (relevantní pro DPH přiznání).</li>
+              <li><strong>Vystavení</strong> — datum vystavení faktury.</li>
+              <li><strong>Úhrada</strong> — datum skutečné platby.</li>
+            </ul>
+            <h3>Export</h3>
+            <p>Přehled lze exportovat do <strong>PDF</strong> (pro tisk nebo archivaci) nebo <strong>CSV</strong> (pro import do Excelu či účetního softwaru) pomocí tlačítek v pravém horním rohu.</p>
+          </div>
+
+          <!-- EXPORTY -->
+          <div class="docs-section" id="doc-exporty">
+            <h2>Exporty</h2>
+            <p class="docs-lead">Generování XML souborů pro elektronické podání na Finanční správu ČR. Podporovány jsou Kontrolní hlášení (KH1) a Přiznání k DPH (DP3).</p>
+            <h3>Kontrolní hlášení (KH1)</h3>
+            <p>XML soubor obsahující seznam přijatých a vydaných plnění dle čtvrtletí. Podává se elektronicky přes portál Finanční správy nebo datovou schránku.</p>
+            <ul>
+              <li>Vyberte rok a čtvrtletí.</li>
+              <li>Klikněte na <strong>Stáhnout KH1 XML</strong>.</li>
+              <li>Soubor nahrajte do portálu Finanční správy (EPO2).</li>
+            </ul>
+            <h3>Přiznání k DPH (DP3)</h3>
+            <p>XML soubor pro čtvrtletní nebo měsíční přiznání k DPH. Obsahuje součty základů daně a DPH dle sazeb.</p>
+            <div class="docs-tip"><strong>Upozornění:</strong> Před podáním vždy zkontrolujte exportovaná data s výkazem ve svém účetním softwaru nebo u daňového poradce. InvoiCzech slouží jako pomocný nástroj, nikoli jako certifikovaný účetní software.</div>
+          </div>
+
+          <!-- PROFIL -->
+          <div class="docs-section" id="doc-profil">
+            <h2>Profil</h2>
+            <p class="docs-lead">Profil obsahuje veškeré informace o vaší firmě, které se automaticky propisují do faktur, PDF a daňových exportů.</p>
+            <h3>Co vyplnit</h3>
+            <ul>
+              <li><strong>Osobní údaje</strong> — jméno, příjmení, e-mail, telefon.</li>
+              <li><strong>Firma</strong> — IČO, DIČ, název firmy (pokud podnikáte pod firmou), status plátce DPH.</li>
+              <li><strong>Adresa</strong> — ulice, číslo popisné/orientační, město, PSČ.</li>
+              <li><strong>Bankovní spojení</strong> — číslo účtu, IBAN, název banky. Tyto údaje se zobrazují na faktuře a generují QR kód.</li>
+              <li><strong>Finanční úřad</strong> — informace pro daňové exporty (KH1, DP3).</li>
+            </ul>
+            <h3>Výchozí nastavení faktur</h3>
+            <ul>
+              <li><strong>Splatnost</strong> — výchozí počet dnů splatnosti (např. 14 dní).</li>
+              <li><strong>Způsob platby</strong> — převodem / hotovost / karta.</li>
+              <li><strong>Text faktury</strong> — výchozí text zobrazený na všech fakturách.</li>
+              <li><strong>Sazba DPH</strong> — výchozí sazba DPH pro nové položky.</li>
+            </ul>
+            <h3>Logo</h3>
+            <p>V sekci loga vyberte jednu ze tří možností: <strong>výchozí</strong> (logo InvoiCzech), <strong>vlastní</strong> (nahrajte obrázek, zobrazí se na PDF fakturách) nebo <strong>žádné</strong> (bez loga).</p>
+          </div>
+
+          <!-- VYHLEDÁVÁNÍ -->
+          <div class="docs-section" id="doc-vyhledavani">
+            <h2>Vyhledávání</h2>
+            <p class="docs-lead">Globální vyhledávání prohledává faktury, náklady i kontakty současně. Výsledky se zobrazují v reálném čase při psaní.</p>
+            <h3>Jak vyhledávat</h3>
+            <ul>
+              <li>Klikněte do vyhledávacího pole v horní liště (nebo stiskněte <span class="docs-key">/</span>).</li>
+              <li>Začněte psát — minimálně <strong>2 znaky</strong> spustí vyhledávání.</li>
+              <li>Výsledky jsou rozděleny do kategorií: Faktury, Náklady, Adresář.</li>
+              <li>Pomocí záložek filtrujte výsledky jen pro jednu kategorii.</li>
+            </ul>
+            <h3>Navigace v výsledcích</h3>
+            <ul>
+              <li>Šipky <span class="docs-key">↑</span> <span class="docs-key">↓</span> pro pohyb v seznamu.</li>
+              <li><span class="docs-key">Enter</span> pro přechod na vybraný výsledek.</li>
+              <li><span class="docs-key">Esc</span> pro zavření výsledků.</li>
+            </ul>
+            <h3>Co se prohledává</h3>
+            <ul>
+              <li><strong>Faktury</strong> — číslo faktury, název kontaktu, variabilní symbol.</li>
+              <li><strong>Náklady</strong> — název nákladu, číslo dokladu, název dodavatele.</li>
+              <li><strong>Adresář</strong> — název firmy, IČO, e-mail.</li>
+            </ul>
+          </div>
+
+          <!-- TIPY -->
+          <div class="docs-section" id="doc-tipy">
+            <h2>Tipy &amp; Zkratky</h2>
+            <p class="docs-lead">Užitečné tipy pro efektivnější práci s InvoiCzech.</p>
+            <h3>Klávesové zkratky</h3>
+            <div class="docs-shortcut-row">
+              <span class="docs-shortcut-desc">Otevřít vyhledávání</span>
+              <span class="docs-kbd"><span class="docs-key">/</span></span>
+            </div>
+            <div class="docs-shortcut-row">
+              <span class="docs-shortcut-desc">Pohyb ve výsledcích vyhledávání</span>
+              <span class="docs-kbd"><span class="docs-key">↑</span> <span class="docs-key">↓</span></span>
+            </div>
+            <div class="docs-shortcut-row">
+              <span class="docs-shortcut-desc">Potvrdit / otevřít výsledek</span>
+              <span class="docs-kbd"><span class="docs-key">Enter</span></span>
+            </div>
+            <div class="docs-shortcut-row">
+              <span class="docs-shortcut-desc">Zavřít dialog / vyhledávání / nápovědu</span>
+              <span class="docs-kbd"><span class="docs-key">Esc</span></span>
+            </div>
+            <div class="docs-shortcut-row">
+              <span class="docs-shortcut-desc">Otevřít nápovědu</span>
+              <span class="docs-kbd"><span class="docs-key">?</span></span>
+            </div>
+            <h3>Tipy</h3>
+            <div class="docs-tip"><strong>ARES:</strong> Při vytváření kontaktu stačí zadat IČO a kliknout na „Načíst z ARES" — název, adresa i DIČ se doplní automaticky.</div>
+            <div class="docs-tip"><strong>Sidebar:</strong> Levý panel lze sbalit kliknutím na oddělovač se šipkou — získáte více prostoru pro práci.</div>
+            <div class="docs-tip"><strong>Neuložené změny:</strong> Při pokusu o odchod z formuláře s neuloženými změnami vás aplikace upozorní a nabídne potvrzení.</div>
+            <div class="docs-tip"><strong>Hromadné akce:</strong> V seznamu faktur a nákladů lze označit více záznamů najednou a provést hromadnou akci (stornování, smazání).</div>
+            <div class="docs-tip"><strong>PWA:</strong> InvoiCzech lze nainstalovat jako aplikaci na plochu telefonu nebo počítače — funguje jako nativní aplikace.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    var overlay = document.getElementById('docs-overlay');
+    var openBtn = document.getElementById('docsBtn');
+    var closeBtn = document.getElementById('docsClose');
+    var headerTitle = document.getElementById('docs-header-title');
+    var navBtns = overlay.querySelectorAll('.docs-nav-btn');
+    var sections = overlay.querySelectorAll('.docs-section');
+
+    var sectionTitles = {
+      uvod: 'Úvod do InvoiCzech',
+      dashboard: 'Dashboard',
+      faktury: 'Faktury',
+      naklady: 'Náklady',
+      adresar: 'Adresář',
+      sablony: 'Šablony faktur',
+      prehled: 'Přehled',
+      exporty: 'Exporty',
+      profil: 'Profil',
+      vyhledavani: 'Vyhledávání',
+      tipy: 'Tipy & Zkratky'
+    };
+
+    function openDocs(section) {
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (section) showSection(section);
+    }
+
+    function closeDocs() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function showSection(key) {
+      navBtns.forEach(function(b) { b.classList.toggle('active', b.dataset.section === key); });
+      sections.forEach(function(s) { s.classList.toggle('active', s.id === 'doc-' + key); });
+      if (headerTitle && sectionTitles[key]) headerTitle.textContent = sectionTitles[key];
+      var content = overlay.querySelector('.docs-content');
+      if (content) content.scrollTop = 0;
+    }
+
+    openBtn.addEventListener('click', function() { openDocs('uvod'); });
+    closeBtn.addEventListener('click', closeDocs);
+
+    navBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() { showSection(btn.dataset.section); });
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeDocs();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (overlay.classList.contains('open') && e.key === 'Escape') {
+        closeDocs();
+      }
+      // Open with '?' key (only when not in an input)
+      if (!overlay.classList.contains('open') && e.key === '?' && !e.target.closest('input, textarea, select')) {
+        openDocs('uvod');
+      }
+    });
+  })();
+  </script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

@@ -145,7 +145,7 @@ Changelog je dostupný přímo v aplikaci — tlačítko s hodinami v levém pan
 ./scripts/release.sh v1.5.0
 ```
 
-Skript automaticky: vytvoří tag → pushne → vygeneruje changelog → commitne → pushne.
+Skript automaticky: vygeneruje changelog → commitne → vytvoří tag → pushne.
 
 Skript rozřadí commity do kategorií (feat→Přidáno, fix→Opraveno, style→Styl…).
 

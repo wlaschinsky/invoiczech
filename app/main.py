@@ -41,11 +41,19 @@ async def auth_middleware(request: Request, call_next):
 
     authenticated = request.session.get("authenticated")
     expires_at_str = request.session.get("expires_at")
+    login_time_str = request.session.get("login_time")  # zpětná kompatibilita
 
-    if authenticated and expires_at_str:
+    if authenticated:
         try:
-            expires_at = datetime.fromisoformat(expires_at_str)
-            if datetime.now() > expires_at:
+            if expires_at_str:
+                if datetime.now() > datetime.fromisoformat(expires_at_str):
+                    request.session.clear()
+                    return RedirectResponse(url="/prihlaseni", status_code=302)
+            elif login_time_str:
+                # stará session — přijmout, ale vynutit nové přihlášení
+                request.session.clear()
+                return RedirectResponse(url="/prihlaseni", status_code=302)
+            else:
                 request.session.clear()
                 return RedirectResponse(url="/prihlaseni", status_code=302)
         except ValueError:

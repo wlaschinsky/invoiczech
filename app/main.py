@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import markdown as md
@@ -40,12 +40,12 @@ async def auth_middleware(request: Request, call_next):
         return await call_next(request)
 
     authenticated = request.session.get("authenticated")
-    login_time_str = request.session.get("login_time")
+    expires_at_str = request.session.get("expires_at")
 
-    if authenticated and login_time_str:
+    if authenticated and expires_at_str:
         try:
-            login_time = datetime.fromisoformat(login_time_str)
-            if datetime.now() - login_time > timedelta(hours=8):
+            expires_at = datetime.fromisoformat(expires_at_str)
+            if datetime.now() > expires_at:
                 request.session.clear()
                 return RedirectResponse(url="/prihlaseni", status_code=302)
         except ValueError:

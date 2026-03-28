@@ -21,16 +21,17 @@ async def login_page(request: Request):
 async def login_submit(
     request: Request,
     password: str = Form(...),
+    remember: str = Form(default=""),
 ):
     if not settings.PASSWORD_HASH:
-        # První spuštění bez hesla — nastavení hesla
         _flash(request, "Heslo není nastaveno. Spusťte setup.py a nastavte PASSWORD_HASH v .env.", "error")
         return templates.TemplateResponse("login.html", {"request": request})
 
     if _bcrypt.checkpw(password.encode(), settings.PASSWORD_HASH.encode()):
-        from datetime import datetime
+        from datetime import datetime, timedelta
+        ttl = timedelta(days=30) if remember == "1" else timedelta(hours=8)
         request.session["authenticated"] = True
-        request.session["login_time"] = datetime.now().isoformat()
+        request.session["expires_at"] = (datetime.now() + ttl).isoformat()
         return RedirectResponse(url="/", status_code=302)
 
     _flash(request, "Nesprávné heslo.", "error")

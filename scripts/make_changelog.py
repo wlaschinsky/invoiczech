@@ -39,8 +39,11 @@ def get_tags() -> list[str]:
     return [t for t in out.splitlines() if t]
 
 
-def get_commits_since(ref: str) -> list[str]:
-    log_range = f"{ref}..HEAD" if ref else "HEAD"
+def get_commits_between(from_ref: str, to_ref: str) -> list[str]:
+    if from_ref:
+        log_range = f"{from_ref}..{to_ref}"
+    else:
+        log_range = to_ref
     out = run(["git", "log", log_range, "--pretty=format:%s"])
     return [l for l in out.splitlines() if l]
 
@@ -85,25 +88,27 @@ def prepend_to_changelog(section: str) -> None:
 
 def main():
     tags = get_tags()
-    prev_tag = tags[0] if tags else None
-
     # Verze pro novou sekci
     if len(sys.argv) > 1:
         new_version = sys.argv[1]
-    elif prev_tag:
-        # Inkrementuj patch číslo automaticky
-        m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", prev_tag)
-        if m:
-            major, minor, patch = int(m.group(1)), int(m.group(2)), int(m.group(3))
-            new_version = f"v{major}.{minor}.{patch + 1}"
-        else:
-            new_version = "Unreleased"
+        # Pokud byl tag zadán a existuje, použij ho jako horní hranici
+        current_tag = new_version if new_version in tags else "HEAD"
+        # Předchozí tag = druhý nejnovější (nebo žádný)
+        tag_index = tags.index(new_version) if new_version in tags else -1
+        prev_tag = tags[tag_index + 1] if tag_index + 1 < len(tags) else None
+    elif tags:
+        # Bez argumentu: nejnovější tag jako horní, druhý jako spodní hranice
+        current_tag = tags[0]
+        new_version = current_tag
+        prev_tag = tags[1] if len(tags) > 1 else None
     else:
+        current_tag = "HEAD"
         new_version = "Unreleased"
+        prev_tag = None
 
-    commits = get_commits_since(prev_tag or "")
+    commits = get_commits_between(prev_tag or "", current_tag)
     if not commits:
-        print(f"Žádné nové commity od {prev_tag or 'začátku'}.")
+        print(f"Žádné commity mezi {prev_tag or 'začátkem'} a {current_tag}.")
         return
 
     buckets = classify(commits)

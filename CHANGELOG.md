@@ -2,6 +2,13 @@
 
 Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým milníkům vývoje, nikoliv git tagům.
 
+## [v1.5.1] — 2026-03-28
+
+### Dokumentace
+- README — opraveno pořadí kroků v release workflow
+
+---
+
 ## [v1.5.0] — 2026-03-28
 
 ### Opraveno

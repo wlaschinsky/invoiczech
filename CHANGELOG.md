@@ -2,32 +2,28 @@
 
 Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým milníkům vývoje, nikoliv git tagům.
 
----
-
-## [Unreleased / v0.8.x] — 2025–2026
-
-### Přidáno
-- Dokumentační popup — tlačítko `?` v sidebaru, 11 sekcí nápovědy
-- Vlastní logo na faktuře — možnost výchozí / vlastní upload / žádné
-- Přehled — filtr dle základu (DUZP / Vystavení / Úhrada)
-- Daň na výstupu — řádek po odečtení DPH z nákladů
-- Tooltips na stat-card v dashboardu a přehledu
-- Rok v exportech — dropdown jen s roky kde existují data
-
-### Opraveno
-- Výběr šablony — odebráním šablony se vyčistí předvyplněná pole
-- Blur pozadí při otevření dokumentačního modalu
-- Přehled — labely Uhrazeno/Vystaveno/DUZP, `available_years` zahrnuje `paid_date`, dynamické tooltips
-- Exporty — oprava přístupu k roku z SQLAlchemy Row
-- Sort ikony na mobilu (cache busting + silnější CSS pravidla)
+## [v1.4.0] — 2026-03-28
 
 ### Styl
-- Šablony mobil — tlačítka Upravit/Smazat pod sebou
-- `content-inner` max-width 1100px → 1280px (všechny stránky)
-- Seznam faktur/nákladů — full width na desktopu (`:has`)
-- Horizontální scroll list tabulky na desktopu (min-width: 1050px)
-- Měna v profilu — dropdown CZK/EUR/USD
-- Sorting hlavičky — na mobilu bez ikon
+- changelog tlačítko v sidebaru přesunuto pod nápovědu
+- blur pozadí při otevření dokumentačního modalu
+
+### Přidáno
+- Claude Code skills (deploy, seed-demo, db) + settings.json permissions + .env.example deployment vars
+- skript make_changelog.py — generuje sekci v CHANGELOG.md z git commitů od posledního tagu
+- changelog v docs modalu — /api/changelog endpoint + nová sekce v nápovědě
+- dokumentační popup — tlačítko ? v sidebaru, 11 sekcí nápovědy
+
+### Dokumentace
+- workflow pro changelog v README
+- CHANGELOG.md — přehled verzí od v0.1.0, doplněny sekce Deploy/Bezpečnost/README do CLAUDE.md
+
+### Refaktoring
+- changelog — vlastní popup modal oddělený od nápovědy, tlačítko v sidebaru
+
+### Opraveno
+- výběr šablony — odebráním šablony se vyčistí předvyplněná pole
+- odstraněn duplicitní block scripts v base.html
 
 ---
 

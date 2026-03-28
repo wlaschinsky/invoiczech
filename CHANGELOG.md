@@ -4,39 +4,16 @@ Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým mi
 
 ## [v1.4.3] — 2026-03-28
 
-### Opraveno
-- odstranění citlivých souborů z gitu (CSV data, settings.local.json)
-- auth middleware — zpětná kompatibilita se starými session (login_time → expires_at)
-
-### Styl
-- login — opravena mezera u checkboxu Zapamatovat heslo
-- login — větší mezera mezi checkboxem a popiskem
-- login — checkbox "Zapamatovat heslo" v designu aplikace (checkbox-label)
-
 ### Přidáno
-- přihlašení — checkbox "Zapamatovat přihlášení" prodlouží session na 30 dní
-
-### Dokumentace
-- changelog v1.4.1
-
----
-
-## [v1.4.3] — 2026-03-28
+- přihlášení — checkbox "Zapamatovat přihlášení" prodlouží session na 30 dní
 
 ### Opraveno
-- odstranění citlivých souborů z gitu (CSV data, settings.local.json)
 - auth middleware — zpětná kompatibilita se starými session (login_time → expires_at)
+- odstranění citlivých souborů z gitu (CSV data, settings.local.json)
 
 ### Styl
-- login — opravena mezera u checkboxu Zapamatovat heslo
-- login — větší mezera mezi checkboxem a popiskem
 - login — checkbox "Zapamatovat heslo" v designu aplikace (checkbox-label)
-
-### Přidáno
-- přihlašení — checkbox "Zapamatovat přihlášení" prodlouží session na 30 dní
-
-### Dokumentace
-- changelog v1.4.1
+- login — opraveny mezery u checkboxu Zapamatovat heslo
 
 ---
 

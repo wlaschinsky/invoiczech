@@ -1,0 +1,15 @@
+Inspect or query the local SQLite database.
+
+Steps:
+1. Determine the DB path from DATABASE_URL in .env (default: `faktury.db` in project root).
+2. Run the requested query using: `sqlite3 <db_path> "<query>"`
+3. For a general overview (no specific query given), run `.tables` and then `SELECT COUNT(*) FROM invoices; SELECT COUNT(*) FROM expenses; SELECT COUNT(*) FROM contacts;`
+
+Common queries to know:
+- List tables: `.tables`
+- Count invoices: `SELECT COUNT(*) FROM invoices;`
+- Count expenses: `SELECT COUNT(*) FROM expenses;`
+- Count contacts: `SELECT COUNT(*) FROM contacts;`
+- Recent invoices: `SELECT number, total, issued_date FROM invoices ORDER BY id DESC LIMIT 10;`
+
+Always use the `./venv/bin/python3` interpreter for any Python-based DB operations (e.g. running migrate.py).

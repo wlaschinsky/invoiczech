@@ -1,11 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pip list:*)",
-      "Bash(./venv/bin/python3 -c \":*)",
-      "WebFetch(domain:qr-platba.cz)",
-      "Bash(kill 78548 78549 78550)",
-      "Bash(./venv/bin/python3 scripts/import_vyfakturuj.py --contacts \"Adresář - 21.03.2026.csv\" --invoices \"Vyfakturuj.cz export 2021-03-01 - 2026-03-31 samuel-wlaschinsky.csv\" --expenses \"Vyfakturuj.cz export samuel-wlaschinsky.csv\")"
+      "Bash(git push:*)",
+      "Bash(ssh *:*)",
+      "Bash(scp *:*)",
+      "Bash(sqlite3 *:*)",
+      "Bash(./venv/bin/python3 *:*)",
+      "Bash(python3 *:*)",
+      "Bash(pip *:*)",
+      "Bash(ls *:*)",
+      "Bash(find *:*)",
+      "WebFetch(domain:qr-platba.cz)"
     ]
   }
 }

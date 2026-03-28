@@ -1,0 +1,9 @@
+Deploy the current branch to the production VPS.
+
+Steps:
+1. Read DEPLOY_HOST and DEPLOY_PATH from the local .env file. If missing, tell the user to add them (see .env.example).
+2. Run: `ssh $DEPLOY_HOST "cd $DEPLOY_PATH && git pull"`
+3. If the pull succeeds, confirm with the commit hash that is now live: `ssh $DEPLOY_HOST "cd $DEPLOY_PATH && git log -1 --oneline"`
+4. Report success or any errors clearly.
+
+Do not restart the service unless the user asks — systemd watchdog handles it automatically.

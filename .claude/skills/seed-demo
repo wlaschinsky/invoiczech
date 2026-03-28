@@ -1,0 +1,9 @@
+Seed (or re-seed) demo data on the demo server instance.
+
+Steps:
+1. Read DEPLOY_HOST and DEPLOY_DEMO_PATH from the local .env file. If missing, tell the user to add them (see .env.example).
+2. First deploy latest code to demo: `ssh $DEPLOY_HOST "cd $DEPLOY_DEMO_PATH && git pull"`
+3. Then clear and re-seed demo data: `ssh $DEPLOY_HOST "cd $DEPLOY_DEMO_PATH && source venv/bin/activate && python scripts/seed_demo.py --clear"`
+4. Report how many records were created (seed_demo.py prints a summary).
+
+If the user only wants to seed without deploying, skip step 2.

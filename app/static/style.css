@@ -566,8 +566,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-primary);
 }
 .breadcrumb-home {
-  position: absolute;
-  right: calc(100% + 8px);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1931,7 +1929,6 @@ a.attachment-filename:hover {
   .stats-row--3 { grid-template-columns: repeat(2, 1fr); }
   .form-row { flex-direction: column; }
   .filter-form { flex-direction: column; }
-  .breadcrumb-home { position: static; }
   /* Hide less important table columns on mobile */
   .mobile-hide { display: none !important; }
   /* Šablony — tlačítka Upravit/Smazat pod sebou */
@@ -2522,6 +2519,36 @@ a.attachment-filename:hover {
   line-height: 1.6;
 }
 .docs-tip strong { color: var(--color-text-primary); }
+
+.changelog-body h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 1.4rem 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.changelog-body h2:first-child { margin-top: 0; }
+.changelog-body h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0.9rem 0 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.changelog-body ul {
+  margin: 0.2rem 0 0.6rem 0;
+  padding-left: 1.2rem;
+}
+.changelog-body ul li {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.15rem;
+}
+.changelog-body p { font-size: 0.82rem; color: var(--color-text-secondary); }
+.changelog-body hr { border: none; border-top: 1px solid var(--color-border); margin: 1rem 0; }
 
 @media (max-width: 768px) {
   .docs-modal {

@@ -1,8 +1,11 @@
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import markdown as md
 
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -76,6 +79,22 @@ app.include_router(invoice_templates.router)
 app.include_router(search.router)
 app.include_router(overview.router)
 app.include_router(profile.router)
+
+
+# --- Changelog API ---
+_CHANGELOG_PATH = Path(__file__).parent.parent / "CHANGELOG.md"
+
+
+@app.get("/api/changelog", response_class=HTMLResponse)
+async def api_changelog(request: Request):
+    if not request.session.get("authenticated"):
+        return HTMLResponse("<p>Neautorizováno.</p>", status_code=401)
+    try:
+        raw = _CHANGELOG_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return HTMLResponse("<p>Soubor CHANGELOG.md nenalezen.</p>")
+    html = md.markdown(raw, extensions=["nl2br"])
+    return HTMLResponse(html)
 
 
 # --- Startup ---

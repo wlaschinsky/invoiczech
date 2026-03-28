@@ -322,6 +322,9 @@
 </style>
 <script>
 var IS_VAT_PAYER = {{ 'true' if profile.vat_payer else 'false' }};
+var DEFAULT_PAYMENT_METHOD = {{ (invoice.payment_method if invoice else 'Bankovní převod')|tojson }};
+var DEFAULT_DUE_DAYS = {{ ((invoice.due_date - invoice.issue_date).days if invoice else 10)|int }};
+var DEFAULT_INVOICE_TEXT = {{ (invoice.invoice_text if invoice else (default_text or ''))|tojson }};
 
 function fmtCzk(val) {
   if (isNaN(val)) return '—';
@@ -424,8 +427,25 @@ function removeRow(btn) {
   }
 }
 
+function clearTemplate() {
+  // Kontakt
+  document.getElementById('contact_search').value = '';
+  document.getElementById('contact-clear').style.display = 'none';
+  fillContact({id: ''});
+  // Způsob úhrady a splatnost
+  document.getElementById('payment_method').value = DEFAULT_PAYMENT_METHOD;
+  document.getElementById('due_days').value = DEFAULT_DUE_DAYS;
+  updateDueDate();
+  // Položky — jeden prázdný řádek
+  const tbody = document.getElementById('items-tbody');
+  tbody.innerHTML = '';
+  addItemRow();
+  // Text faktury
+  document.querySelector('[name="invoice_text"]').value = DEFAULT_INVOICE_TEXT;
+}
+
 async function applyTemplate(tplId) {
-  if (!tplId) return;
+  if (!tplId) { clearTemplate(); return; }
   try {
     const resp = await fetch(`/sablony/${tplId}/json`);
     const data = await resp.json();

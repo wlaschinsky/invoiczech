@@ -18,7 +18,7 @@
 
 {% block content %}
 <div class="page-header">
-  <h1>{% if invoice %}Upravit fakturu {{ invoice.number }}{% else %}Nová faktura ({{ next_number }}){% endif %}</h1>
+  <h1>{% if invoice %}Upravit fakturu {{ invoice.number }}{% else %}Nová faktura{% endif %}</h1>
   {% if invoice %}
   <a href="/faktury/{{ invoice.id }}" class="btn btn-ghost">Zpět</a>
   {% else %}
@@ -123,9 +123,19 @@
     </div>
   </div>
 
-  <!-- Datum a platba -->
+  <!-- Číslo faktury + Datum a platba -->
   <div class="form-section">
     <h2 class="form-section-title">Datum a platební podmínky</h2>
+    {% if not invoice %}
+    <div class="form-row">
+      <div class="form-group">
+        <label for="invoice_number">Číslo faktury *</label>
+        <input type="text" id="invoice_number" name="invoice_number"
+               value="{{ next_number }}"
+               class="form-control" required data-testid="invoice-number-field">
+      </div>
+    </div>
+    {% endif %}
     <div class="form-row">
       <div class="form-group">
         <label for="issue_date">Datum vystavení *</label>

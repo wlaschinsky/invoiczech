@@ -150,12 +150,18 @@ async def create_invoice(request: Request, db: Session = Depends(get_db)):
         flash(request, "Datum vystavení a splatnosti jsou povinné.", "error")
         return templates.TemplateResponse("invoices/form.html", form_ctx)
 
+    # Číslo faktury – uživatel může přepsat
+    number = form.get("invoice_number", "").strip() or next_number
+    existing = db.query(Invoice).filter(Invoice.number == number).first()
+    if existing:
+        flash(request, f"Faktura s číslem {number} již existuje.", "error")
+        return templates.TemplateResponse("invoices/form.html", form_ctx)
+
     # Kontakt
     contact_id_raw = form.get("contact_id", "").strip()
     contact_id = int(contact_id_raw) if contact_id_raw else None
     contact = db.query(Contact).filter(Contact.id == contact_id).first() if contact_id else None
 
-    number = next_number
     variable_symbol = number.replace("FA ", "")
 
     invoice = Invoice(

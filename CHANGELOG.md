@@ -2,6 +2,13 @@
 
 Všechny změny jsou řazeny od nejnovějších. Verze odpovídají logickým milníkům vývoje, nikoliv git tagům.
 
+## [v1.6.0] — 2026-04-01
+
+### Přidáno
+- číslo faktury jako editovatelné pole s předvyplněnou hodnotou
+
+---
+
 ## [v1.5.1] — 2026-03-28
 
 ### Dokumentace

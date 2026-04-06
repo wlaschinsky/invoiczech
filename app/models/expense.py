@@ -104,13 +104,25 @@ class ExpenseItem(Base):
         )
 
     @property
+    def _gross_total(self) -> Decimal:
+        """Total computed from gross unit price (qty * net * (1+vat))."""
+        gross = Decimal(str(self.unit_price)) * (1 + Decimal(str(self.vat_rate)) / 100)
+        return (Decimal(str(self.quantity)) * gross).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+
+    @property
     def vat_amount(self) -> Decimal:
+        if self.expense and self.expense.price_includes_vat and self.vat_rate > 0:
+            return self._gross_total - self.subtotal
         return (self.subtotal * Decimal(str(self.vat_rate)) / 100).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
 
     @property
     def total(self) -> Decimal:
+        if self.expense and self.expense.price_includes_vat and self.vat_rate > 0:
+            return self._gross_total
         return self.subtotal + self.vat_amount
 
 

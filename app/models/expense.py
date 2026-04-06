@@ -96,6 +96,14 @@ class ExpenseItem(Base):
         )
 
     @property
+    def gross_unit_price(self) -> Decimal:
+        """Unit price including VAT — for display in form when price_includes_vat is True."""
+        net = Decimal(str(self.unit_price))
+        return (net * (1 + Decimal(str(self.vat_rate)) / 100)).quantize(
+            Decimal("0.0001"), rounding=ROUND_HALF_UP
+        )
+
+    @property
     def vat_amount(self) -> Decimal:
         return (self.subtotal * Decimal(str(self.vat_rate)) / 100).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP

@@ -288,6 +288,7 @@
              accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic">
       <small class="text-muted">PDF, JPG, PNG, GIF, WebP, HEIC — max 10 MB na soubor</small>
       <div id="attachment-error" class="text-danger" style="display:none; margin-top:4px; font-size:0.85rem;"></div>
+      <ul id="pending-files" class="attachment-list" style="margin-top:8px"></ul>
     </div>
     <div class="form-group">
       <label for="notes">Poznámky</label>
@@ -634,13 +635,43 @@ document.getElementById('items-tbody').addEventListener('input', function(e) {
 document.getElementById('price_includes_vat').addEventListener('change', recalcTotals);
 document.addEventListener('DOMContentLoaded', recalcTotals);
 
-// Attachment validation
+// ── Pending files management ─────────────────────────────────────────────────
 (function() {
   var input = document.getElementById('attachment');
   var errEl = document.getElementById('attachment-error');
+  var pendingList = document.getElementById('pending-files');
   if (!input || !errEl) return;
   var maxSize = 10 * 1024 * 1024;
   var allowed = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.heic'];
+
+  // Collected files (DataTransfer lets us build a synthetic FileList)
+  var pendingFiles = [];
+
+  function renderPending() {
+    pendingList.innerHTML = '';
+    pendingFiles.forEach(function(file, idx) {
+      var li = document.createElement('li');
+      li.className = 'attachment-item';
+      var sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      li.innerHTML =
+        '<span class="attachment-filename">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' +
+          file.name + ' <small style="opacity:.6">(' + sizeMB + ' MB)</small>' +
+        '</span>';
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'attachment-delete-btn';
+      removeBtn.title = 'Odebrat';
+      removeBtn.setAttribute('data-testid', 'expense-attachment-remove-btn');
+      removeBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      removeBtn.addEventListener('click', function() {
+        pendingFiles.splice(idx, 1);
+        renderPending();
+      });
+      li.appendChild(removeBtn);
+      pendingList.appendChild(li);
+    });
+  }
 
   input.addEventListener('change', function() {
     errEl.style.display = 'none';
@@ -661,7 +692,71 @@ document.addEventListener('DOMContentLoaded', recalcTotals);
         input.value = '';
         return;
       }
+      pendingFiles.push(file);
     }
+    input.value = '';
+    renderPending();
+  });
+
+  // Expose for form submit handler
+  window._getPendingFiles = function() { return pendingFiles; };
+})();
+
+// ── Form submit via fetch (prevent 4xx error pages) ─────────────────────────
+(function() {
+  var form = document.querySelector('[data-testid="expense-form"]');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var submitBtn = form.querySelector('[data-testid="expense-submit"]');
+    var origText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Ukládám…';
+
+    var formData = new FormData(form);
+
+    // Remove the empty file input entries and add our pending files
+    formData.delete('attachment');
+    var pendingFiles = window._getPendingFiles ? window._getPendingFiles() : [];
+    for (var i = 0; i < pendingFiles.length; i++) {
+      formData.append('attachment', pendingFiles[i]);
+    }
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    }).then(function(response) {
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+      if (response.ok) {
+        // Server returned HTML (validation error page) — replace page content
+        return response.text().then(function(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        });
+      }
+      // 4xx / 5xx error — show inline
+      var errEl = document.getElementById('attachment-error');
+      if (response.status === 413) {
+        errEl.textContent = 'Soubor je příliš velký. Nginx povoluje max ~1 MB. Kontaktujte správce serveru pro zvýšení limitu (client_max_body_size).';
+      } else {
+        errEl.textContent = 'Chyba při ukládání (HTTP ' + response.status + '). Zkuste to znovu.';
+      }
+      errEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+    }).catch(function(err) {
+      var errEl = document.getElementById('attachment-error');
+      errEl.textContent = 'Chyba připojení. Zkontrolujte internet a zkuste to znovu.';
+      errEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+    });
   });
 })();
 </script>

@@ -142,6 +142,7 @@ cat > /etc/nginx/sites-available/nazev-appky << 'EOF'
 server {
     listen 80;
     server_name appka1.tvadomena.cz;
+    client_max_body_size 50M;
 
     location / {
         proxy_pass http://127.0.0.1:800X;

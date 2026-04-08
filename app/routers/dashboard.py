@@ -33,14 +33,15 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
     prev_month_end = month_start - timedelta(days=1)
     prev_month_start = prev_month_end.replace(day=1)
 
-    # --- Faktury (filter by DUZP) ---
+    # --- Faktury (příjmy = uhrazené, filtr dle paid_date) ---
     all_invoices = db.query(Invoice).filter(Invoice.status != "Stornována").all()
+    paid_invoices = [i for i in all_invoices if i.status == "Uhrazena" and i.paid_date]
 
-    invoices_month = [i for i in all_invoices if i.duzp and i.duzp >= month_start]
-    invoices_year = [i for i in all_invoices if i.duzp and i.duzp >= year_start]
+    invoices_month = [i for i in paid_invoices if i.paid_date >= month_start]
+    invoices_year = [i for i in paid_invoices if i.paid_date >= year_start]
     invoices_prev_month = [
-        i for i in all_invoices
-        if i.duzp and prev_month_start <= i.duzp <= prev_month_end
+        i for i in paid_invoices
+        if prev_month_start <= i.paid_date <= prev_month_end
     ]
 
     income_month_total = sum(i.total for i in invoices_month)
@@ -48,8 +49,12 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
     income_year_total = sum(i.total for i in invoices_year)
     income_year_base = sum(i.subtotal for i in invoices_year)
 
-    # Daň na výstupu předchozí měsíc (VAT from invoices)
-    vat_output_prev = sum(i.vat_total for i in invoices_prev_month)
+    # Daň na výstupu předchozí měsíc (VAT dle DUZP — pro DPH přiznání)
+    vat_invoices_prev = [
+        i for i in all_invoices
+        if i.duzp and prev_month_start <= i.duzp <= prev_month_end
+    ]
+    vat_output_prev = sum(i.vat_total for i in vat_invoices_prev)
 
     # Neuhrazené faktury
     unpaid = [i for i in all_invoices if i.status == "Vystavena"]
